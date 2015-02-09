@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/16x16/camera_black.png</file>
+        <file>img/16x16/movies.png</file>
+        <file>img/16x16/music.png</file>
+        <file>img/32x32/camera_black.png</file>
+        <file>img/32x32/movies.png</file>
+        <file>img/32x32/music.png</file>
+        <file>img/32x32/sound.png</file>
+        <file>img/32x32/video.png</file>
+        <file>img/32x32/visa_2.png</file>
+        <file>img/32x32/control_play.ico</file>
+        <file>img/16x16/sound.ico</file>
+        <file>img/16x16/control_play.ico</file>
+        <file>img/logo/nodecast.jpg</file>
+        <file>img/24x24/ic_volume_up_24px.svg</file>
+        <file>img/24x24/ic_play_circle_outline_24px.svg</file>
+        <file>img/24x24/ic_photo_camera_24px.svg</file>
+        <file>img/24x24/ic_my_library_music_24px.svg</file>
+        <file>img/24x24/ic_video_collection_24px.svg</file>
+        <file>img/24x24/ic_photo_library_24px.svg</file>
+        <file>img/24x24/ic_add_circle_24px.svg</file>
+        <file>img/24x24/ic_add_circle_outline_24px.svg</file>
+    </qresource>
+</RCC>

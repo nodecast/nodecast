@@ -1,0 +1,7 @@
+<RCC>
+<qresource prefix="/">
+    <file>qss/coffee.qss</file>
+    <file>qss/default.qss</file>
+    <file>qss/pagefold.qss</file>
+</qresource>
+</RCC>

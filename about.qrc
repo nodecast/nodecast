@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>gpl.html</file>
+    </qresource>
+</RCC>
