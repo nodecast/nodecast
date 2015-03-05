@@ -38,10 +38,10 @@ CONFIG += debug
 #PKGCONFIG += libtorrent-rasterbar
 
 # LIBTORRENT DEFINES
-DEFINES += WITH_SHIPPED_GEOIP_H
+#DEFINES += WITH_SHIPPED_GEOIP_H
 DEFINES += BOOST_ASIO_DYN_LINK
 #DEFINES += BOOST_ASIO_SEPARATE_COMPILATION
-DEFINES += WITH_GEOIP_EMBEDDED
+#DEFINES += WITH_GEOIP_EMBEDDED
 
 INCLUDEPATH += /usr/local/include/
 LIBS += -L/usr/local/lib
@@ -55,8 +55,7 @@ LIBS += -L/usr/local/lib
 
 
 LIBS += -ltorrent-rasterbar \
-        -lboost_thread-mt \
-        -lboost_system-mt \
+        -lboost_system \
         -lssl -lcrypto -lidn -lpthread -lz
 
 

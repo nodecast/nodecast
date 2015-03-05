@@ -1183,8 +1183,12 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
   if (resumed) {
     if (loadFastResumeData(hash, buf)) {
       fastResume = true;
-      p.resume_data = buf;
-      qDebug("Successfully loaded fast resume data");
+#if LIBTORRENT_VERSION_NUM < 10000
+            p.resume_data = &buf;
+#else
+            p.resume_data = buf;
+#endif                       
+            qDebug("Successfully loaded fast resume data");
     }
   }
 #if LIBTORRENT_VERSION_NUM < 1600

@@ -1,7 +1,13 @@
 nodecast
 ========
 
-On Mac OSX :
+Ubuntu :
+========
+
+apt-get install libtorrent-rasterbar-dev libboost-all-dev libidn11-dev
+
+Mac OSX :
+========
 
 brew install boost
 brew install openssl

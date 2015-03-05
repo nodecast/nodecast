@@ -111,8 +111,8 @@ void Widgettorrent::on_media_doubleClicked()
     program = "open";
     arguments << "-a" << Preferences().getVideoPlayer() << Preferences().getSavePath() + "/" + m_torrent.name();
 #else
-    program = settings.value("player").toString();
-    arguments << settings.value("data").toString() + video;
+    program = Preferences().getVideoPlayer();
+    arguments << Preferences().getSavePath() + "/" + m_torrent.name();
 #endif
 
     qDebug() << "program : " << program;

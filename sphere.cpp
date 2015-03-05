@@ -27,7 +27,7 @@ Sphere::Sphere(Sphere_data data, QWidget *parent)
         media_container = new QWidget(media_scroll);
         flowLayout = new FlowLayout(media_container);
 
-        //Widgettorrent::populate(flowLayout);
+        Widgettorrent::populate(flowLayout);
         media_scroll->setWidget(media_container);
 
         break;
@@ -41,7 +41,7 @@ Sphere::Sphere(Sphere_data data, QWidget *parent)
         media_container = new QWidget(media_scroll);
         flowLayout = new FlowLayout(media_container);
 
-        Widgettorrent::populate(flowLayout);
+        //Widgettorrent::populate(flowLayout);
         media_scroll->setWidget(media_container);
 
         view = new QWebView();
