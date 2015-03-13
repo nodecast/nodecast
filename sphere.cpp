@@ -3,7 +3,7 @@
 
 int Sphere::index = 0;
 
-Sphere::Sphere(Sphere_data data, QWidget *parent)
+Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
         : QAbstractButton(parent), sphere_data(data)
 {
 
@@ -14,21 +14,23 @@ Sphere::Sphere(Sphere_data data, QWidget *parent)
 
   //  data.title.isEmpty()? m_title = data.title : m_title = "";
 
+   // content = new QWidget(parent);
+
 
     switch(sphere_data.scope)
-    {    
+    {
     case Sphere_scope::PRIVATE :
         m_color = new QColor(105,105,105);
-        content = new QWidget(parent);
 
-        media_scroll = new QScrollArea(content);
+        media_scroll = new QScrollArea();
         media_scroll->setWidgetResizable(true);
         media_scroll->setFrameStyle(QFrame::NoFrame);
         media_container = new QWidget(media_scroll);
         flowLayout = new FlowLayout(media_container);
 
-        Widgettorrent::populate(flowLayout);
         media_scroll->setWidget(media_container);
+        index_tab = parent->addWidget(media_scroll);
+        qDebug() << "INDEX TAB : " << index_tab;
 
         break;
 
@@ -41,7 +43,6 @@ Sphere::Sphere(Sphere_data data, QWidget *parent)
         media_container = new QWidget(media_scroll);
         flowLayout = new FlowLayout(media_container);
 
-        //Widgettorrent::populate(flowLayout);
         media_scroll->setWidget(media_container);
 
         view = new QWebView();
@@ -54,15 +55,22 @@ Sphere::Sphere(Sphere_data data, QWidget *parent)
         view->load(QUrl(sphere_data.url));
 
 
-        hSplitter = new QSplitter(Qt::Vertical, parent);
+        hSplitter = new QSplitter(Qt::Vertical);
         hSplitter->addWidget(view);
         hSplitter->addWidget(media_scroll);
+
+        index_tab = parent->addWidget(hSplitter);
+        qDebug() << "INDEX TAB : " << index_tab;
 
         break;
 
     case Sphere_scope::FIXED :
         m_color = new QColor(100, 143, 000);
-        content = new QWidget(parent);
+        content = new QWidget();
+
+        index_tab = parent->addWidget(content);
+        qDebug() << "INDEX TAB : " << index_tab;
+
         break;
     }
 
@@ -180,4 +188,12 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     Widgettorrent *wt = new Widgettorrent();
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
+}
+
+
+
+void Sphere::populate()
+{
+    qDebug() << "Sphere::polulate";
+    Widgettorrent::populate(flowLayout);
 }

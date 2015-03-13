@@ -78,8 +78,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Populate the transfer list
     transferList->getSourceModel()->populate();
 
-    connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), this, SLOT(addTorrent(QTorrentHandle)));
-    connect(QBtSession::instance(), SIGNAL(newDownloadedTorrent(QString, QString)), this, SLOT(processDownloadedFiles(QString, QString)));
+    //connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), this, SLOT(addTorrent(QTorrentHandle)));
+    //connect(QBtSession::instance(), SIGNAL(newDownloadedTorrent(QString, QString)), this, SLOT(processDownloadedFiles(QString, QString)));
 
 
 
@@ -92,47 +92,49 @@ MainWindow::MainWindow(QWidget *parent) :
     snowden.title =  "snowden";
     snowden.scope = Sphere_scope::FIXED;
 
-    m_spheres_private.append( new Sphere(snowden, this) );
+    m_spheres_private.append( new Sphere(snowden, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
     connect(m_spheres_private.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    //sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    sphere_tab.insert(m_spheres_private.last()->index_tab, m_spheres_private.last());
 
 
 
     Sphere_data test;
     test.title =  "test";
     test.scope = Sphere_scope::PRIVATE;
-    m_spheres_private.append( new Sphere(test, this) );
+    m_spheres_private.append( new Sphere(test, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
     connect(m_spheres_private.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    sphere_tab.insert(m_spheres_private.last()->index_tab, m_spheres_private.last());
 
+    m_spheres_private.last()->populate();
 
 
     Sphere_data famille;
     famille.title =  "famille";
     famille.scope = Sphere_scope::PRIVATE;
-    m_spheres_private.append( new Sphere(famille, this) );
+    m_spheres_private.append( new Sphere(famille, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
     connect(m_spheres_private.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    sphere_tab.insert(m_spheres_private.last()->index_tab, m_spheres_private.last());
 
 
     Sphere_data taff;
     taff.title =  "taff";
     taff.scope = Sphere_scope::PRIVATE;
-    m_spheres_private.append( new Sphere(taff, this) );
+    m_spheres_private.append( new Sphere(taff, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
     connect(m_spheres_private.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    sphere_tab.insert(m_spheres_private.last()->index_tab, m_spheres_private.last());
 
     Sphere_data potes;
     potes.title =  "potes";
     potes.scope = Sphere_scope::PRIVATE;
-    m_spheres_private.append( new Sphere(potes, this) );
+    m_spheres_private.append( new Sphere(potes, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
     connect(m_spheres_private.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
+    sphere_tab.insert(m_spheres_private.last()->index_tab, m_spheres_private.last());
 
 
     //ui->verticalLayout_sphereprivate->addWidget(m_spheres_private_list_widget);
@@ -140,20 +142,22 @@ MainWindow::MainWindow(QWidget *parent) :
     Sphere_data halloffame;
     halloffame.title =  "hall of fame";
     halloffame.scope = Sphere_scope::FIXED;
-    m_spheres_public.append( new Sphere(halloffame, this) );
+    m_spheres_public.append( new Sphere(halloffame, m_stacked_tab_medias) );
     ui->verticalLayout_spherepublic->addWidget(m_spheres_public.last());
     connect(m_spheres_public.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_public.last()->content), m_spheres_private.last());
+    sphere_tab.insert( m_spheres_public.last()->index_tab, m_spheres_private.last());
 
 
     Sphere_data debian;
     debian.title =  "debian";
     debian.scope = Sphere_scope::PUBLIC;
     debian.url = "http://debian.org";
-    m_spheres_public.append( new Sphere(debian, this) );
+    m_spheres_public.append( new Sphere(debian, m_stacked_tab_medias) );
     ui->verticalLayout_spherepublic->addWidget(m_spheres_public.last());
     connect(m_spheres_public.last(), SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_public.last()->hSplitter), m_spheres_private.last());
+    sphere_tab.insert( m_spheres_public.last()->index_tab, m_spheres_private.last());
+
+    //m_spheres_public.last()->populate();
 
 
     hSplitter->insertWidget(0, m_stacked_tab_medias);
@@ -816,7 +820,7 @@ void MainWindow::on_pushButton_spherenew_clicked()
         spublic.title =  "public";
         spublic.scope = Sphere_scope::PUBLIC;
 
-        Sphere *sphere = new Sphere(spublic, this);
+        Sphere *sphere = new Sphere(spublic, m_stacked_tab_medias);
         ui->verticalLayout_spherepublic->addWidget(sphere);
     }
 
@@ -866,7 +870,7 @@ void MainWindow::refresh_spheres(QVariantMap sphere)
     sprivate.title = sphere["spherename"].toString();
     sprivate.scope = Sphere_scope::PRIVATE;
 
-    m_spheres_private.append( new Sphere(sprivate, this));
+    m_spheres_private.append( new Sphere(sprivate, m_stacked_tab_medias));
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private.last());
 
 

@@ -470,7 +470,12 @@ QString fsutils::QDesktopServicesDownloadLocation() {
 #endif
 
   // Fallback
-  return QDir::home().absoluteFilePath(tr("Downloads"));
+  //return QDir::home().absoluteFilePath(tr("Downloads"));
+
+  QDir home = QDir::home();
+  home.mkdir("nodecast");
+  return QDir::home().absoluteFilePath("nodecast");
+
 }
 
 QString fsutils::searchEngineLocation() {

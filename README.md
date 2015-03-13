@@ -4,7 +4,7 @@ nodecast
 Ubuntu :
 ========
 
-apt-get install libtorrent-rasterbar-dev libboost-all-dev libidn11-dev
+apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev
 
 Mac OSX :
 ========

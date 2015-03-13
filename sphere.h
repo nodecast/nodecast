@@ -26,19 +26,23 @@ class Sphere : public QAbstractButton
 {
     Q_OBJECT
 public:
-    Sphere(Sphere_data data, QWidget *parent = 0);
+    Sphere(Sphere_data data, QStackedWidget *parent = 0);
     ~Sphere();
     void addTorrent(const QTorrentHandle &h);
+    void populate();
     virtual QSize sizeHint() const;
-    QWidget *content;
-    QSplitter *hSplitter;
-    FlowLayout *flowLayout;
+    int index_tab;
 
 protected:
     virtual void paintEvent(QPaintEvent *e);
     //virtual void mousePressEvent(QMouseEvent * e);
 
 private:
+    FlowLayout *flowLayout;
+    QSplitter *hSplitter;
+    QScrollArea *media_scroll;
+    QWidget *content;
+
     QColor *m_color;
     static int index;
     int m_index;
@@ -46,7 +50,6 @@ private:
     int mFirstY;
     QString m_title;
     QWebView *view;
-    QScrollArea *media_scroll;
     QWidget *media_container;
     Sphere_data sphere_data;
 
