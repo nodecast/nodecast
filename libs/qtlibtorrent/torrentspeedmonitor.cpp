@@ -209,7 +209,7 @@ void TorrentSpeedMonitor::saveStats() const {
   if (!(dirty && (QDateTime::currentMSecsSinceEpoch() - lastWrite >= 15*60*1000) ))
 #endif
     return;
-  QIniSettings s("qBittorrent", "qBittorrent-data");
+  QIniSettings s("pcode", "nodecast-data");
   QVariantHash v;
   v.insert("AlltimeDL", alltimeDL + sessionDL);
   v.insert("AlltimeUL", alltimeUL + sessionUL);
@@ -228,7 +228,7 @@ void TorrentSpeedMonitor::loadStats() {
   // from the old file. This code should be removed after some time has passed.
   // e.g. When we reach v3.3.0
   QIniSettings s_old;
-  QIniSettings s("qBittorrent", "qBittorrent-data");
+  QIniSettings s("pcode", "nodecast-data");
   QVariantHash v;
 
   // Let's test if the qbittorrent.ini holds the key

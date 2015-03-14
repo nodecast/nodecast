@@ -407,7 +407,7 @@ void QBtSession::configureSession() {
   }
   // * Session settings
   session_settings sessionSettings = s->settings();
-  sessionSettings.user_agent = "qBittorrent " VERSION;
+  sessionSettings.user_agent = "nodecast " VERSION;
   //std::cout << "HTTP user agent is " << sessionSettings.user_agent << std::endl;
   addConsoleMessage(tr("HTTP user agent is %1").arg(misc::toQString(sessionSettings.user_agent)));
 
@@ -2015,7 +2015,7 @@ void QBtSession::setListeningPort(int port) {
   const QString iface_name = pref.getNetworkInterface();
   const bool listen_ipv6 = pref.getListenIPv6();
   if (iface_name.isEmpty()) {
-    addConsoleMessage(tr("qBittorrent is trying to listen on any interface port: TCP/%1", "e.g: qBittorrent is trying to listen on any interface port: TCP/6881").arg(QString::number(port)), "blue");
+    addConsoleMessage(tr("nodecast is trying to listen on any interface port: TCP/%1", "e.g: nodecast is trying to listen on any interface port: TCP/6881").arg(QString::number(port)), "blue");
     if (listen_ipv6)
 #if LIBTORRENT_VERSION_NUM >= 1600
       s->listen_on(ports, ec, "::", session::listen_no_system_port);
@@ -2031,7 +2031,7 @@ void QBtSession::setListeningPort(int port) {
 
 #if LIBTORRENT_VERSION_NUM >= 1600
     if (ec)
-      addConsoleMessage(tr("qBittorrent failed to listen on any interface port: %1. Reason: %2", "e.g: qBittorrent failed to listen on any interface port: TCP/6881. Reason: no such interface" ).arg(QString::number(port)).arg(misc::toQStringU(ec.message())), "red");
+      addConsoleMessage(tr("nodecast failed to listen on any interface port: %1. Reason: %2", "e.g: nodecast failed to listen on any interface port: TCP/6881. Reason: no such interface" ).arg(QString::number(port)).arg(misc::toQStringU(ec.message())), "red");
 #endif
 
     return;
@@ -2057,11 +2057,11 @@ void QBtSession::setListeningPort(int port) {
     if (s->listen_on(ports, entry.ip().toString().toAscii().constData())) {
 #endif
       ip = entry.ip().toString();
-      addConsoleMessage(tr("qBittorrent is trying to listen on interface %1 port: TCP/%2", "e.g: qBittorrent is trying to listen on interface 192.168.0.1 port: TCP/6881").arg(ip).arg(QString::number(port)), "blue");
+      addConsoleMessage(tr("nodecast is trying to listen on interface %1 port: TCP/%2", "e.g: nodecast is trying to listen on interface 192.168.0.1 port: TCP/6881").arg(ip).arg(QString::number(port)), "blue");
       return;
     }
   }
-  addConsoleMessage(tr("qBittorrent didn't find an %1 local address to listen on", "qBittorrent didn't find an IPv4 local address to listen on").arg(listen_ipv6 ? "IPv6" : "IPv4"), "red");
+  addConsoleMessage(tr("nodecast didn't find an %1 local address to listen on", "nodecast didn't find an IPv4 local address to listen on").arg(listen_ipv6 ? "IPv6" : "IPv4"), "red");
 }
 
 // Set download rate limit
@@ -2283,7 +2283,7 @@ void QBtSession::autoRunExternalProgram(const QTorrentHandle &h) {
 //  content += tr("Torrent size: %1").arg(misc::friendlyUnit(h.actual_size())) + "\n";
 //  content += tr("Save path: %1").arg(TorrentPersistentData::getSavePath(h.hash())) + "\n\n";
 //  content += tr("The torrent was downloaded in %1.", "The torrent was downloaded in 1 hour and 20 seconds").arg(misc::userFriendlyDuration(h.active_time())) + "\n\n\n";
-//  content += tr("Thank you for using qBittorrent.") + "\n";
+//  content += tr("Thank you for using nodecast.") + "\n";
 //  // Send the notification email
 //  Smtp *sender = new Smtp(this);
 //  sender->sendMail("notification@qbittorrent.org", Preferences().getMailNotificationEmail(), tr("[qBittorrent] %1 has finished downloading").arg(h.name()), content);
@@ -2727,7 +2727,7 @@ void QBtSession::readAlerts() {
       else if (listen_succeeded_alert *p = dynamic_cast<listen_succeeded_alert*>(a.get())) {
         boost::system::error_code ec;
         qDebug() << "Successfully listening on" << p->endpoint.address().to_string(ec).c_str() << "/" << p->endpoint.port();
-        addConsoleMessage(tr("qBittorrent is successfully listening on interface %1 port: TCP/%2", "e.g: qBittorrent is successfully listening on interface 192.168.0.1 port: TCP/6881").arg(p->endpoint.address().to_string(ec).c_str()).arg(QString::number(p->endpoint.port())), "blue");
+        addConsoleMessage(tr("nodecast is successfully listening on interface %1 port: TCP/%2", "e.g: nodecast is successfully listening on interface 192.168.0.1 port: TCP/6881").arg(p->endpoint.address().to_string(ec).c_str()).arg(QString::number(p->endpoint.port())), "blue");
         // Force reannounce on all torrents because some trackers blacklist some ports
         std::vector<torrent_handle> torrents = s->get_torrents();
 
@@ -2740,7 +2740,7 @@ void QBtSession::readAlerts() {
       else if (listen_failed_alert *p = dynamic_cast<listen_failed_alert*>(a.get())) {
         boost::system::error_code ec;
         qDebug() << "Failed listening on" << p->endpoint.address().to_string(ec).c_str() << "/" << p->endpoint.port();
-        addConsoleMessage(tr("qBittorrent failed listening on interface %1 port: TCP/%2. Reason: %3", "e.g: qBittorrent failed listening on interface 192.168.0.1 port: TCP/6881. Reason: already in use").arg(p->endpoint.address().to_string(ec).c_str()).arg(QString::number(p->endpoint.port())).arg(misc::toQStringU(p->error.message())), "red");
+        addConsoleMessage(tr("nodecast failed listening on interface %1 port: TCP/%2. Reason: %3", "e.g: nodecast failed listening on interface 192.168.0.1 port: TCP/6881. Reason: already in use").arg(p->endpoint.address().to_string(ec).c_str()).arg(QString::number(p->endpoint.port())).arg(misc::toQStringU(p->error.message())), "red");
       }
       else if (torrent_checked_alert* p = dynamic_cast<torrent_checked_alert*>(a.get())) {
         QTorrentHandle h(p->handle);

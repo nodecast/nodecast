@@ -210,7 +210,7 @@ void misc::shutdownComputer(shutDownAction action) {
   else if (action == HIBERNATE_COMPUTER)
     SetSuspendState(true, false, false);
   else
-    InitiateSystemShutdownA(0, QCoreApplication::translate("misc", "qBittorrent will shutdown the computer now because all downloads are complete.").toLocal8Bit().data(), 10, true, false);
+    InitiateSystemShutdownA(0, QCoreApplication::translate("misc", "nodecast will shutdown the computer now because all downloads are complete.").toLocal8Bit().data(), 10, true, false);
 
   // Disable shutdown privilege.
   tkp.Privileges[0].Attributes = 0;

@@ -97,7 +97,7 @@ public:
           display = tr("Downloading metadata", "used when loading a magnet link");
           break;
         case TorrentModelItem::STATE_ALLOCATING:
-          display = tr("Allocating", "qBittorrent is allocating the files on disk");
+          display = tr("Allocating", "nodecast is allocating the files on disk");
           break;
         case TorrentModelItem::STATE_PAUSED_DL:
         case TorrentModelItem::STATE_PAUSED_UP:
