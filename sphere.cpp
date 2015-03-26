@@ -226,5 +226,5 @@ void Sphere::addTorrent(const QTorrentHandle &h)
 void Sphere::populate()
 {
     qDebug() << "Sphere::polulate";
-    Widgettorrent::populate(flowLayout);
+    Widgettorrent::populate(sphere_data.title, flowLayout);
 }

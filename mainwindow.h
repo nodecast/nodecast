@@ -160,8 +160,8 @@ private:
     QSplitter *hSplitter;
     QSplitter *vSplitter;
 
-    QList<Sphere *> m_spheres_private;
-    QList<Sphere *> m_spheres_public;
+    QHash<QString, Sphere *> m_spheres_private;
+    QHash<QString, Sphere *> m_spheres_public;
     QHash<int, Sphere *> sphere_tab;
 
     QThread *thread_torrent;

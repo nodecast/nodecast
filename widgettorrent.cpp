@@ -42,7 +42,7 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 }
 
 
-void Widgettorrent::populate(QLayout *parent)
+void Widgettorrent::populate( QString title, QLayout *parent)
 {
 
     std::vector<libtorrent::torrent_handle> torrents = QBtSession::instance()->getSession()->get_torrents();
@@ -54,11 +54,22 @@ void Widgettorrent::populate(QLayout *parent)
         const QTorrentHandle h(*it);
         //    if (HiddenData::hasData(h.hash()))
         //      continue;
+
+        // get path
+        qDebug() << "SAVE PATH : "<< h.save_path();
+
+        QString path = h.save_path();
+
+        if (!path.contains(title, Qt::CaseSensitive)) continue;
+
+
+            qDebug() << "PATH : " << path << " TITLE " << title;
         Widgettorrent *wt = new Widgettorrent();
         parent->addWidget(wt);
         qDebug() << "Widgettorrent::populate";
         wt->addTorrent(h);
-        QObject::connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), wt, SLOT(addTorrent(QTorrentHandle)));
+       // QObject::connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), wt, SLOT(addTorrent(QTorrentHandle)));
+
     }
 
 }
@@ -185,7 +196,7 @@ void Widgettorrent::on_media_doubleClicked()
 
 void Widgettorrent::addTorrent(const QTorrentHandle &h)
 {
-
+    qDebug() << "Widgettorrent::addedTorrent";
     connect(this, SIGNAL(emit_title()), this, SLOT(on_media_doubleClicked()));
 
     m_torrent = h;

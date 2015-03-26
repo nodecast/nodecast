@@ -25,7 +25,7 @@ public:
     explicit Widgettorrent();
     ~Widgettorrent();    
 //    void populate();
-    static void populate(QLayout *parent = 0);
+    static void populate(QString title, QLayout *parent = 0);
     static void unckeck_widget_selected(Widgettorrent *wt);
 
 

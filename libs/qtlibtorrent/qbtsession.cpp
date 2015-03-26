@@ -1080,6 +1080,7 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
   QTorrentHandle h;
   Preferences pref;
 
+
   // Check if BT_backup directory exists
   const QDir torrentBackup(fsutils::BTBackupLocation());
   if (!torrentBackup.exists()) {
@@ -1262,6 +1263,8 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
 
     // Backup torrent file
     const QString newFile = torrentBackup.absoluteFilePath(hash + ".torrent");
+    //const QString newFile = torrentBackup.absoluteFilePath(misc::toQString(t->info_hash()) + ".torrent");
+
     if (path != newFile)
       QFile::copy(path, newFile);
     // Copy the torrent file to the export folder
@@ -1740,6 +1743,9 @@ void QBtSession::saveFastResumeData() {
   std::vector<torrent_handle>::iterator torrentITend = torrents.end();
   for ( ; torrentIT != torrentITend; ++torrentIT) {
     QTorrentHandle h = QTorrentHandle(*torrentIT);
+    qDebug() << "BEFORE HANDLE1 : " << misc::toQString(h.info_hash());
+    QString h_status = h.is_valid()? "H IS VALID" : "H NOT VALID";
+    qDebug() << "H VALID ? :" << h_status;
     if (!h.is_valid())
       continue;
     try {
@@ -1783,13 +1789,22 @@ void QBtSession::saveFastResumeData() {
     if (!rd->resume_data) continue;
     QDir torrentBackup(fsutils::BTBackupLocation());
     const QTorrentHandle h(rd->handle);
+    qDebug() << "AFTER HANDLE2 : " << misc::toQString(h.info_hash());
+
     if (!h.is_valid()) continue;
     try {
       // Remove old fastresume file if it exists
       backupPersistentData(h.hash(), rd->resume_data);
       vector<char> out;
       bencode(back_inserter(out), *rd->resume_data);
-      const QString filepath = torrentBackup.absoluteFilePath(h.hash()+".fastresume");
+//      const QString filepath = torrentBackup.absoluteFilePath(h.hash()+".fastresume");
+      // fixed file name of .fastresume
+      torrent_info const& ti = h.get_torrent_info();
+      qDebug() << "REAL HASH ? : " << misc::toQString(ti.info_hash());
+      qDebug() << "HASH BREAK : " << h.hash();
+      //it  should be the same hash ... I suppose
+
+      const QString filepath = torrentBackup.absoluteFilePath(misc::toQString(ti.info_hash())+".fastresume");
       QFile resume_file(filepath);
       if (resume_file.exists())
         fsutils::forceRemove(filepath);
@@ -2415,7 +2430,11 @@ void QBtSession::readAlerts() {
         const QDir torrentBackup(fsutils::BTBackupLocation());
         const QTorrentHandle h(p->handle);
         if (h.is_valid() && p->resume_data) {
-          const QString filepath = torrentBackup.absoluteFilePath(h.hash()+".fastresume");
+//          const QString filepath = torrentBackup.absoluteFilePath(h.hash()+".fastresume");
+         // fixed file name of .fastresume
+          torrent_info const& ti = h.get_torrent_info();
+          const QString filepath = torrentBackup.absoluteFilePath(misc::toQString(ti.info_hash())+".fastresume");
+
           QFile resume_file(filepath);
           if (resume_file.exists())
             fsutils::forceRemove(filepath);
@@ -2828,6 +2847,7 @@ QString QBtSession::getSavePath(const QString &hash, bool fromScanDir, QString f
       if (fromScanDir && m_scanFolders->downloadInTorrentFolder(filePath)) {
         savePath = QFileInfo(filePath).dir().path();
       } else {
+          qDebug() << "DEFAULT SAVE PATH : " << defaultSavePath;
         savePath = defaultSavePath;
       }
     }
