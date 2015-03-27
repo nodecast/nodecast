@@ -44,8 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
    // fixNativeWindow( this );
 #endif
 
-
-
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(shutdownCleanUp()), Qt::DirectConnection);
 
     // hide tchat room
@@ -203,7 +201,11 @@ void MainWindow::addTorrent(const QTorrentHandle &h)
     QString sphere = sphere_path.takeAt(sphere_path.size()-2);
     qDebug() << "LAST ITEM : " << sphere;
 
+
+    m_stacked_tab_medias->setCurrentIndex(m_spheres_private[sphere]->index_tab);
     m_spheres_private[sphere]->addTorrent(h);
+
+
 
 
 //    Widgettorrent *wt = new Widgettorrent();

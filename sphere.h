@@ -66,6 +66,8 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *e);
+    virtual void dropEvent(QDropEvent* event);
+    virtual void dragEnterEvent(QDragEnterEvent *event);
     //virtual void mousePressEvent(QMouseEvent * e);
 
 private:

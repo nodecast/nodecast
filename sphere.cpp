@@ -114,6 +114,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 //        m_color = new QColor(100, 143, 000);
 
 
+    setAcceptDrops(true);
     setAutoExclusive(true);
     setCheckable(true);
 
@@ -132,6 +133,43 @@ QSize Sphere::sizeHint() const
 
 Sphere::~Sphere()
 {}
+
+
+void Sphere::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+}
+
+void Sphere::dropEvent(QDropEvent* event)
+{
+    QList<QUrl> droppedUrls = event->mimeData()->urls();
+    int droppedUrlCnt = droppedUrls.size();
+
+    for(int i = 0; i < droppedUrlCnt; i++)
+    {
+       QString localPath = droppedUrls[i].toLocalFile();
+       QFileInfo fileInfo(localPath);
+
+       if(fileInfo.isFile())
+       {
+           // file
+           QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+       }
+       else if(fileInfo.isDir())
+       {
+           // directory
+           QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+       }
+       else
+       {
+           // none
+           QMessageBox::information(this, tr("Dropped, but unknown in %1 sphere").arg(sphere_data.title), tr("Unknown: %1").arg(fileInfo.absoluteFilePath()));
+       }
+    }
+
+    event->acceptProposedAction();
+}
 
 
 
@@ -216,6 +254,9 @@ void Sphere::selected()
 
 void Sphere::addTorrent(const QTorrentHandle &h)
 {
+    // active sphere on new torrent
+    this->setChecked(true);
+
     Widgettorrent *wt = new Widgettorrent();
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
