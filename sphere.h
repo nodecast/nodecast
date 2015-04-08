@@ -41,6 +41,7 @@
 
 #include "flowlayout.h"
 #include "widgettorrent.h"
+#include "torrentcreator/torrentcreatordlg.h"
 
 enum class Sphere_scope { PRIVATE, PUBLIC, FIXED};
 
@@ -85,11 +86,13 @@ private:
     QWebView *view;
     QWidget *media_container;
     Sphere_data sphere_data;
+    QPointer<TorrentCreatorDlg> createTorrentDlg;
 
 public slots:
 
 private slots:
     void selected();
+    void addTorrent(QString path);
 
 signals:
     void row(int);

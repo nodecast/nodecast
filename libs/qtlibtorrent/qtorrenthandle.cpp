@@ -82,11 +82,6 @@ QTorrentHandle::QTorrentHandle(const torrent_handle& h): torrent_handle(h) {}
 
 QString QTorrentHandle::hash() const {
   return misc::toQString(torrent_handle::info_hash());
-    // try to fix inconsistence hash from handle ...
-//    std::cout << "INFO HASH torrent_handle : " << torrent_handle::info_hash() << std::endl;
- //   torrent_info const& ti = torrent_handle::get_torrent_info();
- //   std::cout << "INFO HASH torrent_info : " << ti.info_hash() << std::endl;
- //   return misc::toQString(ti.info_hash());
 }
 
 QString QTorrentHandle::name() const {

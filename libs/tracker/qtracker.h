@@ -1,5 +1,6 @@
 /*
- * Bittorrent Client using Qt4 and libtorrent.
+ * Bittorrent Client using Qt and libtorrent.
+ * Copyright (C) 2015  Vladimir Golovnev <glassez@yandex.ru>
  * Copyright (C) 2010  Christophe Dumez
  *
  * This program is free software; you can redistribute it and/or
@@ -31,13 +32,33 @@
 #ifndef QTRACKER_H
 #define QTRACKER_H
 
-#include <QTcpSocket>
-#include <QHostAddress>
+#include <libtorrent/entry.hpp>
 #include <QHash>
-#include <QUrlQuery>
+#include "http/types.h"
+#include "http/responsebuilder.h"
+#include "http/irequesthandler.h"
 
-#include "trackerannouncerequest.h"
-#include "qpeer.h"
+struct QPeer
+{
+    QString ip;
+    QString peer_id;
+    int port;
+
+    bool operator!=(const QPeer &other) const;
+    bool operator==(const QPeer &other) const;
+    QString qhash() const;
+    libtorrent::entry toEntry(bool no_peer_id) const;
+};
+
+struct TrackerAnnounceRequest
+{
+    QString info_hash;
+    QString event;
+    int numwant;
+    QPeer peer;
+    // Extensions
+    bool no_peer_id;
+};
 
 // static limits
 const int MAX_TORRENTS = 100;
@@ -47,44 +68,31 @@ const int ANNOUNCE_INTERVAL = 1800; // 30min
 typedef QHash<QString, QPeer> PeerList;
 typedef QHash<QString, PeerList> TorrentList;
 
-/* Basic Bittorrent tracker implementation in Qt4 */
+namespace Http { class Server; }
+
+/* Basic Bittorrent tracker implementation in Qt */
 /* Following http://wiki.theory.org/BitTorrent_Tracker_Protocol */
-class QTracker : public QObject
+class QTracker : public Http::ResponseBuilder, public Http::IRequestHandler
 {
-  Q_OBJECT
-  Q_DISABLE_COPY(QTracker)
+    Q_OBJECT
+    Q_DISABLE_COPY(QTracker)
 
 public:
-  explicit QTracker(int socketDescriptor, QObject *parent = 0);
-  ~QTracker();
-  bool start();
+    explicit QTracker(QObject *parent = 0);
+    ~QTracker();
 
-
-signals:
-  void error(QTcpSocket::SocketError socketError);
-
-
-public slots:
-    void init();
-
-protected slots:
-    void discardClient();
-
-    void readRequest();
-    //void handlePeerConnection();
-    void respondInvalidRequest(int code, QString msg);
-    void respondToAnnounceRequest(const QHash<QString, QString>& get_parameters);
-    void ReplyWithPeerList(const TrackerAnnounceRequest &annonce_req);
+    bool start();
+    Http::Response processRequest(const Http::Request &request, const Http::Environment &env);
 
 private:
-  void sendToSocket();
-  std::string hex_decode(const std::string &in);
-  //QString getkey(QUrl url, QString key, bool &error, bool fixed_size=false);
+    void respondToAnnounceRequest();
+    void replyWithPeerList(const TrackerAnnounceRequest &annonce_req);
 
+    Http::Server *m_server;
+    TorrentList m_torrents;
 
-  TorrentList m_torrents;
-  QTcpSocket *tcpSocket;
-  int socketDescriptor;
+    Http::Request m_request;
+    Http::Environment m_env;
 };
 
 #endif // QTRACKER_H

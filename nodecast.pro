@@ -21,21 +21,32 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
 
 OBJECTIVE_SOURCES += osxutil.mm
 
+DEFINES += QT_NO_CAST_TO_ASCII
+# Fast concatenation (Qt >= 4.6)
+DEFINES += QT_USE_FAST_CONCATENATION QT_USE_FAST_OPERATOR_PLUS
+
+# Fixes compilation with Boost >= v1.46 where boost
+# filesystem v3 is the default.
+DEFINES += BOOST_FILESYSTEM_VERSION=2
 
 include(libs/qtlibtorrent/qtlibtorrent.pri)
 include(libs/tracker/tracker.pri)
 include(libs/geoip/geoip.pri)
 include(preferences/preferences.pri)
+include(torrentcreator/torrentcreator.pri)
 # VERSION DEFINES
 include(version.pri)
 
+
+QMAKE_CXXFLAGS += -Wformat -Wformat-security
+QMAKE_LFLAGS_APP += -rdynamic
 
 # Use pkg-config to get all necessary libtorrent DEFINES
 CONFIG += link_pkgconfig
 CONFIG += c++11
 CONFIG += debug
 
-#PKGCONFIG += libtorrent-rasterbar
+PKGCONFIG += libtorrent-rasterbar
 
 # LIBTORRENT DEFINES
 #DEFINES += WITH_SHIPPED_GEOIP_H
@@ -54,8 +65,7 @@ LIBS += -L/usr/local/lib
 #LIBS += /usr/local/lib/libtorrent-rasterbar.a
 
 
-LIBS += -ltorrent-rasterbar \
-        -lboost_system \
+LIBS += -lboost_system \
         -lssl -lcrypto -lidn -lpthread -lz
 
 
@@ -115,7 +125,8 @@ HEADERS  += mainwindow.h \
     account.h \
     godcast_api.h \
     newsphere.h \
-    sphere.h
+    sphere.h \
+    torrentcreatorthread.h
 
 FORMS    += mainwindow.ui \
     video.ui \
@@ -153,3 +164,5 @@ RESOURCES += \
 #DEPENDPATH += $$PWD/../../../../../../usr/local/lib
 
 #macx: PRE_TARGETDEPS += $$PWD/../../../../../../usr/local/lib/libtorrent-rasterbar.a
+
+OTHER_FILES +=

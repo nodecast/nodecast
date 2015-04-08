@@ -1,6 +1,9 @@
 nodecast
 ========
 
+Nodecast is a file sharing software using bittorrent protocol and based on qBitorrent code.
+It aims to be really simple by using spheres and respectful of private life.
+
 Ubuntu :
 ========
 

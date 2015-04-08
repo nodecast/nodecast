@@ -365,6 +365,23 @@ QString fsutils::expandPath(const QString& path) {
   return QDir::cleanPath(path);
 }
 
+bool fsutils::createLink(const QString& filename_source, const QString& filename_target) {
+  qDebug() << "CREATE LINK source : " << filename_source << " TARGET : " << filename_target;
+  QFile f(filename_source);
+  if (!f.exists())
+    return false;
+
+  QString extension, target;
+
+#ifdef Q_WS_WIN
+  extension = ".lnk";
+#endif
+
+  target = filename_target + extension;
+  return QFile::link(filename_source, target);
+}
+
+
 QString fsutils::QDesktopServicesDataLocation() {
 #ifdef Q_WS_WIN
   LPWSTR path=new WCHAR[256];
@@ -482,8 +499,10 @@ QString fsutils::QDesktopServicesDownloadLocation() {
 
   QDir home = QDir::home();
   home.mkdir("nodecast");
-  return QDir::home().absoluteFilePath("nodecast");
-
+  QString nodecast = home.absolutePath() + "/nodecast";
+  QDir spheres = nodecast;
+  spheres.mkdir("spheres");
+  return spheres.absoluteFilePath("spheres");
 }
 
 QString fsutils::searchEngineLocation() {

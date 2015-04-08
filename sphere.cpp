@@ -31,7 +31,6 @@
 
 #include "sphere.h"
 
-
 int Sphere::index = 0;
 
 Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
@@ -151,15 +150,32 @@ void Sphere::dropEvent(QDropEvent* event)
        QString localPath = droppedUrls[i].toLocalFile();
        QFileInfo fileInfo(localPath);
 
+       QString target_link = fsutils::QDesktopServicesDownloadLocation() + "/private/" + sphere_data.title + "/" + fileInfo.fileName();
+
+       QFileInfo fileInfoLink(target_link);
+
+       bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
+       QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
+       qDebug() << link_status;
+       if (!check_link)
+       {
+           QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+           return;
+       }
+
        if(fileInfo.isFile())
        {
            // file
-           QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.title, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
+           //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else if(fileInfo.isDir())
        {
            // directory
-           QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.title, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
+           //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else
        {
@@ -171,6 +187,12 @@ void Sphere::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
+
+
+void Sphere::addTorrent(QString path)
+{
+  QBtSession::instance()->addTorrent(path);
+}
 
 
 void Sphere::paintEvent(QPaintEvent *e)

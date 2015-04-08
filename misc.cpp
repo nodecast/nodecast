@@ -87,6 +87,35 @@ static struct { const char *source; const char *comment; } units[] = {
   QT_TRANSLATE_NOOP3("misc", "TiB", "tebibytes (1024 gibibytes)")
 };
 
+QString misc::toQString(const std::string &str)
+{
+    return QString::fromLocal8Bit(str.c_str());
+}
+
+QString misc::toQString(const char* str)
+{
+    return QString::fromLocal8Bit(str);
+}
+
+QString misc::toQStringU(const std::string &str)
+{
+    return QString::fromUtf8(str.c_str());
+}
+
+QString misc::toQStringU(const char* str)
+{
+    return QString::fromUtf8(str);
+}
+
+QString misc::toQString(const libtorrent::sha1_hash &hash)
+{
+    //qDebug() << "misc::toQString(const libtorrent::sha1_hash &hash)";
+    //std::cout << "misc::toQString(const libtorrent::sha1_hash &hash) : " << hash << std::endl;
+    char out[41];
+    libtorrent::to_hex((char const*)&hash[0], libtorrent::sha1_hash::size, out);
+    return QString(out);
+}
+
 #ifndef DISABLE_GUI
 void misc::shutdownComputer(shutDownAction action) {
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
@@ -677,4 +706,31 @@ QString misc::accurateDoubleToString(const double &n, const int &precision, bool
     return QLocale::system().toString(std::floor(n*prec)/prec, 'f', precision);
   else
     return QString::number(std::floor(n*prec)/prec, 'f', precision);
+}
+
+
+
+void misc::loadBencodedFile(const QString &filename, std::vector<char> &buffer, libtorrent::lazy_entry &entry, libtorrent::error_code &ec)
+{
+    int pos = -1;
+    int ret;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) return;
+    const qint64 content_size = file.bytesAvailable();
+    if (content_size <= 0) return;
+    buffer.resize(content_size);
+    file.read(&buffer[0], content_size);
+    // bdecode
+    ret = lazy_bdecode(&buffer[0], &buffer[0] + buffer.size(), entry, ec, &pos);
+
+    //ret = lazy_bdecode(&buf[0], &buf[0] + buf.size(), e, ec, &pos
+    //    , depth_limit, item_limit);
+
+    if (ret != 0)
+      {
+        qDebug() << "misc::loadBencodedFile failed to decode: " << ec.message().c_str() << " at character: " << pos;
+        //return 1;
+      }
+
 }

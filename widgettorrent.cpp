@@ -150,10 +150,10 @@ void Widgettorrent::on_media_doubleClicked()
 
 #if defined (Q_OS_MAC)
     program = "open";
-    arguments << "-a" << Preferences().getVideoPlayer() << Preferences().getSavePath() + "/" + m_torrent.name();
+    arguments << "-a" << Preferences().getVideoPlayer() << m_torrent.save_path_parsed();
 #else
     program = Preferences().getVideoPlayer();
-    arguments << Preferences().getSavePath() + "/" + m_torrent.name();
+    arguments << m_torrent.save_path_parsed();
 #endif
 
     qDebug() << "program : " << program;

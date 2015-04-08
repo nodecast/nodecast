@@ -188,9 +188,6 @@ void TorrentSpeedMonitor::getSamples()
         int up = st.upload_payload_rate;
         int down = st.download_payload_rate;
         m_samples[misc::toQString(it->info_hash())].addSample(down, up);
-        // try to fix inconsistence hash from handle ...
-        //torrent_info const& ti = it->get_torrent_info();
-        //m_samples[misc::toQString(ti.info_hash())].addSample(down, up);
       }
     } catch(invalid_handle&) {}
   }

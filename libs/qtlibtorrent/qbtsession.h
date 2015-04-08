@@ -76,6 +76,7 @@ class QBtSession : public QObject
 
 public:
   static const qreal MAX_RATIO;
+  QString external_ip;
 
 private:
   explicit QBtSession();
@@ -185,9 +186,11 @@ public slots:
 private:
   QString getSavePath(const QString &hash, bool fromScanDir = false, QString filePath = QString::null, bool imported = false);
   bool loadFastResumeData(const QString &hash, std::vector<char> &buf);
+  //bool loadFastResumeData(const QTorrentHandle &h, std::vector<char> &buf);
+
   void loadTorrentSettings(QTorrentHandle &h);
   void loadTorrentTempData(QTorrentHandle &h, QString savePath, bool magnet);
-  libtorrent::add_torrent_params initializeAddTorrentParams(const QString &hash);
+  void initializeAddTorrentParams(const QString &hash, libtorrent::add_torrent_params &p);
   libtorrent::entry generateFilePriorityResumeData(boost::intrusive_ptr<libtorrent::torrent_info> &t, const std::vector<int> &fp);
   void updateRatioTimer();
   void recoverPersistentData(const QString &hash, const std::vector<char> &buf);
@@ -281,13 +284,13 @@ private:
   // Tracker
 //  QPointer<QTracker> m_tracker;
 
-  QPointer<Qtrackerserv> m_tracker;
+  QPointer<QTracker> m_tracker;
   TorrentSpeedMonitor *m_speedMonitor;
   shutDownAction m_shutdownAct;
   // Port forwarding
-  //libtorrent::upnp *m_upnp;
-  //libtorrent::natpmp *m_natpmp;
-  bool m_upnp;
+  libtorrent::upnp *m_upnp;
+  libtorrent::natpmp *m_natpmp;
+  //bool m_upnp;
   // DynDNS
   //DNSUpdater *m_dynDNSUpdater;
 };

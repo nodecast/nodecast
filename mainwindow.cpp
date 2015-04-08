@@ -256,7 +256,7 @@ void MainWindow::populate()
 //      hSplitter->insertWidget(0, media_scroll);
 
 
-      ui->label_counter_medias->setText(QString::number(list_torrents.size()));
+     // ui->label_counter_medias->setText(QString::number(list_torrents.size()));
 
 
   // Load the torrents
@@ -420,21 +420,19 @@ void MainWindow::shutdownCleanUp()
     QBtSession::drop();
     Preferences().sync();
     qDebug() << "exit app";
-    if (torrent)
-    {
-        torrent->deleteLater();
-        thread_torrent->wait();
-    }
+ //   if (torrent)
+ //   {
+ //       torrent->deleteLater();
+ //       thread_torrent->wait();
+ //   }
 
     delete transferList;
-    delete transferListFilters;
+    //delete transferListFilters;
 
-    list_torrents.clear();
+    //list_torrents.clear();
 
     m_godcastapi->deleteLater();
     qDebug() << "godcast_api deleted";
-
-
 
     //qApp->quit();
     //qApp->exit(0);
@@ -442,13 +440,44 @@ void MainWindow::shutdownCleanUp()
 
 void MainWindow::on_actionQuit_triggered()
 {
-    if (torrent)
-    {
-        torrent->deleteLater();
-        thread_torrent->wait();
-    }
+ //   if (torrent)
+ //   {
+ //       torrent->deleteLater();
+ //       thread_torrent->wait();
+ //   }
+   qDebug() << "MainWindow::on_actionQuit_triggered()";
+
     qApp->quit();
 }
+
+//void MainWindow::writeSettings() {
+//  QIniSettings settings;
+//  settings.beginGroup(QString::fromUtf8("MainWindow"));
+//  settings.setValue("geometry", saveGeometry());
+  // Splitter size
+  //settings.setValue(QString::fromUtf8("vsplitterState"), vSplitter->saveState());
+//  settings.endGroup();
+//  properties->saveSettings();
+//}
+
+//void MainWindow::readSettings() {
+//  QIniSettings settings;
+//  settings.beginGroup(QString::fromUtf8("MainWindow"));
+//  if (settings.contains("geometry")) {
+//    if (restoreGeometry(settings.value("geometry").toByteArray()))
+//      m_posInitialized = true;
+// }
+ // const QByteArray splitterState = settings.value("vsplitterState").toByteArray();
+ // if (splitterState.isEmpty()) {
+    // Default sizes
+ //   vSplitter->setSizes(QList<int>() << 120 << vSplitter->width()-120);
+ // } else {
+ //   vSplitter->restoreState(splitterState);
+ // }
+//  settings.endGroup();
+//}
+
+
 
 void MainWindow::on_actionOpen_triggered()
 {

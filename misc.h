@@ -54,27 +54,12 @@ enum shutDownAction { NO_SHUTDOWN, SHUTDOWN_COMPUTER, SUSPEND_COMPUTER, HIBERNAT
 /*  Miscellaneaous functions that can be useful */
 namespace misc
 {
-  inline QString toQString(const std::string &str) {
-    return QString::fromLocal8Bit(str.c_str());
-  }
+  QString toQString(const std::string &str);
+  QString toQString(const char* str);
+  QString toQStringU(const std::string &str);
+  QString toQStringU(const char* str);
+  QString toQString(const libtorrent::sha1_hash &hash);
 
-  inline QString toQString(const char* str) {
-    return QString::fromLocal8Bit(str);
-  }
-
-  inline QString toQStringU(const std::string &str) {
-    return QString::fromUtf8(str.c_str());
-  }
-
-  inline QString toQStringU(const char* str) {
-    return QString::fromUtf8(str);
-  }
-
-  inline QString toQString(const libtorrent::sha1_hash &hash) {
-    char out[41];
-    libtorrent::to_hex((char const*)&hash[0], libtorrent::sha1_hash::size, out);
-    return QString(out);
-  }
 
 #ifndef DISABLE_GUI
   void shutdownComputer(shutDownAction action=SHUTDOWN_COMPUTER);
@@ -119,6 +104,9 @@ namespace misc
 #ifndef DISABLE_GUI
   bool naturalSort(QString left, QString right, bool& result);
 #endif
+
+
+  void loadBencodedFile(const QString &filename, std::vector<char> &buffer, libtorrent::lazy_entry &entry, libtorrent::error_code &ec);
 }
 
 //  Trick to get a portable sleep() function

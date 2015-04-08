@@ -14,7 +14,7 @@ class Qtrackerserv : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit Qtrackerserv(quint16 port, QObject *parent = 0);
+    explicit Qtrackerserv(const quint16 port, QObject *parent = 0);
     ~Qtrackerserv();
 //    Scf *scf;
 
