@@ -7,13 +7,14 @@ It aims to be really simple by using spheres and respectful of private life.
 Ubuntu :
 ========
 
-apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev
+apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev libqxmpp-dev
 
 Mac OSX :
 ========
 
 brew install boost
 brew install openssl
+brew install qxmpp
 brew install libtorrent-rasterbar
 
 Test :
