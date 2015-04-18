@@ -46,10 +46,30 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 
    // content = new QWidget(parent);
 
+    qDebug() << "SPHERE DIRECTORY : " << sphere_data.directory;
+
+    QString uuid;
+    QDir nodecast_datas;
+    QDir check_dir;
 
     switch(sphere_data.scope)
     {
     case Sphere_scope::PRIVATE :
+        // check directory exist
+        if (sphere_data.directory.isEmpty())
+        {
+            uuid = QUuid::createUuid().toString().remove("-").replace(0, 1, "");
+            uuid = uuid.replace(uuid.size()-1, 1, "");
+            sphere_data.directory = sphere_data.title.toLower().trimmed() + "_" + uuid;
+        }
+
+        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+        check_dir = nodecast_datas.absolutePath() + "/" + sphere_data.directory;
+        if (!check_dir.exists())
+            nodecast_datas.mkdir(sphere_data.directory);
+
+
+
         m_color = new QColor(105,105,105);
 
         media_scroll = new QScrollArea();
@@ -123,6 +143,15 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 //    initStyleOption(QStyleOptionButton::Flat);
 }
 
+QString Sphere::get_directory()
+{
+    if (!sphere_data.directory.isEmpty())
+        return sphere_data.directory;
+    else return "";
+}
+
+
+
 QSize Sphere::sizeHint() const
 {
     return QSize(105,105);
@@ -136,12 +165,15 @@ Sphere::~Sphere()
 
 void Sphere::dragEnterEvent(QDragEnterEvent *event)
 {
+    if (sphere_data.scope == Sphere_scope::FIXED) return;
+
     if(event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
 
 void Sphere::dropEvent(QDropEvent* event)
 {
+
     QList<QUrl> droppedUrls = event->mimeData()->urls();
     int droppedUrlCnt = droppedUrls.size();
 
@@ -151,7 +183,7 @@ void Sphere::dropEvent(QDropEvent* event)
        QFileInfo fileInfo(localPath);
 
 
-       QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.title + "/" + fileInfo.fileName();
+       QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
 
        QFileInfo fileInfoLink(target_link);
 

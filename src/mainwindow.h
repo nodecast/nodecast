@@ -137,10 +137,12 @@ private slots:
 
 
     void changePage(int current);
-
+    void changeConnectionStatus(bool status);
+    void receiveMessageChat(QString from, QString message);
 
 private:
     void populate();
+    void load_spheres();
 
     QStackedWidget *m_stacked_tab_medias;
 

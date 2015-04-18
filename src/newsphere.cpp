@@ -38,6 +38,10 @@ newsphere::newsphere(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //QRegExp re("[_a-zA-Z][_a-zA-Z0-9]+");
+    QRegExp re("[a-z][a-z0-9]+");
+    QRegExpValidator *v = new QRegExpValidator(re);
+    ui->lineEdit_sphere->setValidator(v);
 
 }
 

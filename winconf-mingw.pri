@@ -33,3 +33,4 @@ CONFIG(debug, debug|release) {
 LIBS += libadvapi32 libshell32 libuser32
 LIBS += libcrypto.dll libssl.dll libwsock32 libws2_32 libz libiconv.dll
 LIBS += libpowrprof
+LIBS += libqxmpp

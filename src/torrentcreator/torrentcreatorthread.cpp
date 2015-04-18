@@ -135,13 +135,13 @@ void TorrentCreatorThread::run() {
     // torrent_info structure
     t.set_creator(creator_str.toUtf8().constData());
     //t.set_comment(comment.toUtf8().constData());
-    t.set_comment(" made by and for nodecast");
+    t.set_comment("made by and for nodecast");
 
     // Is private ?
     //    t.set_priv(is_private);
     //t.set_priv(is_private);
-    // on nodecast torrents are private
-    t.set_priv(true);
+    // not private because we need LSD (local service discovery) to share on a local network
+    t.set_priv(false);
 
     if (abort) return;
     // create the torrent and print it to out

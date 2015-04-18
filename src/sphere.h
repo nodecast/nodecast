@@ -38,6 +38,8 @@
 #include <QDebug>
 #include <QColor>
 #include <QtWebKitWidgets>
+#include <QUuid>
+
 
 #include "flowlayout.h"
 #include "widgettorrent.h"
@@ -50,6 +52,7 @@ struct Sphere_data {
     QString title="";
     Sphere_scope scope;
     QString url="";
+    QString directory="";
 };
 
 
@@ -64,6 +67,7 @@ public:
     void populate();
     virtual QSize sizeHint() const;
     int index_tab;
+    QString get_directory();
 
 protected:
     virtual void paintEvent(QPaintEvent *e);

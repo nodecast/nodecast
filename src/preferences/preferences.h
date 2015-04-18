@@ -204,17 +204,17 @@ public:
 #ifdef Q_WS_WIN
   bool Startup() const {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
-    return settings.contains("qBittorrent");
+    return settings.contains("nodecast");
   }
 
   void setStartup(bool b) {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (b) {
         const QString bin_path = "\""+qApp->applicationFilePath().replace("/", "\\")+"\"";
-        settings.setValue("qBittorrent", bin_path);
+        settings.setValue("nodecast", bin_path);
     }
     else {
-        settings.remove("qBittorrent");
+        settings.remove("nodecast");
     }
   }
 #endif
@@ -244,14 +244,14 @@ public:
       QHash<QString, QString> hash;
 
     hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
-    hash["token"]  = value(QString::fromUtf8("Preferences/Nodecast/Token")).toString();
+    hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
       return hash;
 
   }
 
   void setNodecastAccount(const QHash<QString, QString> &account) {
     setValue(QString::fromUtf8("Preferences/Nodecast/Login"), account.value("login"));
-    setValue(QString::fromUtf8("Preferences/Nodecast/Token"), account.value("token"));
+    setValue(QString::fromUtf8("Preferences/Nodecast/Password"), account.value("password"));
   }
 
 
@@ -1299,8 +1299,8 @@ public:
 
   static bool isTorrentFileAssocSet() {
       QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QSettings::NativeFormat);
-      if (settings.value(".torrent/Default").toString() != "qBittorrent") {
-        qDebug(".torrent != qBittorrent");
+      if (settings.value(".torrent/Default").toString() != "nodecast") {
+        qDebug(".torrent != nodecast");
         return false;
       }
 
@@ -1328,9 +1328,9 @@ public:
       // .Torrent association
       if (set) {
         QString old_progid = settings.value(".torrent/Default").toString();
-        if (!old_progid.isEmpty() && (old_progid != "qBittorrent"))
+        if (!old_progid.isEmpty() && (old_progid != "nodecast"))
           settings.setValue(".torrent/OpenWithProgids/" + old_progid, "");
-        settings.setValue(".torrent/Default", "qBittorrent");
+        settings.setValue(".torrent/Default", "nodecast");
       } else if (isTorrentFileAssocSet()) {
         settings.setValue(".torrent/Default", "");
       }

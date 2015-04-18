@@ -45,17 +45,20 @@
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>token</string>
+           <string>password</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_token">
+         <widget class="QLineEdit" name="lineEdit_password">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
         </item>

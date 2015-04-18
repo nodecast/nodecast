@@ -81,8 +81,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>104</width>
-                    <height>413</height>
+                    <width>102</width>
+                    <height>443</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -122,8 +122,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>76</width>
-                    <height>26</height>
+                    <width>100</width>
+                    <height>30</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -321,13 +321,13 @@
                        <rect>
                         <x>0</x>
                         <y>0</y>
-                        <width>280</width>
-                        <height>188</height>
+                        <width>274</width>
+                        <height>215</height>
                        </rect>
                       </property>
                       <layout class="QVBoxLayout" name="verticalLayout_10">
                        <item>
-                        <widget class="QGraphicsView" name="graphicsView_tchat"/>
+                        <widget class="QGraphicsView" name="graphicsView_chat"/>
                        </item>
                       </layout>
                      </widget>
@@ -349,20 +349,20 @@
                        <rect>
                         <x>0</x>
                         <y>0</y>
-                        <width>280</width>
-                        <height>188</height>
+                        <width>274</width>
+                        <height>214</height>
                        </rect>
                       </property>
                       <layout class="QVBoxLayout" name="verticalLayout_9">
                        <item>
-                        <widget class="QTextEdit" name="textEdit_tchat"/>
+                        <widget class="QTextEdit" name="textEdit_chat"/>
                        </item>
                       </layout>
                      </widget>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="lineEdit_tchat"/>
+                    <widget class="QLineEdit" name="lineEdit_chat"/>
                    </item>
                   </layout>
                  </item>
@@ -464,6 +464,16 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QLabel" name="label_connection">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="icons.qrc">:/Icons/skin/disconnected.png</pixmap>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -476,12 +486,12 @@
      <x>0</x>
      <y>0</y>
      <width>1166</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuNodecast">
     <property name="title">
-     <string>File</string>
+     <string>Account</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionAccount"/>
@@ -529,13 +539,14 @@
   </action>
   <action name="actionAccount">
    <property name="text">
-    <string>account</string>
+    <string>login</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="nodecast.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>

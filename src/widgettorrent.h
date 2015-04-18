@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QTimer>
+#include <QImageReader>
 
 //#include "torrentpersistentdata.h"
 #include "qtorrenthandle.h"
@@ -15,6 +16,14 @@
 namespace Ui {
 class widgettorrent;
 }
+
+
+
+struct Torrent_data {
+    QString type="";
+    QString url="";
+    QString directory="";
+};
 
 
 class Widgettorrent : public QWidget
@@ -28,6 +37,7 @@ public:
     static void populate(QString title, QLayout *parent = 0);
     static void unckeck_widget_selected(Widgettorrent *wt);
 
+    Torrent_data torrent_data;
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);

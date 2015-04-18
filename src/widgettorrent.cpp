@@ -209,6 +209,18 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     timer_get_torrent_progress->start(1000);
 
 
+    qDebug() << " save_path_parsed : " << h.save_path_parsed();
+    QByteArray imageFormat = QImageReader::imageFormat(h.save_path_parsed()); //Where fileName - path to your file
+    qDebug() << "imageFormat : " << imageFormat;
+
+    QPixmap img;
+
+    if (imageFormat.size() != 0 && img.load(h.save_path_parsed()))
+    {
+        QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+        ui->label_thumbnail->setPixmap(thumbnail);
+        torrent_data.type = "img";
+    }
 
 
 //  if (torrentRow(h.hash()) < 0) {

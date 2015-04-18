@@ -18,7 +18,7 @@ QMAKE_CXXFLAGS += -Wformat -Wformat-security
 QMAKE_LFLAGS_APP += -rdynamic
 CONFIG += link_pkgconfig
 PKGCONFIG += libtorrent-rasterbar
-LIBS += -lssl -lcrypto -lz -lidn
+LIBS += -lssl -lcrypto -lz -lidn -lqxmpp
 
 # Man page    
 man.files = ../doc/qbittorrent.1

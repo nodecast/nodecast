@@ -55,7 +55,7 @@ TorrentCreatorDlg::TorrentCreatorDlg(QString sphere, QString file, QString file_
 
   textInputPath->setText(file_path);
 
-  QString tracker = "http://" + QBtSession::instance()->external_ip + ":9001" + "/announce";
+  QString tracker = "http://" + QBtSession::instance()->external_ip + ":" + QString::number(prefs.getTrackerPort()) + "/announce";
   qDebug() << "TRACKER : " << tracker;
   trackers_list->setText(tracker);
 

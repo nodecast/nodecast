@@ -35,6 +35,7 @@
 #include <QDialog>
 #include <QDebug>
 #include "preferences.h"
+#include "xmpp_client.h"
 
 namespace Ui {
 class account;
@@ -50,10 +51,12 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
+    void receive_tchat(QString message);
 
 private:
     Preferences pref;
     Ui::account *ui;
+    Xmpp_client *m_xmpp_client;
 };
 
 #endif // ACCOUNT_H

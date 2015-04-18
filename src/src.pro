@@ -31,6 +31,7 @@ QT += gui network opengl webkitwidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Vars
+LIBS_PATH = libs
 LANG_PATH = lang
 ICONS_PATH = Icons
 
@@ -108,7 +109,8 @@ SOURCES +=  main.cpp\
             account.cpp \
             godcast_api.cpp \
             newsphere.cpp \
-            sphere.cpp
+            sphere.cpp \
+    xmpp_client.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -136,7 +138,8 @@ HEADERS  += mainwindow.h \
             account.h \
             godcast_api.h \
             newsphere.h \
-            sphere.h
+            sphere.h \
+    xmpp_client.h
 
 win32|macx {
   HEADERS += programupdater.h
@@ -154,7 +157,9 @@ FORMS += mainwindow.ui \
     newsphere.ui
 
 
-DESTDIR = .
+INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
+INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
+
 
 # OS specific config
 OTHER_FILES += ../winconf.pri ../macxconf.pri ../unixconf.pri ../os2conf.pri

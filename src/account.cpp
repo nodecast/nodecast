@@ -40,13 +40,15 @@ account::account(QWidget *parent) :
     account = pref.getNodecastAccount();
 
     ui->lineEdit_login->setText(account.value("login") );
-    ui->lineEdit_token->setText(account.value("token"));
+    ui->lineEdit_password->setText(account.value("password"));
 
     show();
 }
 
 account::~account()
 {
+    qDebug() << "DELETE ACCOUNT";
+    m_xmpp_client->deleteLater();
     delete ui;
 }
 
@@ -56,12 +58,39 @@ void account::on_buttonBox_accepted()
 
 
     hash["login"] = ui->lineEdit_login->text();
-    hash["token"]  = ui->lineEdit_token->text();
+    hash["password"]  = ui->lineEdit_password->text();
 
     pref.setNodecastAccount(hash);
+    pref.sync();
 
     qDebug() << "ACCOUNT : " << hash;
 
+
+    Xmpp_client::loadXMPP();
+
+    //thread_xmpp_client = new QThread(this);
+
+//    if (Xmpp_client::instance == 0)
+//    {
+//        qDebug() << "XMPP BEFORE";
+//        m_xmpp_client = new Xmpp_client(hash["login"], hash["password"], 5223);
+//        connect(m_xmpp_client, SIGNAL(emit_tchat(QString)), SLOT(receive_tchat(QString)));
+//        qDebug() << "XMPP AFTER";
+//    }
+//    else qDebug() << "XMPP ALREADY CONNECTED";
+
+
+    //connect(m_xmpp_client, SIGNAL(destroyed()), thread_xmpp_client, SLOT(quit()), Qt::DirectConnection);
+    //connect(thread_xmpp_client, SIGNAL(started()), m_xmpp_client, SLOT(init()));
+    //connect(ncw, SIGNAL(parseClientData(QString)), m_xmpp_client, SLOT(receive_payload(QString)), Qt::QueuedConnection);
+
+
     //qDebug() << "LOGIN : " << ui->lineEdit_login->text();
     //qDebug() << "TOKEN : " << ui->lineEdit_token->text();
+}
+
+void account::receive_tchat(QString message)
+{
+    qDebug() << "RECEIVE message : " << message;
+
 }

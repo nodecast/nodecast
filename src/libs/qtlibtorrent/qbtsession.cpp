@@ -1327,6 +1327,8 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
   // Adding torrent to Bittorrent session
   try {
     h =  QTorrentHandle(s->add_torrent(p));
+    // set sequential download to watch while download
+    h.set_sequential_download(true);
     qDebug() << "H : " << h.hash();
   }catch(std::exception &e) {
     qDebug("Error: %s", e.what());

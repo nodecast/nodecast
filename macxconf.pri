@@ -31,7 +31,7 @@ LIBS += -lboost_system-mt
 LIBS += -framework Carbon -framework IOKit
 # Zlib
 LIBS += -lz
-LIBS += -ltorrent-rasterbar
+LIBS += -ltorrent-rasterbar -lqxmpp
 
 
 QT_LANG_PATH = ../dist/qt-translations
