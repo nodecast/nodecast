@@ -145,10 +145,9 @@ void MainWindow::changeConnectionStatus(bool status)
     QPixmap pix = status? QPixmap(":/Icons/skin/connected.png") : QPixmap(":/Icons/skin/disconnected.png");
     ui->label_connection->setPixmap(pix);
 
-    // connect to room
+    // connect to chat rooms
     if (status)
     {
-
         QList <QString> keys = m_spheres_private.keys();
         qDebug() << "KEYS : " << keys;
 
@@ -164,29 +163,9 @@ void MainWindow::changeConnectionStatus(bool status)
                 Xmpp_client::instance()->connectToRoom(i.value()->get_directory());
         }
     }
-
-
-
-
 }
 
 
-
-//void MainWindow::loadXMPP()
-//{
-//    QHash<QString, QString> account;
-//    account = pref.getNodecastAccount();
-
-
-//    if (Xmpp_client::instance == 0 && !account.isEmpty())
-//    {
-//        qDebug() << "XMPP BEFORE";
-//        m_xmpp_client = new Xmpp_client(hash["login"], hash["password"], 5223);
-//        connect(m_xmpp_client, SIGNAL(emit_tchat(QString)), SLOT(receive_tchat(QString)));
-//        qDebug() << "XMPP AFTER";
-//    }
-//    else qDebug() << "XMPP ALREADY CONNECTED";
-//}
 
 void MainWindow::changePage(int index)
 {

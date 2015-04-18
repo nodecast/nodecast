@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QTimer>
 #include <QImageReader>
+#include <QMimeDatabase>
 
 //#include "torrentpersistentdata.h"
 #include "qtorrenthandle.h"
@@ -59,6 +60,7 @@ private:
 
     QProcess *videoPlayer;
     QTimer *timer_get_torrent_progress;
+    QMimeDatabase m_mime_db;
 
 private slots:
     void on_media_doubleClicked();

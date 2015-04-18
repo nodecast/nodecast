@@ -145,9 +145,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 
 QString Sphere::get_directory()
 {
-    if (!sphere_data.directory.isEmpty())
-        return sphere_data.directory;
-    else return "";
+    return sphere_data.directory;
 }
 
 
@@ -184,7 +182,7 @@ void Sphere::dropEvent(QDropEvent* event)
 
 
        QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
-
+       fsutils::forceRemove(target_link);
        QFileInfo fileInfoLink(target_link);
 
        bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());

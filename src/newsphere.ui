@@ -20,7 +20,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>no special characters, 15 chars max</string>
+      <string>no special characters, 10 chars max</string>
      </property>
     </widget>
    </item>
@@ -36,7 +36,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit_sphere">
        <property name="maxLength">
-        <number>15</number>
+        <number>10</number>
        </property>
       </widget>
      </item>

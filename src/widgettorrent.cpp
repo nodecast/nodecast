@@ -143,25 +143,30 @@ void Widgettorrent::mouseDoubleClickEvent(QMouseEvent *e)
 
 void Widgettorrent::on_media_doubleClicked()
 {
-    qDebug() << "LAUNCH PLAYER : ";
 
-    QString program;
-    QStringList arguments;
+    // open with VLC if media type is a video or a directory
+    if (torrent_data.type == "video"  || torrent_data.type == "directory")
+    {
 
-#if defined (Q_OS_MAC)
-    program = "open";
-    arguments << "-a" << Preferences().getVideoPlayer() << m_torrent.absolute_files_path();
-#else
-    program = Preferences().getVideoPlayer();
-    arguments << m_torrent.absolute_files_path();
-#endif
+        qDebug() << "LAUNCH PLAYER : ";
 
-    qDebug() << "program : " << program;
+        QString program;
+        QStringList arguments;
 
-    videoPlayer = new QProcess(this);
-    videoPlayer->start(program, arguments);
+    #if defined (Q_OS_MAC)
+        program = "open";
+        arguments << "-a" << Preferences().getVideoPlayer() << m_torrent.absolute_files_path();
+    #else
+        program = Preferences().getVideoPlayer();
+        arguments << m_torrent.absolute_files_path();
+    #endif
+
+        qDebug() << "program : " << program;
+
+        videoPlayer = new QProcess(this);
+        videoPlayer->start(program, arguments);
+    }
 }
-
 
 
 //void Widgettorrent::populate()
@@ -210,17 +215,75 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
 
 
     qDebug() << " save_path_parsed : " << h.save_path_parsed();
-    QByteArray imageFormat = QImageReader::imageFormat(h.save_path_parsed()); //Where fileName - path to your file
-    qDebug() << "imageFormat : " << imageFormat;
 
-    QPixmap img;
 
-    if (imageFormat.size() != 0 && img.load(h.save_path_parsed()))
+
+    QMimeType mime = m_mime_db.mimeTypeForFile(h.save_path_parsed());
+
+
+    if (mime.inherits("image/gif") ||
+             mime.inherits("image/jpeg") ||
+             mime.inherits("image/png") ||
+             mime.inherits("image/tiff"))
     {
-        QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-        ui->label_thumbnail->setPixmap(thumbnail);
-        torrent_data.type = "img";
+        QByteArray imageFormat = QImageReader::imageFormat(h.save_path_parsed()); //Where fileName - path to your file
+        qDebug() << "imageFormat : " << imageFormat;
+
+        QPixmap img;
+
+        if (imageFormat.size() != 0 && img.load(h.save_path_parsed()))
+        {
+            QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            ui->label_thumbnail->setPixmap(thumbnail);
+        }
+        torrent_data.type = "image";
     }
+    else if (mime.inherits("text/css") ||
+             mime.inherits("text/csv") ||
+             mime.inherits("text/html") ||
+             mime.inherits("text/plain") ||
+             mime.inherits("text/xml"))
+    {
+        torrent_data.type = "text";
+    }
+    else if (mime.inherits("video/mpeg") ||
+             mime.inherits("video/mp4") ||
+             mime.inherits("video/quicktime") ||
+             mime.inherits("video/x-ms-wmv") ||
+             mime.inherits("video/x-msvideo") ||
+             mime.inherits("video/x-flv") ||
+             mime.inherits("video/webm")
+             )
+    {
+        torrent_data.type = "video";
+    }
+    else if (mime.inherits("audio/mpeg") ||
+             mime.inherits("audio/mp3") ||
+             mime.inherits("audio/x-ms-wma") ||
+             mime.inherits("audio/vnd.rn-realaudio") ||
+             mime.inherits("audio/x-wav") ||
+             mime.inherits("audio/wav")
+             )
+    {
+        torrent_data.type = "audio";
+    }
+    else
+    {
+        QFileInfo fileInfo(h.save_path_parsed());
+        if(fileInfo.isFile())
+        {
+            // torrent is a file but unknown type, maybe a binary file
+            torrent_data.type = "binary";
+        }
+        else if(fileInfo.isDir())
+        {
+            // torrent is a directory
+            torrent_data.type = "directory";
+        }
+    }
+
+
+    qDebug() << "DATA TYPE : " << torrent_data.type;
 
 
 //  if (torrentRow(h.hash()) < 0) {
