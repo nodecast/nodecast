@@ -310,7 +310,7 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     // active sphere on new torrent
     this->setChecked(true);
 
-    Widgettorrent *wt = new Widgettorrent();
+    Widgettorrent *wt = new Widgettorrent(sphere_data);
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
 }
@@ -320,5 +320,5 @@ void Sphere::addTorrent(const QTorrentHandle &h)
 void Sphere::populate()
 {
     qDebug() << "Sphere::polulate";
-    Widgettorrent::populate(sphere_data.title, flowLayout);
+    Widgettorrent::populate(sphere_data, flowLayout);
 }

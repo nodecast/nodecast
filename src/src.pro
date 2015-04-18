@@ -139,7 +139,8 @@ HEADERS  += mainwindow.h \
             godcast_api.h \
             newsphere.h \
             sphere.h \
-    xmpp_client.h
+    xmpp_client.h \
+    global.h
 
 win32|macx {
   HEADERS += programupdater.h

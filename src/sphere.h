@@ -40,21 +40,10 @@
 #include <QtWebKitWidgets>
 #include <QUuid>
 
-
+#include "global.h"
 #include "flowlayout.h"
 #include "widgettorrent.h"
 #include "torrentcreator/torrentcreatordlg.h"
-
-enum class Sphere_scope { PRIVATE, PUBLIC, FIXED};
-
-
-struct Sphere_data {
-    QString title="";
-    Sphere_scope scope;
-    QString url="";
-    QString directory="";
-};
-
 
 
 class Sphere : public QAbstractButton

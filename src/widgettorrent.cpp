@@ -42,7 +42,7 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 }
 
 
-void Widgettorrent::populate( QString title, QLayout *parent)
+void Widgettorrent::populate(Sphere_data a_sphere_data, QLayout *parent)
 {
 
     std::vector<libtorrent::torrent_handle> torrents = QBtSession::instance()->getSession()->get_torrents();
@@ -60,11 +60,11 @@ void Widgettorrent::populate( QString title, QLayout *parent)
 
         QString path = h.save_path();
 
-        if (!path.contains(title, Qt::CaseSensitive)) continue;
+        if (!path.contains(a_sphere_data.title, Qt::CaseSensitive)) continue;
 
 
-            qDebug() << "PATH : " << path << " TITLE " << title;
-        Widgettorrent *wt = new Widgettorrent();
+            qDebug() << "PATH : " << path << " TITLE " << a_sphere_data.title;
+        Widgettorrent *wt = new Widgettorrent(a_sphere_data);
         parent->addWidget(wt);
         qDebug() << "Widgettorrent::populate";
         wt->addTorrent(h);
@@ -75,7 +75,7 @@ void Widgettorrent::populate( QString title, QLayout *parent)
 }
 
 
-Widgettorrent::Widgettorrent() :
+Widgettorrent::Widgettorrent(Sphere_data a_sphere_data) : sphere_data(a_sphere_data),
     ui(new Ui::widgettorrent)
 {
     ui->setupUi(this);
@@ -83,7 +83,6 @@ Widgettorrent::Widgettorrent() :
 
     setMinimumSize(200, 130);
     setMaximumSize(200, 130);
-
     videoPlayer = NULL;
 }
 
@@ -166,6 +165,21 @@ void Widgettorrent::on_media_doubleClicked()
         videoPlayer = new QProcess(this);
         videoPlayer->start(program, arguments);
     }
+    else if (torrent_data.type == "binary")
+    {
+        QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory;
+        QString path = QDir::toNativeSeparators(dir);
+        qDebug() << "LAUNCH FILE EXPLORER TO : " << path;
+        QDesktopServices::openUrl(QUrl("file:///" + path));
+    }
+    else if (torrent_data.type == "image")
+    {
+        QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
+        QString path = QDir::toNativeSeparators(dir);
+        qDebug() << "OPEN PICTURE TO : " << path;
+        QDesktopServices::openUrl(QUrl("file:///" + path));
+    }
+
 }
 
 
@@ -207,7 +221,7 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     m_torrent = h;
     m_title.setText(h.name());
     ui->label_title->setText(h.name());
-
+    torrent_data.file = h.name();
 
     timer_get_torrent_progress = new QTimer(this);
     connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));

@@ -9,21 +9,22 @@
 #include <QTimer>
 #include <QImageReader>
 #include <QMimeDatabase>
+#include <QDesktopServices>
 
 //#include "torrentpersistentdata.h"
 #include "qtorrenthandle.h"
 #include "qbtsession.h"
+#include "global.h"
 
 namespace Ui {
 class widgettorrent;
 }
 
 
-
 struct Torrent_data {
+    QString file="";
     QString type="";
-    QString url="";
-    QString directory="";
+    qint64 size=0;
 };
 
 
@@ -32,13 +33,14 @@ class Widgettorrent : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widgettorrent();
+    explicit Widgettorrent(Sphere_data a_sphere_data);
     ~Widgettorrent();    
-//    void populate();
-    static void populate(QString title, QLayout *parent = 0);
+    static void populate(Sphere_data a_sphere_data, QLayout *parent = 0);
     static void unckeck_widget_selected(Widgettorrent *wt);
 
+    Sphere_data sphere_data;
     Torrent_data torrent_data;
+
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
