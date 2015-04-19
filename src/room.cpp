@@ -29,73 +29,52 @@
  */
 
 
-#ifndef SPHERE_H
-#define SPHERE_H
-
-#include <QAbstractButton>
-#include <QStyleOption>
-#include <QPainter>
-#include <QDebug>
-#include <QColor>
-#include <QtWebKitWidgets>
-#include <QUuid>
-
-#include "global.h"
-#include "flowlayout.h"
-#include "widgettorrent.h"
-#include "torrentcreator/torrentcreatordlg.h"
+#include "room.h"
 
 
-class Sphere : public QAbstractButton
+Room::Room(QString room_name, QStackedWidget *parent)
 {
-    Q_OBJECT
-public:
-    Sphere(Sphere_data data, QStackedWidget *parent = 0);
-    ~Sphere();
-    void addTorrent(const QTorrentHandle &h);
-    void populate();
-    virtual QSize sizeHint() const;
-    int index_tab;
-    QString get_directory();
-    bool isScopeFixed();
-    void reloadWeb();
+//    QGroupBox
+//        QVBoxLayout
+//            QScrollArea
+//                scrollAreaWidgetContent
+//                    QGraphicsView
+//            QScrollArea
+//                scrollAreaWidgetContent
+//                    QTextEdit
+//            QLineEdit
 
-protected:
-    virtual void paintEvent(QPaintEvent *e);
-    virtual void dropEvent(QDropEvent* event);
-    virtual void dragEnterEvent(QDragEnterEvent *event);
-    //virtual void mousePressEvent(QMouseEvent * e);
 
-private:
-    FlowLayout *flowLayout;
-    QSplitter *hSplitter;
-    QScrollArea *media_scroll;
-    QWidget *content;
+    groupBox = new QGroupBox;
+    groupBox->setTitle("chat room : " + room_name);
+    vbox = new QVBoxLayout;
+    scrollArea_users = new QScrollArea;
+    scrollArea_users->setWidgetResizable(true);
+    scrollArea_chat = new QScrollArea;
+    scrollArea_chat->setWidgetResizable(true);
+    users = new QGraphicsView;
+    chat_room = new QTextEdit;
+    line_chat = new QLineEdit;
 
-    QColor *m_color;
-    static int index;
-    int m_index;
-    int mFirstX;
-    int mFirstY;
-    QString m_title;
-    QWebView *view;
-    QWidget *media_container;
-    Sphere_data sphere_data;
-    QPointer<TorrentCreatorDlg> createTorrentDlg;
-    Preferences prefs;
+    scrollArea_users->setWidget(users);
+    scrollArea_chat->setWidget(chat_room);
+    vbox->addWidget(scrollArea_users);
+    vbox->addWidget(scrollArea_chat);
+    vbox->addWidget(line_chat);
+    groupBox->setLayout(vbox);
 
-public slots:
-
-private slots:
-    void selected();
-    void addTorrent(QString path);
-
-signals:
-    void row(int);
-};
+    index_tab = parent->addWidget(groupBox);
+}
 
 
 
+Room::~Room()
+{
+}
 
 
-#endif // SPHERE_H
+
+void Room::receiveMessage(QString message)
+{
+    chat_room->append(message);
+}

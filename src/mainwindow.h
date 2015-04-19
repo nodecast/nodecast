@@ -68,6 +68,7 @@
 #include "newsphere.h"
 #include "godcast_api.h"
 #include "sphere.h"
+#include "room.h"
 
 #ifdef Q_OS_MAC
 void fixNativeWindow( QMainWindow *window );
@@ -145,6 +146,7 @@ private:
     void load_spheres();
 
     QStackedWidget *m_stacked_tab_medias;
+    QStackedWidget *m_stacked_tab_room;
 
     QPointer<about> aboutDlg;
     QPointer<newsphere> new_sphere;
@@ -164,7 +166,10 @@ private:
 
     QHash<QString, Sphere *> m_spheres_private;
     QHash<QString, Sphere *> m_spheres_public;
+    QHash<QString, Room *> m_rooms;
+
     QHash<int, Sphere *> sphere_tab;
+    QHash<int, Room *> room_tab;
 
     QThread *thread_torrent;
     Torrent *torrent;

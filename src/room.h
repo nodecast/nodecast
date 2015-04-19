@@ -29,73 +29,35 @@
  */
 
 
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef ROOM_H
+#define ROOM_H
 
-#include <QAbstractButton>
-#include <QStyleOption>
-#include <QPainter>
-#include <QDebug>
-#include <QColor>
-#include <QtWebKitWidgets>
-#include <QUuid>
+#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QScrollArea>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QStackedWidget>
+#include <QGraphicsView>
 
-#include "global.h"
-#include "flowlayout.h"
-#include "widgettorrent.h"
-#include "torrentcreator/torrentcreatordlg.h"
-
-
-class Sphere : public QAbstractButton
+class Room : QWidget
 {
     Q_OBJECT
-public:
-    Sphere(Sphere_data data, QStackedWidget *parent = 0);
-    ~Sphere();
-    void addTorrent(const QTorrentHandle &h);
-    void populate();
-    virtual QSize sizeHint() const;
-    int index_tab;
-    QString get_directory();
-    bool isScopeFixed();
-    void reloadWeb();
 
-protected:
-    virtual void paintEvent(QPaintEvent *e);
-    virtual void dropEvent(QDropEvent* event);
-    virtual void dragEnterEvent(QDragEnterEvent *event);
-    //virtual void mousePressEvent(QMouseEvent * e);
+public:
+    Room(QString room_name, QStackedWidget *parent = 0);
+    ~Room();
+    void receiveMessage(QString message);
+    int index_tab;
 
 private:
-    FlowLayout *flowLayout;
-    QSplitter *hSplitter;
-    QScrollArea *media_scroll;
-    QWidget *content;
-
-    QColor *m_color;
-    static int index;
-    int m_index;
-    int mFirstX;
-    int mFirstY;
-    QString m_title;
-    QWebView *view;
-    QWidget *media_container;
-    Sphere_data sphere_data;
-    QPointer<TorrentCreatorDlg> createTorrentDlg;
-    Preferences prefs;
-
-public slots:
-
-private slots:
-    void selected();
-    void addTorrent(QString path);
-
-signals:
-    void row(int);
+    QGroupBox *groupBox;
+    QVBoxLayout *vbox;
+    QScrollArea *scrollArea_users;
+    QScrollArea *scrollArea_chat;
+    QTextEdit *chat_room;
+    QLineEdit *line_chat;
+    QGraphicsView *users;
 };
 
-
-
-
-
-#endif // SPHERE_H
+#endif // ROOM_H

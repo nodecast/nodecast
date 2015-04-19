@@ -110,7 +110,8 @@ SOURCES +=  main.cpp\
             godcast_api.cpp \
             newsphere.cpp \
             sphere.cpp \
-    xmpp_client.cpp
+    xmpp_client.cpp \
+    room.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -140,7 +141,8 @@ HEADERS  += mainwindow.h \
             newsphere.h \
             sphere.h \
     xmpp_client.h \
-    global.h
+    global.h \
+    room.h
 
 win32|macx {
   HEADERS += programupdater.h

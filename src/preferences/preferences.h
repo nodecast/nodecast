@@ -243,10 +243,9 @@ public:
   QHash<QString, QString> getNodecastAccount() const {
       QHash<QString, QString> hash;
 
-    hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
-    hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
+      hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
+      hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
       return hash;
-
   }
 
   void setNodecastAccount(const QHash<QString, QString> &account) {
@@ -254,6 +253,15 @@ public:
     setValue(QString::fromUtf8("Preferences/Nodecast/Password"), account.value("password"));
   }
 
+  QString getNodecastLogin() const {
+      QHash<QString, QString> hash;
+      QString login;
+
+      hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
+      if (!hash["login"].contains("@")) return "";
+      login = hash["login"].isEmpty()? "" : hash["login"].split("@").at(0);
+      return login;
+  }
 
 
 

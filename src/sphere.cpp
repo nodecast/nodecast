@@ -104,7 +104,6 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
         view->setZoomFactor(0.8);
         view->load(QUrl(sphere_data.url));
 
-
         hSplitter = new QSplitter(Qt::Vertical);
         hSplitter->addWidget(view);
         hSplitter->addWidget(media_scroll);
@@ -116,9 +115,18 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 
     case Sphere_scope::FIXED :
         m_color = new QColor(100, 143, 000);
-        content = new QWidget();
+        view = new QWebView();
+        view->settings()->setAttribute(QWebSettings::JavascriptEnabled, false);
+        view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+        view->settings()->setAttribute(QWebSettings::ZoomTextOnly, true);
+        view->settings()->setAttribute(QWebSettings::AutoLoadImages, true);
+        view->settings()->setAttribute(QWebSettings::NotificationsEnabled, false);
+        view->setZoomFactor(0.8);
+        view->load(QUrl(sphere_data.url));
+        index_tab = parent->addWidget(view);
 
-        index_tab = parent->addWidget(content);
+        //content = new QWidget();
+        //index_tab = parent->addWidget(content);
         qDebug() << "INDEX TAB : " << index_tab;
 
         break;
@@ -142,6 +150,20 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
     connect(this, SIGNAL(clicked()), this, SLOT(selected()));
 //    initStyleOption(QStyleOptionButton::Flat);
 }
+
+bool Sphere::isScopeFixed()
+{
+    bool scope = (sphere_data.scope == Sphere_scope::FIXED)? true : false;
+    return scope;
+}
+
+
+void Sphere::reloadWeb()
+{
+    qDebug() << "RELOAD WEB";
+    view->load(QUrl(sphere_data.url));
+}
+
 
 QString Sphere::get_directory()
 {

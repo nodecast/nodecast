@@ -230,9 +230,8 @@ void Xmpp_client::connectToRoom(QString room_name)
 {
     qDebug() << "Xmpp_client::connectToRoom : " << room_name;
 
-
     QXmppMucRoom *room = muc_manager->addRoom(room_name + "@conference.nodecast.net");
-    room->setNickName("mynick");
+    room->setNickName(Preferences().getNodecastLogin());
     room->join();
 }
 

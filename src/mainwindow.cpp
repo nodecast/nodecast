@@ -55,21 +55,19 @@ MainWindow::MainWindow(QWidget *parent) :
     videoPlayer = NULL;
 
 
-    m_godcastapi = new Godcast_api("127.0.0.1", "3000", this);
+    //m_godcastapi = new Godcast_api("127.0.0.1", "3000", this);
     //connect(m_godcastapi, SIGNAL(users_Changed(QVariantMap)), this, SLOT(refresh_users(QVariantMap)), Qt::QueuedConnection);
     //connect(m_godcastapi, SIGNAL(spheres_Changed(QVariantMap)), this, SLOT(refresh_spheres(QVariantMap)), Qt::QueuedConnection);
     //connect(m_godcastapi, SIGNAL(nodestatus_Changed(QString)), this, SLOT(node_changed(QString)), Qt::QueuedConnection);
 
-
+    m_stacked_tab_room = new QStackedWidget;
+    m_stacked_tab_room->hide();
 
     hSplitter = new QSplitter(Qt::Vertical, this);
-
     transferList = new TransferListWidget(hSplitter, this, QBtSession::instance());
-
     hSplitter->insertWidget(1, transferList);
-
     ui->verticalLayout_medias->addWidget(hSplitter);
-
+    ui->horizontalLayout_media->addWidget(m_stacked_tab_room);
     // Resume unfinished torrents
     QBtSession::instance()->startUpTorrents();
 
@@ -84,32 +82,26 @@ MainWindow::MainWindow(QWidget *parent) :
     m_stacked_tab_medias = new QStackedWidget;
   //  ui->verticalLayout_medias->addWidget(m_stacked_tab_medias);
 
-    qDebug() << "BEFORE SNOWDEN";
 
-    Sphere_data snowden;
-    snowden.title =  "snowden";
-    snowden.scope = Sphere_scope::FIXED;
+    Sphere_data news;
+    news.title =  "news";
+    news.scope = Sphere_scope::FIXED;
+    news.url = "http://twitter.com/nodecast";
 
-    m_spheres_private.insert(snowden.title,new Sphere(snowden, m_stacked_tab_medias) );
-    ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[snowden.title]);
-    connect(m_spheres_private[snowden.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
-    //sphere_tab.insert( m_stacked_tab_medias->addWidget(m_spheres_private.last()->content), m_spheres_private.last());
-    sphere_tab.insert(m_spheres_private[snowden.title]->index_tab, m_spheres_private[snowden.title]);
-
+    m_spheres_private.insert(news.title,new Sphere(news, m_stacked_tab_medias) );
+    ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[news.title]);
+    connect(m_spheres_private[news.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
+    sphere_tab.insert(m_spheres_private[news.title]->index_tab, m_spheres_private[news.title]);
 
 
-
-
-    //ui->verticalLayout_sphereprivate->addWidget(m_spheres_private_list_widget);
-
-    Sphere_data halloffame;
-    halloffame.title =  "hall of fame";
-    halloffame.scope = Sphere_scope::FIXED;
-    halloffame.directory = "";
-    m_spheres_public.insert(halloffame.title, new Sphere(halloffame, m_stacked_tab_medias) );
-    ui->verticalLayout_spherepublic->addWidget(m_spheres_public[halloffame.title]);
-    connect(m_spheres_public[halloffame.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_spheres_public[halloffame.title]->index_tab, m_spheres_public[halloffame.title]);
+//    Sphere_data halloffame;
+//    halloffame.title =  "hall of fame";
+//    halloffame.scope = Sphere_scope::FIXED;
+//    halloffame.directory = "";
+//    m_spheres_public.insert(halloffame.title, new Sphere(halloffame, m_stacked_tab_medias) );
+//    ui->verticalLayout_spherepublic->addWidget(m_spheres_public[halloffame.title]);
+//    connect(m_spheres_public[halloffame.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
+//    sphere_tab.insert( m_spheres_public[halloffame.title]->index_tab, m_spheres_public[halloffame.title]);
 
 
     Sphere_data debian;
@@ -136,7 +128,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::receiveMessageChat(QString from, QString message)
 {
-    ui->textEdit_chat->append(from + " : " + message);
+    QString room_dest = from.split("_").at(0);
+    QString from_login = from.split("/").at(1);
+
+    if (m_rooms.contains(room_dest))
+        m_rooms[room_dest]->receiveMessage(from_login + " : " + message);
 }
 
 
@@ -170,6 +166,17 @@ void MainWindow::changeConnectionStatus(bool status)
 void MainWindow::changePage(int index)
 {
     m_stacked_tab_medias->setCurrentIndex(index);
+    if (sphere_tab[index]->isScopeFixed()) sphere_tab[index]->reloadWeb();
+
+
+    // gruick to bypass news sphere
+    if (index != 0 && room_tab.contains(index))
+    {
+        m_stacked_tab_room->show();
+        m_stacked_tab_room->setCurrentIndex(room_tab[index]->index_tab);
+    }
+    else m_stacked_tab_room->hide();
+
 
     qDebug() << "QStackedWidget index : " << index;
 }
@@ -885,7 +892,6 @@ void MainWindow::load_spheres()
         spheres = path.entryList(QDir::NoDotAndDotDot | QDir::AllDirs);
         qDebug() << "SPHERES DIRECTORY : " << spheres;
 
-
         foreach(QString sphere_dir, spheres)
         {
             qDebug() << "SPHERE DIR : " << sphere_dir;
@@ -902,15 +908,11 @@ void MainWindow::load_spheres()
             sphere_tab.insert(m_spheres_private[sphere]->index_tab, m_spheres_private[sphere]);
 
             m_spheres_private[sphere]->populate();
+
+            m_rooms.insert(sphere, new Room(sphere, m_stacked_tab_room) );
+            room_tab.insert(m_spheres_private[sphere]->index_tab, m_rooms[sphere]);
         }
-
-
-
     }
-
-
-
-
 }
 
 
