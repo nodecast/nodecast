@@ -116,7 +116,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
     case Sphere_scope::FIXED :
         m_color = new QColor(100, 143, 000);
         view = new QWebView();
-        view->settings()->setAttribute(QWebSettings::JavascriptEnabled, false);
+        view->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
         view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
         view->settings()->setAttribute(QWebSettings::ZoomTextOnly, true);
         view->settings()->setAttribute(QWebSettings::AutoLoadImages, true);

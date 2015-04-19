@@ -19,7 +19,7 @@ class Xmpp_client : public QXmppClient
 public:
     Xmpp_client(QString m_login, QString m_password, int a_xmpp_client_port, QObject *parent = 0);
     ~Xmpp_client();
-    static void loadXMPP();
+    static void connectXMPP();
     static void drop();
     static bool connection_failed;
     static Xmpp_client *instance();

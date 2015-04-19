@@ -67,7 +67,7 @@ class about : public QDialog, private Ui::AboutDlg{
               "</p></body></html>");
       lb_about->setText(aboutText);
       // Set icons
-      logo->setPixmap(QPixmap(QString::fromUtf8(":/Icons/skin/qbittorrent22.png")));
+      logo->setPixmap(QPixmap(QString::fromUtf8(":/img/logo/nodecast_logo22.png")));
       //Title
       lb_name->setText(QString::fromUtf8("<b><h1>nodecast")+QString::fromUtf8(" " VERSION "</h1></b>"));
       // Thanks

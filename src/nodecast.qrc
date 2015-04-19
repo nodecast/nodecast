@@ -22,5 +22,9 @@
         <file>img/24x24/ic_add_circle_24px.svg</file>
         <file>img/24x24/ic_add_circle_outline_24px.svg</file>
         <file>img/logo/nodecast_logo.jpg</file>
+        <file>img/logo/nodecast_cloud.jpg</file>
+        <file>img/32x32/nodecast_logo32.png</file>
+        <file>img/16x16/nodecast_logo16.png</file>
+        <file>img/logo/nodecast_logo22.png</file>
     </qresource>
 </RCC>

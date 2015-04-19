@@ -12,7 +12,7 @@ Xmpp_client * Xmpp_client::instance()
 
 
 
-void Xmpp_client::loadXMPP()
+void Xmpp_client::connectXMPP()
 {
     QHash<QString, QString> account;
     Preferences prefs;
@@ -218,10 +218,9 @@ void Xmpp_client::connectedToServer()
     emit emit_connected(true);
 
 
-    QXmppMucRoom *room = muc_manager->addRoom("test@conference.nodecast.net");
-    room->setNickName("mynick");
+    QXmppMucRoom *room = muc_manager->addRoom("nodecast@conference.nodecast.net");
+    room->setNickName(Preferences().getNodecastLogin());
     room->join();
-
 }
 
 

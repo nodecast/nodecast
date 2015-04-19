@@ -121,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     load_spheres();
-    Xmpp_client::loadXMPP();
+    Xmpp_client::connectXMPP();
     connect(Xmpp_client::instance(), SIGNAL(emit_connected(bool)), this, SLOT(changeConnectionStatus(bool)));
     connect(Xmpp_client::instance(), SIGNAL(emit_chat(QString, QString)), this, SLOT(receiveMessageChat(QString, QString)));
 }

@@ -172,11 +172,11 @@ void Widgettorrent::on_media_doubleClicked()
         qDebug() << "LAUNCH FILE EXPLORER TO : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
-    else if (torrent_data.type == "image")
+    else if (torrent_data.type == "image" || torrent_data.type == "pdf")
     {
         QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
         QString path = QDir::toNativeSeparators(dir);
-        qDebug() << "OPEN PICTURE TO : " << path;
+        qDebug() << "OPEN PICTURE/PDF TO : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
 
@@ -280,6 +280,10 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
              )
     {
         torrent_data.type = "audio";
+    }
+    else if (mime.inherits("application/pdf"))
+    {
+        torrent_data.type = "pdf";
     }
     else
     {
