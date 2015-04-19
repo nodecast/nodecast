@@ -76,7 +76,7 @@
    <item>
     <widget class="QTabWidget" name="tw_tabs">
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab6">
       <attribute name="title">
@@ -89,7 +89,10 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="nodecast.qrc">:/img/logo/nodecast.jpg</pixmap>
+          <pixmap resource="nodecast.qrc">:/img/logo/nodecast_logo.jpg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -21,5 +21,6 @@
         <file>img/24x24/ic_photo_library_24px.svg</file>
         <file>img/24x24/ic_add_circle_24px.svg</file>
         <file>img/24x24/ic_add_circle_outline_24px.svg</file>
+        <file>img/logo/nodecast_logo.jpg</file>
     </qresource>
 </RCC>
