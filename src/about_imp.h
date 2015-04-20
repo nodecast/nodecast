@@ -51,17 +51,14 @@ class about : public QDialog, private Ui::AboutDlg{
       // About
       QString aboutText =
           QString::fromUtf8("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">p, li { white-space: pre-wrap; }</style></head><body style=\" font-size:11pt; font-weight:400; font-style:normal;\"><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">") +
-          tr("A media P2P software programmed in C++ based on qBittorrent, Qt and libtorrent-rasterbar.") +
-          QString::fromUtf8(" <br /><br />") +
+          tr("A media P2P software programmed in Qt/C++ based on qBittorrent, Qxmpp and libtorrent-rasterbar.") +
+          QString::fromUtf8(" <br />") +
           trUtf8("Copyright ©2015 pcode.io") +
           QString::fromUtf8("<br /><br />") +
           tr("Home Page: ") +
-          QString::fromUtf8("<a href=\"http://www.nodecast.net\"><span style=\" text-decoration: underline; color:#0000ff;\">http://www.nodecast.net</span></a></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">") +
-          tr("Bug Tracker: ") +
-          QString::fromUtf8("<a href=\"http://redmine.pcode.io/projects/nodecast\"><span style=\" text-decoration: underline; color:#0000ff;\">http://redmine.pcode.io/projects/nodecast</span></a><br />") +
-          tr("Forum: ") +
-          QString::fromUtf8(
-              "<a href=\"http://redmine.pcode.io/projects/nodecast/boards\"><span style=\" text-decoration: underline; color:#0000ff;\">http://redmine.pcode.io/projects/nodecast/boards</span></a></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">") +
+          QString::fromUtf8("<a href=\"http://www.nodecast.net\"><span style=\" text-decoration: underline; color:#ffffff;\">http://www.nodecast.net</span></a></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">") +
+          tr("Source code: ") +
+          QString::fromUtf8("<a href=\"https://github.com/pcodeio/nodecast\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/pcodeio/nodecast</span></a><br />") +
           tr("IRC: #nodecast on Freenode") +
           QString::fromUtf8(
               "</p></body></html>");
@@ -72,8 +69,15 @@ class about : public QDialog, private Ui::AboutDlg{
       lb_name->setText(QString::fromUtf8("<b><h1>nodecast")+QString::fromUtf8(" " VERSION "</h1></b>"));
       // Thanks
       QString thanks_txt;
-      thanks_txt += QString::fromUtf8("<p>Thanks to all free software projects I am using.</p>");
-      te_thanks->setHtml(thanks_txt);
+      thanks_txt = QString::fromUtf8("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">p, li { white-space: pre-wrap; }</style></head><body style=\" font-size:11pt; font-weight:400; font-style:normal;\"><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">");
+      thanks_txt += QString::fromUtf8("<p>Thanks to these free software projects :</p>");
+      thanks_txt += QString::fromUtf8("<ul><li><a href=\"http://www.qbittorrent.org\"><span style=\" text-decoration: underline; color:#ffffff;\">qBittorrent project</span></a></li>");
+      thanks_txt += QString::fromUtf8("<li><a href=\"http://www.libtorrent.org\"><span style=\" text-decoration: underline; color:#ffffff;\">libtorrent rasterbar</span></a></li>");
+      thanks_txt += QString::fromUtf8("<li><a href=\"http://www.qxmpp.org\"><span style=\" text-decoration: underline; color:#ffffff;\">Qxmpp</span></a></li>");
+      thanks_txt += QString::fromUtf8("<li><a href=\"http://www.qt.io\"><span style=\" text-decoration: underline; color:#ffffff;\">Qt</span></a></li></ul>");
+      thanks_txt += QString::fromUtf8("and many others");
+      thanks_txt += QString::fromUtf8("</p></body></html>");
+      lb_thanks->setText(thanks_txt);
       // Translation
       QString trans_txt = "<p>"+tr("I would like to thank the following people who volunteered to translate qBittorrent:")+"</p>";
       trans_txt += QString::fromUtf8("<ul><li><u>Arabic:</u> SDERAWI (abz8868@msn.com), sn51234 (nesseyan@gmail.com) and  Ibrahim Saed ibraheem_alex(Transifex)</li>\

@@ -59,6 +59,7 @@ public:
     QString get_directory();
     bool isScopeFixed();
     void reloadWeb();
+    QString getTitle() {return sphere_data.title;}
 
 protected:
     virtual void paintEvent(QPaintEvent *e);

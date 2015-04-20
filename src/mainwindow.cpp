@@ -38,6 +38,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QFont font;
+    font.setBold(true);
+    font.setUnderline(true);
+    ui->groupBox_media->setFont(font);
+
+    vSplitter = new QSplitter(Qt::Horizontal, this);
+    vSplitter->insertWidget(0, ui->groupBox_media);
+
+
+
 
     //this->setWindowFlags( Qt::WindowMinimizeButtonHint );
 #ifdef Q_OS_MAC
@@ -50,7 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->groupBox_tchat->hide();
     //ui->pushButton_play->hide();
     ui->pushButton_torrent_info->hide();
-
+    ui->widget_media_tools->hide();
+    ui->groupBox_media->setTitle("news");
 
     videoPlayer = NULL;
 
@@ -62,12 +73,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_stacked_tab_room = new QStackedWidget;
     m_stacked_tab_room->hide();
+    vSplitter->insertWidget(1, m_stacked_tab_room);
+
 
     hSplitter = new QSplitter(Qt::Vertical, this);
     transferList = new TransferListWidget(hSplitter, this, QBtSession::instance());
     hSplitter->insertWidget(1, transferList);
+    transferList->hide();
     ui->verticalLayout_medias->addWidget(hSplitter);
-    ui->horizontalLayout_media->addWidget(m_stacked_tab_room);
+//    ui->horizontalLayout_media->addWidget(m_stacked_tab_room);
+    ui->horizontalLayout_media->addWidget(vSplitter);
+
     // Resume unfinished torrents
     QBtSession::instance()->startUpTorrents();
 
@@ -166,7 +182,17 @@ void MainWindow::changeConnectionStatus(bool status)
 void MainWindow::changePage(int index)
 {
     m_stacked_tab_medias->setCurrentIndex(index);
-    if (sphere_tab[index]->isScopeFixed()) sphere_tab[index]->reloadWeb();
+    if (sphere_tab[index]->isScopeFixed())
+    {
+        ui->groupBox_media->setTitle("news");
+        ui->widget_media_tools->hide();
+        sphere_tab[index]->reloadWeb();
+    }
+    else
+    {
+        ui->groupBox_media->setTitle(sphere_tab[index]->getTitle());
+        ui->widget_media_tools->show();
+    }
 
 
     // gruick to bypass news sphere
@@ -443,8 +469,11 @@ void MainWindow::shutdownCleanUp()
 
     //list_torrents.clear();
 
-    m_godcastapi->deleteLater();
-    qDebug() << "godcast_api deleted";
+    //m_godcastapi->deleteLater();
+    //qDebug() << "godcast_api deleted";
+
+    Xmpp_client::drop();
+    qDebug() << "xmpp deleted";
 
     //qApp->quit();
     //qApp->exit(0);
@@ -1000,3 +1029,9 @@ void MainWindow::refresh_spheres(QVariantMap sphere)
     // ui->treeWidget_nodes->addTopLevelItem(pRow);
 }
 
+
+void MainWindow::on_actionTransferts_triggered()
+{
+    transferList->isHidden()? transferList->show() : transferList->hide();
+    qDebug() << "SHOW TRANSFERT";
+}

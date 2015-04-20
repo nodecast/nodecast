@@ -141,6 +141,8 @@ private slots:
     void changeConnectionStatus(bool status);
     void receiveMessageChat(QString from, QString message);
 
+    void on_actionTransferts_triggered();
+
 private:
     void populate();
     void load_spheres();

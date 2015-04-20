@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>504</width>
-    <height>320</height>
+    <height>371</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -83,7 +83,7 @@
        <string>About</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="mascot_lbl">
          <property name="text">
           <string/>
@@ -96,7 +96,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="2" column="0">
         <widget class="QLabel" name="lb_about">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -381,7 +381,17 @@
         <number>6</number>
        </property>
        <item>
-        <widget class="QTextBrowser" name="te_thanks"/>
+        <widget class="QLabel" name="lb_thanks">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

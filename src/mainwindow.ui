@@ -20,7 +20,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="groupBox_spheres">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -31,6 +31,9 @@
            <string>Spheres</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMaximumSize</enum>
+           </property>
            <item>
             <widget class="QTabWidget" name="tabWidget_spheres">
              <property name="sizePolicy">
@@ -93,7 +96,11 @@
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_13">
                    <item>
-                    <layout class="QVBoxLayout" name="verticalLayout_sphereprivate"/>
+                    <layout class="QVBoxLayout" name="verticalLayout_sphereprivate">
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SetMaximumSize</enum>
+                     </property>
+                    </layout>
                    </item>
                   </layout>
                  </widget>
@@ -122,8 +129,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>102</width>
+                    <height>443</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -165,7 +172,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_media">
               <item>
-               <widget class="QGroupBox" name="groupBox">
+               <widget class="QGroupBox" name="groupBox_media">
                 <property name="title">
                  <string>medias</string>
                 </property>
@@ -173,118 +180,124 @@
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_medias">
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout">
-                     <item>
-                      <widget class="QLabel" name="label_filter">
-                       <property name="text">
-                        <string>Filter :</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QToolButton" name="toolButton_video">
-                       <property name="text">
-                        <string>video</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="nodecast.qrc">
-                         <normaloff>:/img/24x24/ic_video_collection_24px.svg</normaloff>:/img/24x24/ic_video_collection_24px.svg</iconset>
-                       </property>
-                       <property name="checkable">
-                        <bool>true</bool>
-                       </property>
-                       <property name="toolButtonStyle">
-                        <enum>Qt::ToolButtonIconOnly</enum>
-                       </property>
-                       <property name="arrowType">
-                        <enum>Qt::NoArrow</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QToolButton" name="toolButton_photo">
-                       <property name="text">
-                        <string>photo</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="nodecast.qrc">
-                         <normaloff>:/img/24x24/ic_photo_library_24px.svg</normaloff>:/img/24x24/ic_photo_library_24px.svg</iconset>
-                       </property>
-                       <property name="checkable">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QToolButton" name="toolButton_audio">
-                       <property name="text">
-                        <string>audio</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="nodecast.qrc">
-                         <normaloff>:/img/24x24/ic_my_library_music_24px.svg</normaloff>:/img/24x24/ic_my_library_music_24px.svg</iconset>
-                       </property>
-                       <property name="checkable">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_2">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_medias">
-                       <property name="text">
-                        <string>medias :</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_counter_medias">
-                       <property name="text">
-                        <string>0</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_download">
-                       <property name="text">
-                        <string>download :</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_counter_download">
-                       <property name="text">
-                        <string>0</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_upload">
-                       <property name="text">
-                        <string>upload :</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_counter_upload">
-                       <property name="text">
-                        <string>0</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                    <widget class="QWidget" name="widget_media_tools" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_media_filter">
+                        <item>
+                         <widget class="QLabel" name="label_filter">
+                          <property name="text">
+                           <string>Filter :</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButton_video">
+                          <property name="text">
+                           <string>video</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="nodecast.qrc">
+                            <normaloff>:/img/24x24/ic_video_collection_24px.svg</normaloff>:/img/24x24/ic_video_collection_24px.svg</iconset>
+                          </property>
+                          <property name="checkable">
+                           <bool>true</bool>
+                          </property>
+                          <property name="toolButtonStyle">
+                           <enum>Qt::ToolButtonIconOnly</enum>
+                          </property>
+                          <property name="arrowType">
+                           <enum>Qt::NoArrow</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButton_photo">
+                          <property name="text">
+                           <string>photo</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="nodecast.qrc">
+                            <normaloff>:/img/24x24/ic_photo_library_24px.svg</normaloff>:/img/24x24/ic_photo_library_24px.svg</iconset>
+                          </property>
+                          <property name="checkable">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButton_audio">
+                          <property name="text">
+                           <string>audio</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="nodecast.qrc">
+                            <normaloff>:/img/24x24/ic_my_library_music_24px.svg</normaloff>:/img/24x24/ic_my_library_music_24px.svg</iconset>
+                          </property>
+                          <property name="checkable">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_2">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_medias">
+                          <property name="text">
+                           <string>medias :</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_counter_medias">
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_download">
+                          <property name="text">
+                           <string>download :</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_counter_download">
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_upload">
+                          <property name="text">
+                           <string>upload :</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_counter_upload">
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </widget>
                    </item>
                   </layout>
                  </item>
@@ -413,7 +426,7 @@
    </property>
    <widget class="QMenu" name="menuNodecast">
     <property name="title">
-     <string>Account</string>
+     <string>Nodecast</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionAccount"/>
@@ -427,7 +440,14 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuShow">
+    <property name="title">
+     <string>Show</string>
+    </property>
+    <addaction name="actionTransferts"/>
+   </widget>
    <addaction name="menuNodecast"/>
+   <addaction name="menuShow"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -462,6 +482,14 @@
   <action name="actionAccount">
    <property name="text">
     <string>login</string>
+   </property>
+  </action>
+  <action name="actionTransferts">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Transferts detail</string>
    </property>
   </action>
  </widget>
