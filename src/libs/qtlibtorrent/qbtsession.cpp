@@ -1648,7 +1648,8 @@ void QBtSession::setMaxUploadsPerTorrent(int max) {
 
 void QBtSession::enableUPnP(bool b) {
   Preferences pref;
-  if (b) {
+  if (b)
+  {
     if (!m_upnp) {
       qDebug("Enabling UPnP / NAT-PMP");
 #if LIBTORRENT_VERSION_NUM < 10000
@@ -1658,15 +1659,17 @@ void QBtSession::enableUPnP(bool b) {
         s->start_upnp();
         s->start_natpmp();
 #endif
-      //m_upnp = true;
     }
-    // Use UPnP/NAT-PMP for Web UI too
-//    if (pref.isWebUiEnabled() && pref.useUPnPForWebUIPort()) {
-//      const qint16 port = pref.getWebUiPort();
-//      m_upnp->add_mapping(upnp::tcp, port, port);
-//      m_natpmp->add_mapping(natpmp::tcp, port, port);
-//    }
-  } else {
+    // Use UPnP/NAT-PMP for Tracker
+    if (pref.isTrackerEnabled())
+    {
+      const qint16 port = pref.getTrackerPort();
+      m_upnp->add_mapping(upnp::tcp, port, port);
+      m_natpmp->add_mapping(natpmp::tcp, port, port);
+    }
+  }
+  else
+  {
     if (m_upnp) {
       qDebug("Disabling UPnP / NAT-PMP");
       s->stop_upnp();

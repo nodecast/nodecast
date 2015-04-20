@@ -12,10 +12,7 @@ apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libi
 Mac OSX :
 ========
 
-brew install boost
-brew install openssl
-brew install qxmpp
-brew install libtorrent-rasterbar
+brew install boost openssl qxmpp libtorrent-rasterbar
 
 Test :
 

@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Sphere_data news;
     news.title =  "news";
     news.scope = Sphere_scope::FIXED;
-    news.url = "http://twitter.com/nodecast";
+    news.url = "http://nodecast.wordpress.com";
 
     m_spheres_private.insert(news.title,new Sphere(news, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[news.title]);

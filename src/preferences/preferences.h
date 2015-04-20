@@ -1377,7 +1377,7 @@ public:
   }
 
   int getTrackerPort() const {
-    return value(QString::fromUtf8("Preferences/Advanced/trackerPort"), 9000).toInt();
+    return value(QString::fromUtf8("Preferences/Advanced/trackerPort"), 9006).toInt();
   }
 
   void setTrackerPort(int port) {

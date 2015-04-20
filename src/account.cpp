@@ -66,7 +66,7 @@ void account::on_buttonBox_accepted()
     qDebug() << "ACCOUNT : " << hash;
 
 
-    Xmpp_client::loadXMPP();
+    Xmpp_client::connectXMPP();
 
     //thread_xmpp_client = new QThread(this);
 

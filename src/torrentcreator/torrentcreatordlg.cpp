@@ -144,6 +144,10 @@ void TorrentCreatorDlg::on_createButton_clicked() {
   } else {
     return;
   }
+  // remove torrent if exist
+  fsutils::forceRemove(destination);
+
+
   // Disable dialog
   setInteractionEnabled(false);
   showProgressBar(true);
