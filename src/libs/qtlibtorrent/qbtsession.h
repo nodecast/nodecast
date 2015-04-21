@@ -237,6 +237,7 @@ signals:
   void recursiveTorrentDownloadPossible(const QTorrentHandle &h);
   void ipFilterParsed(bool error, int ruleCount);
   void metadataReceivedHidden(const QTorrentHandle &h);
+  void UPnPSuccess(bool);
 
 private:
   // Bittorrent

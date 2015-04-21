@@ -32,7 +32,7 @@
 #include "room.h"
 
 
-Room::Room(QString room_name, QStackedWidget *parent)
+Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sphere_data)
 {
 //    QGroupBox
 //        QVBoxLayout
@@ -44,37 +44,59 @@ Room::Room(QString room_name, QStackedWidget *parent)
 //                    QTextEdit
 //            QLineEdit
 
+    m_room = NULL;
+    refresh_users = new QTimer(this);
 
     groupBox = new QGroupBox;
-    groupBox->setTitle("chat room : " + room_name);
+    groupBox->setTitle("chat room : " + sphere_data.title);
     vbox = new QVBoxLayout;
     scrollArea_users = new QScrollArea;
     scrollArea_users->setWidgetResizable(true);
     scrollArea_chat = new QScrollArea;
     scrollArea_chat->setWidgetResizable(true);
-    users = new QGraphicsView;
+    users_list = new QListWidget;
     chat_room = new QTextEdit;
     line_chat = new QLineEdit;
 
-    scrollArea_users->setWidget(users);
+    scrollArea_users->setWidget(users_list);
     scrollArea_chat->setWidget(chat_room);
     vbox->addWidget(scrollArea_users);
     vbox->addWidget(scrollArea_chat);
     vbox->addWidget(line_chat);
     groupBox->setLayout(vbox);
-
     index_tab = parent->addWidget(groupBox);
+
+    connect(refresh_users, SIGNAL(timeout()), this, SLOT(refreshUsers()));
+    refresh_users->start(1000);
 }
 
 
 
 Room::~Room()
 {
+    if (m_room && m_room->isJoined())
+        m_room->leave("I'll be back");
 }
-
 
 
 void Room::receiveMessage(QString message)
 {
     chat_room->append(message);
+}
+
+void Room::refreshUsers()
+{
+    if (m_room && m_room->isJoined())
+    {
+        refresh_users->stop();
+        refresh_users->deleteLater();
+
+        QStringList users =  m_room->participants();
+        //ROOM USERS :  ("test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/fredix", "test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/test")
+
+        foreach(QString user, users)
+        {
+            users_list->addItem(user.split("/").at(1));
+        }
+    }
 }

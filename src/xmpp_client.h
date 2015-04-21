@@ -9,6 +9,7 @@
 #include "QXmppClient.h"
 #include <QXmppTransferManager.h>
 #include <QXmppMucManager.h>
+#include <QHash>
 
 #include "preferences.h"
 
@@ -24,6 +25,7 @@ public:
     static bool connection_failed;
     static Xmpp_client *instance();
     void connectToRoom(QString room_name);
+    //QXmppMucRoom* get_room(QString room) { if (rooms.contains(room)) return rooms.value(room); else return NULL;}
 
 
 private:
@@ -39,6 +41,7 @@ private:
     QFile *file;
     QString file_name;
     QXmppMucManager *muc_manager;
+    QHash <QString, QXmppMucRoom*> rooms;
     void reload(QString login, QString password);
 
 public slots:
@@ -57,7 +60,7 @@ private slots:
 signals:
     void emit_connected(bool);
     void emit_chat(QString, QString);
-
+    void emit_room(QString room_name, QXmppMucRoom* room);
 };
 
 

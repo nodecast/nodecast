@@ -93,6 +93,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), this, SLOT(addTorrent(QTorrentHandle)));
     //connect(QBtSession::instance(), SIGNAL(newDownloadedTorrent(QString, QString)), this, SLOT(processDownloadedFiles(QString, QString)));
 
+    connect(QBtSession::instance(), SIGNAL(UPnPSuccess(bool)), this, SLOT(NatChangeConnectionStatus(bool)));
+
 
 
     m_stacked_tab_medias = new QStackedWidget;
@@ -138,13 +140,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     load_spheres();
     Xmpp_client::connectXMPP();
-    connect(Xmpp_client::instance(), SIGNAL(emit_connected(bool)), this, SLOT(changeConnectionStatus(bool)));
+    connect(Xmpp_client::instance(), SIGNAL(emit_connected(bool)), this, SLOT(XmppChangeConnectionStatus(bool)));
     connect(Xmpp_client::instance(), SIGNAL(emit_chat(QString, QString)), this, SLOT(receiveMessageChat(QString, QString)));
+    connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
+
 }
+
+
+void MainWindow::mapRoom(QString room_name, QXmppMucRoom *room)
+{
+    qDebug() << "MainWindow::mapRoom : " << room_name;
+    if (m_rooms.contains(room_name))
+        m_rooms.value(room_name)->setXMPPRoom(room);
+}
+
 
 void MainWindow::receiveMessageChat(QString from, QString message)
 {
-    QString room_dest = from.split("_").at(0);
+    QString room_dest = from.split("@").at(0);
     QString from_login = from.split("/").at(1);
 
     if (m_rooms.contains(room_dest))
@@ -152,10 +165,10 @@ void MainWindow::receiveMessageChat(QString from, QString message)
 }
 
 
-void MainWindow::changeConnectionStatus(bool status)
+void MainWindow::XmppChangeConnectionStatus(bool status)
 {
     QPixmap pix = status? QPixmap(":/Icons/skin/connected.png") : QPixmap(":/Icons/skin/disconnected.png");
-    ui->label_connection->setPixmap(pix);
+    ui->label_xmpp->setPixmap(pix);
 
     // connect to chat rooms
     if (status)
@@ -175,6 +188,13 @@ void MainWindow::changeConnectionStatus(bool status)
                 Xmpp_client::instance()->connectToRoom(i.value()->get_directory());
         }
     }
+}
+
+
+void MainWindow::NatChangeConnectionStatus(bool status)
+{
+    QPixmap pix = status? QPixmap(":/Icons/skin/connected.png") : QPixmap(":/Icons/skin/disconnected.png");
+    ui->label_tracker->setPixmap(pix);
 }
 
 
@@ -471,6 +491,11 @@ void MainWindow::shutdownCleanUp()
 
     //m_godcastapi->deleteLater();
     //qDebug() << "godcast_api deleted";
+
+    foreach(Room* room, m_rooms)
+    {
+        delete room;
+    }
 
     Xmpp_client::drop();
     qDebug() << "xmpp deleted";
@@ -938,8 +963,8 @@ void MainWindow::load_spheres()
 
             m_spheres_private[sphere]->populate();
 
-            m_rooms.insert(sphere, new Room(sphere, m_stacked_tab_room) );
-            room_tab.insert(m_spheres_private[sphere]->index_tab, m_rooms[sphere]);
+            m_rooms.insert(sphere_dir, new Room(sphere_datas, m_stacked_tab_room) );
+            room_tab.insert(m_spheres_private[sphere]->index_tab, m_rooms[sphere_dir]);
         }
     }
 }

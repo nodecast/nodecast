@@ -38,26 +38,37 @@
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QStackedWidget>
-#include <QGraphicsView>
+#include <QListWidget>
+#include <QTimer>
+
+#include "xmpp_client.h"
+#include "global.h"
 
 class Room : QWidget
 {
     Q_OBJECT
 
 public:
-    Room(QString room_name, QStackedWidget *parent = 0);
+    Room(Sphere_data a_sphere_data, QStackedWidget *parent = 0);
     ~Room();
     void receiveMessage(QString message);
     int index_tab;
+    void setXMPPRoom(QXmppMucRoom* room) { m_room = room;}
 
 private:
+    QTimer *refresh_users;
     QGroupBox *groupBox;
     QVBoxLayout *vbox;
     QScrollArea *scrollArea_users;
     QScrollArea *scrollArea_chat;
     QTextEdit *chat_room;
     QLineEdit *line_chat;
-    QGraphicsView *users;
+    QListWidget *users_list;
+    Sphere_data sphere_data;
+    QXmppMucRoom* m_room;
+
+private slots:
+    void refreshUsers();
 };
 
 #endif // ROOM_H

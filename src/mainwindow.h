@@ -138,10 +138,14 @@ private slots:
 
 
     void changePage(int current);
-    void changeConnectionStatus(bool status);
+    void XmppChangeConnectionStatus(bool status);
+    void NatChangeConnectionStatus(bool status);
+
     void receiveMessageChat(QString from, QString message);
 
     void on_actionTransferts_triggered();
+    void mapRoom(QString room_name, QXmppMucRoom *room);
+
 
 private:
     void populate();

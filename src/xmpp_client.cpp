@@ -215,12 +215,11 @@ void Xmpp_client::connectedToServer()
     qDebug() << "Xmpp_client::connectedToServer";
     qDebug() << "Connection successfull !";
 
+    rooms.insert("nodecast", muc_manager->addRoom("nodecast@conference.nodecast.net"));
+    rooms["nodecast"]->setNickName(Preferences().getNodecastLogin());
+    rooms["nodecast"]->join();
+
     emit emit_connected(true);
-
-
-    QXmppMucRoom *room = muc_manager->addRoom("nodecast@conference.nodecast.net");
-    room->setNickName(Preferences().getNodecastLogin());
-    room->join();
 }
 
 
@@ -229,9 +228,10 @@ void Xmpp_client::connectToRoom(QString room_name)
 {
     qDebug() << "Xmpp_client::connectToRoom : " << room_name;
 
-    QXmppMucRoom *room = muc_manager->addRoom(room_name + "@conference.nodecast.net");
-    room->setNickName(Preferences().getNodecastLogin());
-    room->join();
+    rooms.insert(room_name, muc_manager->addRoom(room_name + "@conference.nodecast.net"));
+    rooms[room_name]->setNickName(Preferences().getNodecastLogin());
+    rooms[room_name]->join();
+    emit emit_room(room_name, rooms[room_name]);
 }
 
 
