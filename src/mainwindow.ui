@@ -129,8 +129,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>102</width>
-                    <height>443</height>
+                    <width>100</width>
+                    <height>30</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -419,7 +419,7 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>xmpp connection</string>
+           <string>chat</string>
           </property>
          </widget>
         </item>
