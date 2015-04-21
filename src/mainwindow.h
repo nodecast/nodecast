@@ -146,6 +146,7 @@ private slots:
     void on_actionTransferts_triggered();
     void mapRoom(QString room_name, QXmppMucRoom *room);
 
+    void send_torrent_to_room(QString sphere_dir, QString path);
 
 private:
     void populate();

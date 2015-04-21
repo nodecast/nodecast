@@ -45,7 +45,7 @@ const uint NB_PIECES_MAX = 2200;
 
 using namespace libtorrent;
 
-TorrentCreatorDlg::TorrentCreatorDlg(QString sphere, QString file, QString file_path, QWidget *parent): sphere_name(sphere), file_name(file), QDialog(parent), creatorThread(0) {
+TorrentCreatorDlg::TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent): m_sphere_dir(sphere_dir), file_name(file), QDialog(parent), creatorThread(0) {
   setupUi(this);
   // Icons
   //addFile_button->setIcon(IconProvider::instance()->getIcon("document-new"));
@@ -132,7 +132,7 @@ void TorrentCreatorDlg::on_createButton_clicked() {
 
   //QString destination = fsutils::QDesktopServicesDownloadLocation() + "/private/" + sphere_name + "/" + file_name;
   //QString destination = fsutils::QDesktopServicesDownloadLocation() + "/../torrents/" + file_name;
-  QString destination = prefs.getSavePath() + "/nodecast/torrents/" + file_name;
+  QString destination = prefs.getSavePath() + "/nodecast/spheres/private/" + m_sphere_dir + "/torrents/" + file_name;
 
 
   qDebug() << "DESTINATION TORRENT : " << destination;

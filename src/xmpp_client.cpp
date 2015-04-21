@@ -48,7 +48,7 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 {
     qDebug() << "Xmpp_client::Xmpp_client !!!";
 
-    QXmppTransferManager *transfer_manager = new QXmppTransferManager;
+    transfer_manager = new QXmppTransferManager;
     this->addExtension (transfer_manager);
 
 
@@ -56,7 +56,7 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     //
      transfer_manager->setSupportedMethods(QXmppTransferJob::InBandMethod);
     // manager->setSupportedMethods(QXmppTransferJob::SocksMethod);
-
+     transfer_manager->setProxy("proxy.nodecast.net");
 
      muc_manager = new QXmppMucManager;
      this->addExtension(muc_manager);
@@ -143,7 +143,13 @@ void Xmpp_client::init()
 
 }
 
+void Xmpp_client::sendFile(QString jid, QString path)
+{
+    qDebug() << "send file : " << path << " TO : " << jid;
+    transfer_manager->sendFile(jid, path);
 
+
+}
 
 
 void Xmpp_client::file_received (QXmppTransferJob *job)

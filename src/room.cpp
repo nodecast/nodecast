@@ -45,6 +45,10 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 //            QLineEdit
 
     m_room = NULL;
+
+    my_nickname = Preferences().getNodecastLogin();
+
+
     refresh_users = new QTimer(this);
 
     groupBox = new QGroupBox;
@@ -54,11 +58,11 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     scrollArea_users->setWidgetResizable(true);
     scrollArea_chat = new QScrollArea;
     scrollArea_chat->setWidgetResizable(true);
-    users_list = new QListWidget;
+    w_users_list = new QListWidget;
     chat_room = new QTextEdit;
     line_chat = new QLineEdit;
 
-    scrollArea_users->setWidget(users_list);
+    scrollArea_users->setWidget(w_users_list);
     scrollArea_chat->setWidget(chat_room);
     vbox->addWidget(scrollArea_users);
     vbox->addWidget(scrollArea_chat);
@@ -66,8 +70,8 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     groupBox->setLayout(vbox);
     index_tab = parent->addWidget(groupBox);
 
-    connect(refresh_users, SIGNAL(timeout()), this, SLOT(refreshUsers()));
-    refresh_users->start(1000);
+ //   connect(refresh_users, SIGNAL(timeout()), this, SLOT(refreshUsers()));
+ //   refresh_users->start(1000);
 }
 
 
@@ -84,6 +88,22 @@ void Room::receiveMessage(QString message)
     chat_room->append(message);
 }
 
+void Room::setXMPPRoom(QXmppMucRoom* room)
+{
+    m_room = room;
+
+    connect(m_room, SIGNAL(participantAdded(QString)), this, SLOT(newUser(QString)));
+
+}
+
+void Room::newUser(const QString &jid)
+{
+    qDebug() << "NEW USER JOINED : " << jid;
+    QString l_jid = jid.split("/").at(1);
+        w_users_list->addItem(l_jid);
+}
+
+
 void Room::refreshUsers()
 {
     if (m_room && m_room->isJoined())
@@ -91,12 +111,29 @@ void Room::refreshUsers()
         refresh_users->stop();
         refresh_users->deleteLater();
 
-        QStringList users =  m_room->participants();
+        l_users_list =  m_room->participants();
         //ROOM USERS :  ("test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/fredix", "test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/test")
 
-        foreach(QString user, users)
+        foreach(QString user, l_users_list)
         {
-            users_list->addItem(user.split("/").at(1));
+            qDebug() << "FULL JID : " << m_room->participantFullJid(user);
+            w_users_list->addItem(user.split("/").at(1));
         }
     }
 }
+
+QStringList Room::get_users()
+{
+    QStringList users =  m_room->participants();
+    QStringList users_fulljid;
+    foreach(QString user, users)
+    {
+        if (!user.contains(my_nickname))
+            users_fulljid << m_room->participantFullJid(user);
+    }
+    qDebug() << "FULL JID LIST : " << users_fulljid;
+    return users_fulljid;
+}
+
+
+

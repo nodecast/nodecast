@@ -40,7 +40,7 @@ class TorrentCreatorDlg : public QDialog, private Ui::createTorrentDialog{
   Q_OBJECT
 
 public:
-  TorrentCreatorDlg(QString sphere, QString file, QString file_path, QWidget *parent = 0);
+  TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent = 0);
   ~TorrentCreatorDlg();
   int getPieceSize() const;
 
@@ -71,7 +71,7 @@ private:
   Preferences prefs;
   void saveSettings();
   void loadSettings();
-  QString sphere_name;
+  QString m_sphere_dir;
   QString file_name;
 
 private:

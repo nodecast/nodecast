@@ -44,7 +44,7 @@
 #include "xmpp_client.h"
 #include "global.h"
 
-class Room : QWidget
+class Room : public QWidget
 {
     Q_OBJECT
 
@@ -53,9 +53,12 @@ public:
     ~Room();
     void receiveMessage(QString message);
     int index_tab;
-    void setXMPPRoom(QXmppMucRoom* room) { m_room = room;}
+    void setXMPPRoom(QXmppMucRoom* room);
+    QStringList get_users();
+    QString get_name() { return sphere_data.title;}
 
 private:
+    QString my_nickname;
     QTimer *refresh_users;
     QGroupBox *groupBox;
     QVBoxLayout *vbox;
@@ -63,12 +66,14 @@ private:
     QScrollArea *scrollArea_chat;
     QTextEdit *chat_room;
     QLineEdit *line_chat;
-    QListWidget *users_list;
+    QListWidget *w_users_list;
     Sphere_data sphere_data;
     QXmppMucRoom* m_room;
+    QStringList l_users_list;
 
 private slots:
     void refreshUsers();
+    void newUser(const QString &jid);
 };
 
 #endif // ROOM_H

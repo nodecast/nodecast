@@ -56,10 +56,10 @@ public:
     void populate();
     virtual QSize sizeHint() const;
     int index_tab;
-    QString get_directory();
     bool isScopeFixed();
     void reloadWeb();
     QString getTitle() {return sphere_data.title;}
+    QString getDirectory() {return sphere_data.directory;}
 
 protected:
     virtual void paintEvent(QPaintEvent *e);
@@ -93,6 +93,7 @@ private slots:
 
 signals:
     void row(int);
+    void send_torrent(QString sphere_dir, QString path);
 };
 
 

@@ -66,8 +66,10 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
         check_dir = nodecast_datas.absolutePath() + "/" + sphere_data.directory;
         if (!check_dir.exists())
+        {
             nodecast_datas.mkdir(sphere_data.directory);
-
+            nodecast_datas.mkdir(sphere_data.directory + "/torrents");
+        }
 
 
         m_color = new QColor(105,105,105);
@@ -165,13 +167,6 @@ void Sphere::reloadWeb()
 }
 
 
-QString Sphere::get_directory()
-{
-    return sphere_data.directory;
-}
-
-
-
 QSize Sphere::sizeHint() const
 {
     return QSize(105,105);
@@ -219,14 +214,14 @@ void Sphere::dropEvent(QDropEvent* event)
        if(fileInfo.isFile())
        {
            // file
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.title, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
            connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
            //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else if(fileInfo.isDir())
        {
            // directory
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.title, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
            connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
            //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
@@ -244,7 +239,9 @@ void Sphere::dropEvent(QDropEvent* event)
 
 void Sphere::addTorrent(QString path)
 {
-  QBtSession::instance()->addTorrent(path);
+    // add torrent to seed file
+    QBtSession::instance()->addTorrent(path);
+    emit send_torrent(sphere_data.directory, path);
 }
 
 

@@ -25,11 +25,13 @@ public:
     static bool connection_failed;
     static Xmpp_client *instance();
     void connectToRoom(QString room_name);
+    void sendFile(QString jid, QString path);
     //QXmppMucRoom* get_room(QString room) { if (rooms.contains(room)) return rooms.value(room); else return NULL;}
 
 
 private:
     static Xmpp_client* m_instance;
+    QXmppTransferManager *transfer_manager;
     Preferences prefs;
     QFile *log;
     QString m_login;

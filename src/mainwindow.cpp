@@ -179,13 +179,13 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
         QHashIterator<QString, Sphere*> i(m_spheres_private);
         while (i.hasNext()) {
             i.next();
-            qDebug() << "DIR " << i.value()->get_directory();
+            qDebug() << "DIR " << i.value()->getDirectory();
 
 
      //   foreach(QString key, keys)
      //   {
           //  qDebug() << " DIR : " << m_spheres_private[key]->get_directory();
-                Xmpp_client::instance()->connectToRoom(i.value()->get_directory());
+                Xmpp_client::instance()->connectToRoom(i.value()->getDirectory());
         }
     }
 }
@@ -495,6 +495,7 @@ void MainWindow::shutdownCleanUp()
     foreach(Room* room, m_rooms)
     {
         delete room;
+        //room->deleteLater();
     }
 
     Xmpp_client::drop();
@@ -933,6 +934,23 @@ void MainWindow::on_pushButton_spherenew_clicked()
 
 }
 
+void MainWindow::send_torrent_to_room(QString sphere_dir, QString path)
+{
+    qDebug() << "SEND TORRENT : " << sphere_dir << " DIR : " << path;
+    if (m_rooms.contains(sphere_dir))
+    {
+        qDebug() << "ROOM : " << m_rooms.value(sphere_dir)->get_name();
+        QStringList users_list = m_rooms.value(sphere_dir)->get_users();
+
+        qDebug() << "USERS LIST : " << users_list;
+
+        foreach(QString user, users_list)
+        {
+            Xmpp_client::instance()->sendFile(user, path);
+
+        }
+    }
+}
 
 
 void MainWindow::load_spheres()
@@ -950,21 +968,23 @@ void MainWindow::load_spheres()
         {
             qDebug() << "SPHERE DIR : " << sphere_dir;
 
-            QString sphere = sphere_dir.split("_").at(0);
+            QString sphere_name = sphere_dir.split("_").at(0);
 
             Sphere_data sphere_datas;
-            sphere_datas.title =  sphere;
+            sphere_datas.title =  sphere_name;
             sphere_datas.directory = sphere_dir;
             sphere_datas.scope = Sphere_scope::PRIVATE;
-            m_spheres_private.insert(sphere, new Sphere(sphere_datas, m_stacked_tab_medias) );
-            ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere]);
-            connect(m_spheres_private[sphere], SIGNAL(row(int)), this, SLOT(changePage(int)));
-            sphere_tab.insert(m_spheres_private[sphere]->index_tab, m_spheres_private[sphere]);
+            m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_medias) );
+            ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
+            connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
+            connect(m_spheres_private[sphere_name], SIGNAL(send_torrent(QString, QString)), this, SLOT(send_torrent_to_room(QString, QString)));
 
-            m_spheres_private[sphere]->populate();
+            sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
+
+            m_spheres_private[sphere_name]->populate();
 
             m_rooms.insert(sphere_dir, new Room(sphere_datas, m_stacked_tab_room) );
-            room_tab.insert(m_spheres_private[sphere]->index_tab, m_rooms[sphere_dir]);
+            room_tab.insert(m_spheres_private[sphere_name]->index_tab, m_rooms[sphere_dir]);
         }
     }
 }
@@ -984,13 +1004,24 @@ void MainWindow::create_sphere(QString sphere_name)
     {
  //       nodecast_datas.mkdir(sphere_name);
 
-        Sphere_data new_sphere;
-        new_sphere.title =  sphere_name;
-        new_sphere.scope = Sphere_scope::PRIVATE;
-        m_spheres_private.insert(new_sphere.title, new Sphere(new_sphere, m_stacked_tab_medias) );
-        ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[new_sphere.title]);
-        connect(m_spheres_private[new_sphere.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
-        sphere_tab.insert(m_spheres_private[new_sphere.title]->index_tab, m_spheres_private[new_sphere.title]);
+        Sphere_data sphere_datas;
+        sphere_datas.title =  sphere_name;
+        sphere_datas.scope = Sphere_scope::PRIVATE;
+        m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_medias) );
+        ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
+        connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
+        connect(m_spheres_private[sphere_name], SIGNAL(send_torrent(QString, QString)), this, SLOT(send_torrent_to_room(QString, QString)));
+
+        sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
+
+        QString sphere_dir = m_spheres_private[sphere_name]->getDirectory();
+
+        m_rooms.insert(sphere_dir, new Room(sphere_datas, m_stacked_tab_room) );
+        room_tab.insert(m_spheres_private[sphere_name]->index_tab, m_rooms[sphere_dir]);
+
+
+        Xmpp_client::instance()->connectToRoom(sphere_dir);
+
     }
 
     //QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.title + "/" + fileInfo.fileName();
