@@ -62,6 +62,8 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     chat_room = new QTextEdit;
     line_chat = new QLineEdit;
 
+    connect(line_chat, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+
     scrollArea_users->setWidget(w_users_list);
     scrollArea_chat->setWidget(chat_room);
     vbox->addWidget(scrollArea_users);
@@ -80,6 +82,17 @@ Room::~Room()
 {
     if (m_room && m_room->isJoined())
         m_room->leave("I'll be back");
+}
+
+
+void Room::sendMessage()
+{
+    if (line_chat->text().isEmpty()) return;
+
+    qDebug() << "Room::sendMessage : " << line_chat->text();
+
+    m_room->sendMessage(line_chat->text());
+    line_chat->clear();
 }
 
 

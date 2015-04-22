@@ -74,6 +74,7 @@ private:
 private slots:
     void refreshUsers();
     void newUser(const QString &jid);
+    void sendMessage();
 };
 
 #endif // ROOM_H
