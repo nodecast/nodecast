@@ -59,11 +59,12 @@ void Widgettorrent::populate(Sphere_data a_sphere_data, QLayout *parent)
         qDebug() << "SAVE PATH : "<< h.save_path();
 
         QString path = h.save_path();
+        // remove last / of the path, split on / and take the directory name
+        QString dir = path.remove(path.size()-1, 1).split("/").takeLast();
 
-        if (!path.contains(a_sphere_data.title, Qt::CaseSensitive)) continue;
+        if (dir != a_sphere_data.directory) continue;
 
-
-            qDebug() << "PATH : " << path << " TITLE " << a_sphere_data.title;
+        qDebug() << "PATH : " << path << " TITLE " << a_sphere_data.title;
         Widgettorrent *wt = new Widgettorrent(a_sphere_data);
         parent->addWidget(wt);
         qDebug() << "Widgettorrent::populate";
