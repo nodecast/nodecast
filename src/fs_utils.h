@@ -63,6 +63,8 @@ static bool createLink(const QString &filename_source, const QString &filename_t
 static QString QDesktopServicesDataLocation();
 static QString QDesktopServicesCacheLocation();
 static QString QDesktopServicesDownloadLocation();
+static QString QDesktopInitServicesDownloadLocation(const QString &save_path);
+
 /* End of Qt4 code */
 static QString searchEngineLocation();
 static QString BTBackupLocation();

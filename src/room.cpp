@@ -53,6 +53,15 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 
     groupBox = new QGroupBox;
     groupBox->setTitle("chat room : " + sphere_data.title);
+    QFont font;
+    font.setBold(true);
+    font.setUnderline(true);
+    groupBox->setFont(font);
+
+    invit = new QPushButton;
+    invit->setText("send invitation");
+    connect(invit, SIGNAL(clicked()), this, SLOT(sendInvitation()));
+
     vbox = new QVBoxLayout;
     scrollArea_users = new QScrollArea;
     scrollArea_users->setWidgetResizable(true);
@@ -66,6 +75,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 
     scrollArea_users->setWidget(w_users_list);
     scrollArea_chat->setWidget(chat_room);
+    vbox->addWidget(invit);
     vbox->addWidget(scrollArea_users);
     vbox->addWidget(scrollArea_chat);
     vbox->addWidget(line_chat);
@@ -84,6 +94,24 @@ Room::~Room()
         m_room->leave("I'll be back");
 }
 
+void Room::sendInvitation()
+{
+    qDebug() << "send invitation";
+    room_invitation = new roominvit(this);
+    connect(room_invitation, SIGNAL(emit_jids(QStringList)), this, SLOT(send_invitation(QStringList)));
+    room_invitation->show();
+
+}
+
+
+void Room::send_invitation(QStringList jids)
+{
+    foreach(const QString jid, jids)
+    {
+        m_room->sendInvitation(jid, "you have been invited to join this sphere, from " + Preferences().getNodecastLogin());
+    }
+}
+
 
 void Room::sendMessage()
 {
@@ -94,6 +122,7 @@ void Room::sendMessage()
     m_room->sendMessage(line_chat->text());
     line_chat->clear();
 }
+
 
 
 void Room::receiveMessage(QString message)
@@ -123,9 +152,7 @@ void Room::refreshUsers()
     {
         refresh_users->stop();
         refresh_users->deleteLater();
-
         l_users_list =  m_room->participants();
-        //ROOM USERS :  ("test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/fredix", "test_3923f2dea95f460c8061c68728812331@conference.nodecast.net/test")
 
         foreach(QString user, l_users_list)
         {
@@ -138,10 +165,11 @@ void Room::refreshUsers()
 QStringList Room::get_users()
 {
     QStringList users =  m_room->participants();
+    qDebug() << "USERS ROOM LIST : " << users;
     QStringList users_fulljid;
     foreach(QString user, users)
     {
-        if (!user.contains(my_nickname))
+        if (user.split("/").takeLast() != my_nickname)
             users_fulljid << m_room->participantFullJid(user);
     }
     qDebug() << "FULL JID LIST : " << users_fulljid;

@@ -111,7 +111,8 @@ SOURCES +=  main.cpp\
             newsphere.cpp \
             sphere.cpp \
     xmpp_client.cpp \
-    room.cpp
+    room.cpp \
+    roominvit.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -142,7 +143,8 @@ HEADERS  += mainwindow.h \
             sphere.h \
     xmpp_client.h \
     global.h \
-    room.h
+    room.h \
+    roominvit.h
 
 win32|macx {
   HEADERS += programupdater.h
@@ -157,7 +159,8 @@ FORMS += mainwindow.ui \
     widgettorrent.ui \
     about.ui \
     account.ui \
-    newsphere.ui
+    newsphere.ui \
+    roominvit.ui
 
 
 INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base

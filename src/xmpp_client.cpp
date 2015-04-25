@@ -17,6 +17,7 @@ void Xmpp_client::connectXMPP()
     QHash<QString, QString> account;
     Preferences prefs;
     account = prefs.getNodecastAccount();
+    if (account.size() == 0) return;
 
     if (Xmpp_client::m_instance && !account.isEmpty())
     {
@@ -27,7 +28,7 @@ void Xmpp_client::connectXMPP()
     }
     else if (!Xmpp_client::m_instance && !account.isEmpty())
     {
-        qDebug() << "XMPP BEFORE";
+        qDebug() << "XMPP BEFORE : " << account["login"]  << " PASS : " << account["password"];
         m_instance = new Xmpp_client(account["login"], account["password"], 5223);
         //connect(m_xmpp_client, SIGNAL(emit_tchat(QString)), SLOT(receive_tchat(QString)));
         qDebug() << "XMPP AFTER";

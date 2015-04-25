@@ -245,6 +245,7 @@ public:
 
       hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
       hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
+      if (hash["login"].isEmpty() || hash["password"].isEmpty()) hash.clear();
       return hash;
   }
 
@@ -273,7 +274,8 @@ public:
     return fsutils::QDesktopServicesDownloadLocation();
   }
 
-  void setSavePath(const QString &save_path) {
+  void setSavePath(const QString &save_path) {  
+    fsutils::QDesktopInitServicesDownloadLocation(save_path);
     setValue(QString::fromUtf8("Preferences/Downloads/SavePath"), save_path);
   }
 

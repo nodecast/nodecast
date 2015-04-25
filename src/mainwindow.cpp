@@ -48,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-
     //this->setWindowFlags( Qt::WindowMinimizeButtonHint );
 #ifdef Q_OS_MAC
    // fixNativeWindow( this );
@@ -62,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_torrent_info->hide();
     ui->widget_media_tools->hide();
     ui->groupBox_media->setTitle("news");
+    ui->pushButton_spherenew->setEnabled(false);
 
     videoPlayer = NULL;
 
@@ -173,6 +173,9 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
     // connect to chat rooms
     if (status)
     {
+        ui->pushButton_spherenew->setEnabled(true);
+
+
         QList <QString> keys = m_spheres_private.keys();
         qDebug() << "KEYS : " << keys;
 
@@ -193,6 +196,7 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
 
 void MainWindow::NatChangeConnectionStatus(bool status)
 {
+    if (!prefs.isTrackerEnabled()) status = false;
     QPixmap pix = status? QPixmap(":/Icons/skin/connected.png") : QPixmap(":/Icons/skin/disconnected.png");
     ui->label_tracker->setPixmap(pix);
 }
@@ -465,9 +469,9 @@ void MainWindow::launch_timer_handle(QTorrentHandle h)
 void MainWindow::shutdownCleanUp()
 {
     qDebug("DESTRUCTEUR");
-    if (videoPlayer && videoPlayer->processId() != 0)
+    if (videoPlayer != 0)
     {
-        qDebug() << "process ID = " << videoPlayer->processId();
+        //qDebug() << "process ID = " << videoPlayer->processId();
         videoPlayer->kill();
         delete(videoPlayer);
     }
@@ -947,8 +951,9 @@ void MainWindow::send_torrent_to_room(QString sphere_dir, QString path)
         foreach(QString user, users_list)
         {
             Xmpp_client::instance()->sendFile(user, path);
-
         }
+        QString filename = path.split("/").takeLast();
+        m_rooms.value(sphere_dir)->send_message(" share : " + filename);
     }
 }
 

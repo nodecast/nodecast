@@ -40,9 +40,11 @@
 #include <QStackedWidget>
 #include <QListWidget>
 #include <QTimer>
+#include <QPushButton>
 
 #include "xmpp_client.h"
 #include "global.h"
+#include "roominvit.h"
 
 class Room : public QWidget
 {
@@ -56,6 +58,7 @@ public:
     void setXMPPRoom(QXmppMucRoom* room);
     QStringList get_users();
     QString get_name() { return sphere_data.title;}
+    void send_message(QString message)  {m_room->sendMessage(message);}
 
 private:
     QString my_nickname;
@@ -70,11 +73,15 @@ private:
     Sphere_data sphere_data;
     QXmppMucRoom* m_room;
     QStringList l_users_list;
+    QPushButton *invit;
+    roominvit *room_invitation;
 
 private slots:
     void refreshUsers();
     void newUser(const QString &jid);
     void sendMessage();
+    void sendInvitation();
+    void send_invitation(QStringList jids);
 };
 
 #endif // ROOM_H

@@ -9,6 +9,12 @@ Ubuntu :
 
 apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev libqxmpp-dev
 
+git submodule update --init
+
+cd src/libs/qxmpp/
+qmake && make
+sudo make install
+
 Mac OSX :
 ========
 

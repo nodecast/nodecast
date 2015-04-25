@@ -446,6 +446,24 @@ QString fsutils::QDesktopServicesCacheLocation() {
 #endif
 }
 
+QString fsutils::QDesktopInitServicesDownloadLocation(const QString &save_path)
+{
+    QDir home = save_path;
+    home.mkdir("nodecast");
+    QString nodecast = home.absolutePath() + "/nodecast";
+    QDir spheres = nodecast;
+    spheres.mkdir("spheres");
+    QString scopes = home.absolutePath() + "/nodecast/spheres";
+    QDir spublic = scopes;
+    QDir sprivate = scopes;
+    spublic.mkdir("public");
+    sprivate.mkdir("private");
+    //return spheres.absoluteFilePath("spheres");
+    qDebug() << "fsutils::QDesktopServicesDownloadLocation : " << home.absolutePath();
+    return home.absolutePath();
+}
+
+
 QString fsutils::QDesktopServicesDownloadLocation() {
 #if defined(Q_WS_WIN) || defined(Q_OS_OS2)
   // as long as it stays WinXP like we do the same on OS/2
@@ -498,11 +516,7 @@ QString fsutils::QDesktopServicesDownloadLocation() {
   //return QDir::home().absoluteFilePath(tr("Downloads"));
 
   QDir home = QDir::home();
-  home.mkdir("nodecast");
-  QString nodecast = home.absolutePath() + "/nodecast";
-  QDir spheres = nodecast;
-  spheres.mkdir("spheres");
-  return spheres.absoluteFilePath("spheres");
+  return fsutils::QDesktopInitServicesDownloadLocation(home.absolutePath());
 }
 
 QString fsutils::searchEngineLocation() {

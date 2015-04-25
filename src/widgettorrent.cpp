@@ -88,9 +88,9 @@ Widgettorrent::Widgettorrent(Sphere_data a_sphere_data) : sphere_data(a_sphere_d
 
 Widgettorrent::~Widgettorrent()
 {
-    if (videoPlayer && videoPlayer->processId() != 0)
+    if (videoPlayer != 0)
     {
-        qDebug() << "process ID = " << videoPlayer->processId();
+        //qDebug() << "process ID = " << videoPlayer->processId();
         videoPlayer->kill();
         delete(videoPlayer);
     }
