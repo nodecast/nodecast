@@ -2,6 +2,9 @@
 TEMPLATE = app
 CONFIG += qt thread
 CONFIG += c++11
+QMAKE_PKGCONFIG_CFLAGS = -DQXMPP_STATIC
+#QXMPP_LIBRARY_TYPE = "staticlib"
+
 
 # Windows specific configuration
 win32: include(../winconf.pri)
@@ -17,6 +20,8 @@ unix:!macx: include(../unixconf.pri)
 
 # eCS(OS/2) specific configuration
 os2: include(../os2conf.pri)
+
+include(libs/qxmpp/qxmpp.pri)
 
 
 QT += xml
@@ -90,6 +95,12 @@ include(torrentcreator/torrentcreator.pri)
 }
 
 
+#INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
+#INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
+INCLUDEPATH += $$QXMPP_INCLUDEPATH
+#LIBS += $$QXMPP_LIBS
+LIBS += $$PWD/$$LIBS_PATH/qxmpp/src/libqxmpp.a
+
 
 SOURCES +=  main.cpp\
             mainwindow.cpp \
@@ -162,9 +173,6 @@ FORMS += mainwindow.ui \
     newsphere.ui \
     roominvit.ui
 
-
-INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
-INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
 
 
 # OS specific config

@@ -7,20 +7,21 @@ It aims to be really simple by using spheres and respectful of private life.
 Ubuntu :
 ========
 
-apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev libqxmpp-dev
+apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev 
 
 git submodule update --init
 
 cd src/libs/qxmpp/
-qmake && make
-sudo make install
+
+qmake QXMPP_LIBRARY_TYPE=staticlib && make
 
 Mac OSX :
 ========
 
-brew install boost openssl qxmpp libtorrent-rasterbar
+brew install boost openssl libtorrent-rasterbar
 
-Test :
+git submodule update --init
 
-File open, and paste this link http://www.freetorrent.fr/download.php?id=a751f302a3bd84b5a009a580dff4edebf559127e&f=chiffrofete-up-14.10.torrent
+cd src/libs/qxmpp/
 
+qmake QXMPP_LIBRARY_TYPE=staticlib && make
