@@ -97,6 +97,17 @@ Room::~Room()
 void Room::sendInvitation()
 {
     qDebug() << "send invitation";
+
+    if (Xmpp_client::connection_failed)
+    {
+        errorMessageDialog = new QErrorMessage(this);
+        errorMessageDialog->setModal(true);
+        errorMessageDialog->showMessage("nodecast is not connected, check your account.");
+        //errorMessageDialog->show();
+        return;
+    }
+
+
     room_invitation = new roominvit(this);
     connect(room_invitation, SIGNAL(emit_jids(QStringList)), this, SLOT(send_invitation(QStringList)));
     room_invitation->show();
@@ -108,6 +119,7 @@ void Room::send_invitation(QStringList jids)
 {
     foreach(const QString jid, jids)
     {
+        qDebug() << "SEND INVITATION ROOM : " << jid;
         m_room->sendInvitation(jid, "you have been invited to join this sphere, from " + Preferences().getNodecastLogin());
     }
 }

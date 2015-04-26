@@ -191,6 +191,9 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
                 Xmpp_client::instance()->connectToRoom(i.value()->getDirectory());
         }
     }
+    else
+        ui->pushButton_spherenew->setEnabled(false);
+
 }
 
 

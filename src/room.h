@@ -41,6 +41,7 @@
 #include <QListWidget>
 #include <QTimer>
 #include <QPushButton>
+#include <QErrorMessage>
 
 #include "xmpp_client.h"
 #include "global.h"
@@ -75,6 +76,7 @@ private:
     QStringList l_users_list;
     QPushButton *invit;
     roominvit *room_invitation;
+    QErrorMessage *errorMessageDialog;
 
 private slots:
     void refreshUsers();

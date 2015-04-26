@@ -155,11 +155,36 @@ void Xmpp_client::sendFile(QString jid, QString path)
 
 void Xmpp_client::file_received (QXmppTransferJob *job)
 {
-    qDebug() << "Xmpp_client::file_received : " << job->fileName() << " file size : " << job->fileSize();
+    file_name = job->fileName();
+    qint64 file_size = job->fileSize();
+
+    qDebug() << "Xmpp_client::file_received : " << file_name << " file size : " << file_size;
     qDebug() << "Got transfer request from:" << job->jid();
 
 
-    file_name = job->fileName();
+    // check extension
+    if (!file_name.contains("."))
+    {
+        qDebug() << "file without .";
+        job->abort();
+        return;
+    }
+    else if (file_size > 100000 || file_size == 0)
+    {
+        qDebug() << "file too big";
+        job->abort();
+        return;
+    }
+    QString extension = file_name.split(".").takeLast();
+    qDebug() << "RECEIVE FILE WITH EXTENSION : " << extension;
+
+    if (extension != "torrent")
+    {
+        qDebug() << "file without .torrent";
+        job->abort();
+        return;
+    }
+
 
     bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(job_error(QXmppTransferJob::Error)));
     Q_ASSERT(check);
@@ -200,8 +225,8 @@ void Xmpp_client::job_finished ()
     file->write(m_buffer->data());
     file->close();
     m_buffer->close ();
-    m_buffer->deleteLater();
-    file->deleteLater();
+    delete m_buffer;
+    delete file;
 }
 
 
