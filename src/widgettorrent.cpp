@@ -173,11 +173,11 @@ void Widgettorrent::on_media_doubleClicked()
         qDebug() << "LAUNCH FILE EXPLORER TO : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
-    else if (torrent_data.type == "image" || torrent_data.type == "pdf")
+    else if (torrent_data.type == "image" || torrent_data.type == "pdf" || torrent_data.type == "text")
     {
         QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
         QString path = QDir::toNativeSeparators(dir);
-        qDebug() << "OPEN PICTURE/PDF TO : " << path;
+        qDebug() << "OPEN PICTURE/PDF/TEXT TO : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
 

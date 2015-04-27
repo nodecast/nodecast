@@ -203,7 +203,6 @@ private:
     QSystemTrayIcon m_trayIcon;
     QMenu m_trayIconMenu;
 #endif
-
 };
 
 #endif // MAINWINDOW_H

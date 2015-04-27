@@ -42,7 +42,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
-
     QFont font;
     font.setBold(true);
     font.setUnderline(true);

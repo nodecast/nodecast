@@ -45,6 +45,8 @@
 #include "widgettorrent.h"
 #include "torrentcreator/torrentcreatordlg.h"
 #include "room.h"
+#include "filesystemwatcher.h"
+#include "scannedfoldersmodel.h"
 
 class Sphere : public QAbstractButton
 {
@@ -91,12 +93,14 @@ private:
     QPointer<TorrentCreatorDlg> createTorrentDlg;
     Preferences prefs;
     Room *m_room;
+    FileSystemWatcher *m_fsWatcher;
 
 public slots:
 
 private slots:
     void selected();
-    void addTorrent(QString path);
+    void addTorrent(QString path, bool fromScandir);
+    void torrentsAdded(QStringList &torrents);
 
 signals:
     void row(int);

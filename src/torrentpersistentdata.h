@@ -469,13 +469,13 @@ public:
 
   // Getters
   static QString getSavePath(const QString &hash) {
-      qDebug() << "GETSAVEPATH HASH : " << hash;
+    //  qDebug() << "GETSAVEPATH HASH : " << hash;
     QIniSettings settings(QString::fromUtf8("pcode"), QString::fromUtf8("nodecast-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
 
-    qDebug() << "GETSAVEPATH : " << all_data;
-    qDebug() << "GETSAVEPATH2 : " << data;
+    //qDebug() << "GETSAVEPATH : " << all_data;
+    //qDebug() << "GETSAVEPATH2 : " << data;
     //qDebug("TorrentPersistentData: getSavePath %s", data["save_path"].toString().toLocal8Bit().data());
     return data.value("save_path").toString();
   }

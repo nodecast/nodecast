@@ -193,7 +193,7 @@ void TorrentCreatorDlg::handleCreationSuccess(QString path, QString branch_path)
     TorrentTempData::setSavePath(hash, save_path);
     // Enable seeding mode (do not recheck the files)
     TorrentTempData::setSeedingMode(hash, true);
-    emit torrent_to_seed(path);
+    emit torrent_to_seed(path, false);
     //if (checkIgnoreShareLimits->isChecked())
     QBtSession::instance()->setMaxRatioPerTorrent(hash, -1);
   //}

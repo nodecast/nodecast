@@ -45,7 +45,7 @@ public:
   int getPieceSize() const;
 
 signals:
-  void torrent_to_seed(QString path);
+  void torrent_to_seed(QString path, bool fromScandir);
 
 public slots:
   void updateProgressBar(int progress);

@@ -88,6 +88,13 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
         m_room = new Room(sphere_data, m_stacked_room);
 
+
+        m_fsWatcher = new FileSystemWatcher(this);
+        connect(m_fsWatcher, SIGNAL(torrentsAdded(QStringList&)), this, SLOT(torrentsAdded(QStringList&)));
+        m_fsWatcher->addPath(nodecast_datas.absolutePath() + "/" + sphere_data.directory);
+
+        ScanFoldersModel::instance()->addPath(nodecast_datas.absolutePath() + "/" + sphere_data.directory, true);
+
         break;
 
     case Sphere_scope::PUBLIC :
@@ -253,14 +260,14 @@ void Sphere::dropEvent(QDropEvent* event)
        {
            // file
            createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
-           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
+           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
            //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else if(fileInfo.isDir())
        {
            // directory
            createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
-           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString)), this, SLOT(addTorrent(QString)));
+           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
            //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else
@@ -390,12 +397,20 @@ void Sphere::receive_message(const QString message)
 
 
 
-void Sphere::addTorrent(QString path)
+void Sphere::addTorrent(QString path, bool fromScanDir)
 {
     qDebug() << "SEND TORRENT : " << path;
 
-    // add torrent to seed file
-    QBtSession::instance()->addTorrent(path);
+    if (fromScanDir)
+    {
+        // archive file to torrents directory
+        QFileInfo fi_torrent(path);
+        qDebug() << "COPY FILENAME : " << fi_torrent.fileName();
+
+        QDir nodecast_datas;
+        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+        QFile::copy(fi_torrent.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/torrents/" + fi_torrent.fileName() );
+    }
 
     qDebug() << "ROOM : " << m_room->get_name();
     QStringList users_list = m_room->get_users();
@@ -408,4 +423,18 @@ void Sphere::addTorrent(QString path)
     }
     QString filename = path.split("/").takeLast();
     m_room->send_message(" share : " + filename);
+
+
+    // add torrent to seed file
+    QBtSession::instance()->addTorrent(path, fromScanDir);
 }
+
+void Sphere::torrentsAdded(QStringList &torrents)
+{
+    foreach(QString torrent, torrents)
+    {
+       // qDebug() << "torrentsAdded TORRENT : " << torrent;
+        addTorrent(torrent, true);
+    }
+}
+

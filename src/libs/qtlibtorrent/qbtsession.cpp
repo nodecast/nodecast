@@ -1838,9 +1838,9 @@ void QBtSession::saveFastResumeData() {
   std::vector<torrent_handle>::iterator torrentITend = torrents.end();
   for ( ; torrentIT != torrentITend; ++torrentIT) {
     QTorrentHandle h = QTorrentHandle(*torrentIT);
-    qDebug() << "BEFORE HANDLE1 : " << misc::toQString(h.info_hash());
+    //qDebug() << "BEFORE HANDLE1 : " << misc::toQString(h.info_hash());
     QString h_status = h.is_valid()? "H IS VALID" : "H NOT VALID";
-    qDebug() << "H VALID ? :" << h_status;
+    //qDebug() << "H VALID ? :" << h_status;
     if (!h.is_valid())
       continue;
     try {

@@ -119,7 +119,8 @@ private:
 
 public:
   FileSystemWatcher(QObject *parent): QFileSystemWatcher(parent) {
-    m_filters << "*.torrent" << "*.magnet";
+//    m_filters << "*.torrent" << "*.magnet";
+    m_filters << "*.torrent";
     connect(this, SIGNAL(directoryChanged(QString)), this, SLOT(scanLocalFolder(QString)));
   }
 
