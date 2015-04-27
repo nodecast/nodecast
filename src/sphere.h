@@ -44,22 +44,27 @@
 #include "flowlayout.h"
 #include "widgettorrent.h"
 #include "torrentcreator/torrentcreatordlg.h"
-
+#include "room.h"
 
 class Sphere : public QAbstractButton
 {
     Q_OBJECT
 public:
-    Sphere(Sphere_data data, QStackedWidget *parent = 0);
+    Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *parent = 0);
     ~Sphere();
     void addTorrent(const QTorrentHandle &h);
     void populate();
     virtual QSize sizeHint() const;
     int index_tab;
     bool isScopeFixed();
+    bool isScopePrivate();
+    bool isScopePublic();
     void reloadWeb();
     QString getTitle() {return sphere_data.title;}
     QString getDirectory() {return sphere_data.directory;}
+    void connectRoom(QXmppMucRoom *room);
+    void receive_message(const QString message);
+    int getRoomIndex();
 
 protected:
     virtual void paintEvent(QPaintEvent *e);
@@ -68,6 +73,7 @@ protected:
     //virtual void mousePressEvent(QMouseEvent * e);
 
 private:
+    QStackedWidget *m_stacked_room;
     FlowLayout *flowLayout;
     QSplitter *hSplitter;
     QScrollArea *media_scroll;
@@ -84,6 +90,7 @@ private:
     Sphere_data sphere_data;
     QPointer<TorrentCreatorDlg> createTorrentDlg;
     Preferences prefs;
+    Room *m_room;
 
 public slots:
 
@@ -93,7 +100,6 @@ private slots:
 
 signals:
     void row(int);
-    void send_torrent(QString sphere_dir, QString path);
 };
 
 

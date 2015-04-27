@@ -81,6 +81,7 @@ private:
 private slots:
     void refreshUsers();
     void newUser(const QString &jid);
+    void delUser(const QString &jid);
     void sendMessage();
     void sendInvitation();
     void send_invitation(QStringList jids);

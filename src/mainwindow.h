@@ -51,6 +51,8 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QHash>
+#include <QSystemTrayIcon>
+#include <QMenu>
 
 #include "video.h"
 #include "preferences.h"
@@ -146,9 +148,11 @@ private slots:
     void on_actionTransferts_triggered();
     void mapRoom(QString room_name, QXmppMucRoom *room);
 
-    void send_torrent_to_room(QString sphere_dir, QString path);
+    void on_actionXml_console_triggered();
+    void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
+    void createTrayIconAndMenu();
     void populate();
     void load_spheres();
 
@@ -173,10 +177,8 @@ private:
 
     QHash<QString, Sphere *> m_spheres_private;
     QHash<QString, Sphere *> m_spheres_public;
-    QHash<QString, Room *> m_rooms;
 
     QHash<int, Sphere *> sphere_tab;
-    QHash<int, Room *> room_tab;
 
     QThread *thread_torrent;
     Torrent *torrent;
@@ -196,6 +198,12 @@ private:
    QPointer<Widgettorrent> widgettorrentThumbnail;
 
    Godcast_api *m_godcastapi;
+   QAction m_quitAction;
+#ifndef QT_NO_SYSTEMTRAYICON
+    QSystemTrayIcon m_trayIcon;
+    QMenu m_trayIconMenu;
+#endif
+
 };
 
 #endif // MAINWINDOW_H

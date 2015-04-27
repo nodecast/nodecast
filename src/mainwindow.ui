@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string notr="true">nodecast</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="nodecast.qrc">
+    <normaloff>:/img/logo/nodecast_cloud.jpg</normaloff>:/img/logo/nodecast_cloud.jpg</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
@@ -55,6 +59,9 @@
               <number>0</number>
              </property>
              <widget class="QWidget" name="tab_private">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
               <attribute name="title">
                <string>private</string>
               </attribute>
@@ -109,6 +116,9 @@
               </layout>
              </widget>
              <widget class="QWidget" name="tab_public">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <attribute name="title">
                <string>public</string>
               </attribute>
@@ -129,8 +139,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>66</width>
+                    <height>20</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -469,6 +479,7 @@
      <string>Show</string>
     </property>
     <addaction name="actionTransferts"/>
+    <addaction name="actionXml_console"/>
    </widget>
    <addaction name="menuNodecast"/>
    <addaction name="menuShow"/>
@@ -516,11 +527,19 @@
     <string>Transferts detail</string>
    </property>
   </action>
+  <action name="actionXml_console">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>xml console</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="nodecast.qrc"/>
   <include location="icons.qrc"/>
+  <include location="nodecast.qrc"/>
  </resources>
  <connections/>
 </ui>

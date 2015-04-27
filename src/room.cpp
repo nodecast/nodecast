@@ -147,14 +147,39 @@ void Room::setXMPPRoom(QXmppMucRoom* room)
     m_room = room;
 
     connect(m_room, SIGNAL(participantAdded(QString)), this, SLOT(newUser(QString)));
+    connect(m_room, SIGNAL(participantRemoved(QString)), this, SLOT(delUser(QString)));
+
 
 }
 
 void Room::newUser(const QString &jid)
 {
-    qDebug() << "NEW USER JOINED : " << jid;
-    QString l_jid = jid.split("/").at(1);
+    qDebug() << "USER JOINED : " << jid;
+    //QString l_jid = jid.split("/").at(1);
+     QString l_jid = m_room->participantFullJid(jid);
         w_users_list->addItem(l_jid);
+}
+
+
+void Room::delUser(const QString &jid)
+{
+    qDebug() << "USER QUIT : " << jid;
+    const QString l_jid = m_room->participantFullJid(jid);
+    qDebug() << "L JID : " << l_jid;
+    QList<QListWidgetItem *> items = w_users_list->findItems(l_jid, Qt::MatchFixedString);
+
+    delete items.first();
+
+
+    /*foreach(QListWidgetItem *item, items)
+    {
+        w_users_list->removeItemWidget(item);
+        delete item;
+    }*/
+
+
+   // QString l_jid = jid.split("/").at(1);
+   //     w_users_list->rem->addItem(l_jid);
 }
 
 

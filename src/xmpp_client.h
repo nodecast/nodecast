@@ -9,9 +9,11 @@
 #include "QXmppClient.h"
 #include <QXmppTransferManager.h>
 #include <QXmppMucManager.h>
+#include <QXmppMessageReceiptManager.h>
 #include <QHash>
 
 #include "preferences.h"
+#include "xmlConsoleDialog.h"
 
 class Xmpp_client : public QXmppClient
 {
@@ -27,11 +29,15 @@ public:
     void connectToRoom(QString room_name);
     void sendFile(QString jid, QString path);
     //QXmppMucRoom* get_room(QString room) { if (rooms.contains(room)) return rooms.value(room); else return NULL;}
+    void show_xml_console();
 
 
 private:
+    void reload(QString login, QString password);
+
     static Xmpp_client* m_instance;
     QXmppTransferManager *transfer_manager;
+    QXmppMessageReceiptManager *receipt_manager;
     Preferences prefs;
     QFile *log;
     QString m_login;
@@ -44,7 +50,7 @@ private:
     QString file_name;
     QXmppMucManager *muc_manager;
     QHash <QString, QXmppMucRoom*> rooms;
-    void reload(QString login, QString password);
+    xmlConsoleDialog m_consoleDlg;
 
 public slots:
     void init();

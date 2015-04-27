@@ -49,6 +49,13 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 {
     qDebug() << "Xmpp_client::Xmpp_client !!!";
 
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::SignalLogging);
+    connect(QXmppLogger::getLogger(),
+            SIGNAL(message(QXmppLogger::MessageType,QString)),
+            &m_consoleDlg,
+            SLOT(message(QXmppLogger::MessageType,QString)));
+
+
     transfer_manager = new QXmppTransferManager;
     this->addExtension (transfer_manager);
 
@@ -113,12 +120,19 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 Xmpp_client::~Xmpp_client()
 {
     qDebug() << "Xmpp_client shutdown";
+    m_consoleDlg.deleteLater();
     if (!connection_failed) this->disconnectFromServer ();
     qDebug() << "Xmpp_client : close socket";
     //log->close();
 
    // z_push_api->close ();
    // delete(z_push_api);
+}
+
+
+void Xmpp_client::show_xml_console()
+{
+    m_consoleDlg.show();
 }
 
 
@@ -147,7 +161,7 @@ void Xmpp_client::init()
 void Xmpp_client::sendFile(QString jid, QString path)
 {
     qDebug() << "send file : " << path << " TO : " << jid;
-    transfer_manager->sendFile(jid, path);
+    transfer_manager->sendFile(jid, path, "FILE DESCRIPTION TEST");
 
 
 }
@@ -160,7 +174,9 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
 
     qDebug() << "Xmpp_client::file_received : " << file_name << " file size : " << file_size;
     qDebug() << "Got transfer request from:" << job->jid();
+    QXmppTransferFileInfo fileInfo = job->fileInfo();
 
+    qDebug() << "FILE INFO DESC : " << fileInfo.description();
 
     // check extension
     if (!file_name.contains("."))
@@ -259,6 +275,8 @@ void Xmpp_client::connectedToServer()
 void Xmpp_client::connectToRoom(QString room_name)
 {
     qDebug() << "Xmpp_client::connectToRoom : " << room_name;
+
+    if (room_name.isEmpty()) return;
 
     rooms.insert(room_name, muc_manager->addRoom(room_name + "@conference.nodecast.net"));
     rooms[room_name]->setNickName(Preferences().getNodecastLogin());

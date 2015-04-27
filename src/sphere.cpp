@@ -33,8 +33,8 @@
 
 int Sphere::index = 0;
 
-Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
-        : QAbstractButton(parent), sphere_data(data)
+Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *parent)
+        : m_stacked_room(stacked_room), sphere_data(data), QAbstractButton(parent)
 {
 
 //    QPalette pal = palette();
@@ -46,7 +46,9 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
 
    // content = new QWidget(parent);
 
-    qDebug() << "SPHERE DIRECTORY : " << sphere_data.directory;
+    m_room = NULL;
+
+    qDebug() << "NEW SPHERE DIRECTORY : " << sphere_data.directory;
 
     QString uuid;
     QDir nodecast_datas;
@@ -83,6 +85,8 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
         media_scroll->setWidget(media_container);
         index_tab = parent->addWidget(media_scroll);
         qDebug() << "INDEX TAB : " << index_tab;
+
+        m_room = new Room(sphere_data, m_stacked_room);
 
         break;
 
@@ -150,6 +154,12 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *parent)
     m_index = index++;
 
     connect(this, SIGNAL(clicked()), this, SLOT(selected()));
+
+
+
+
+
+
 //    initStyleOption(QStyleOptionButton::Flat);
 }
 
@@ -157,6 +167,31 @@ bool Sphere::isScopeFixed()
 {
     bool scope = (sphere_data.scope == Sphere_scope::FIXED)? true : false;
     return scope;
+}
+
+
+bool Sphere::isScopePrivate()
+{
+    bool scope = (sphere_data.scope == Sphere_scope::PRIVATE)? true : false;
+    return scope;
+}
+
+
+bool Sphere::isScopePublic()
+{
+    bool scope = (sphere_data.scope == Sphere_scope::PUBLIC)? true : false;
+    return scope;
+}
+
+
+int Sphere::getRoomIndex()
+{
+    if (m_room)
+    {
+        qDebug() << "ROOM INDEX : " << m_room->index_tab;
+        return m_room->index_tab;
+    }
+    return -1;
 }
 
 
@@ -175,7 +210,10 @@ QSize Sphere::sizeHint() const
 
 
 Sphere::~Sphere()
-{}
+{
+    qDebug() << "DELETE SPHERE";
+    if (m_room) delete m_room;
+}
 
 
 void Sphere::dragEnterEvent(QDragEnterEvent *event)
@@ -235,14 +273,6 @@ void Sphere::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
-
-
-void Sphere::addTorrent(QString path)
-{
-    // add torrent to seed file
-    QBtSession::instance()->addTorrent(path);
-    emit send_torrent(sphere_data.directory, path);
-}
 
 
 void Sphere::paintEvent(QPaintEvent *e)
@@ -340,4 +370,42 @@ void Sphere::populate()
 {
     qDebug() << "Sphere::polulate";
     Widgettorrent::populate(sphere_data, flowLayout);
+}
+
+
+void Sphere::connectRoom(QXmppMucRoom *room)
+{
+    qDebug() << "Sphere::connectRoom";
+    m_room->setXMPPRoom(room);
+}
+
+
+
+void Sphere::receive_message(const QString message)
+{
+    qDebug() << "Sphere::receive_message : " << message;
+    m_room->receiveMessage(message);
+}
+
+
+
+
+void Sphere::addTorrent(QString path)
+{
+    qDebug() << "SEND TORRENT : " << path;
+
+    // add torrent to seed file
+    QBtSession::instance()->addTorrent(path);
+
+    qDebug() << "ROOM : " << m_room->get_name();
+    QStringList users_list = m_room->get_users();
+
+    qDebug() << "USERS LIST : " << users_list;
+
+    foreach(QString user, users_list)
+    {
+        Xmpp_client::instance()->sendFile(user, path);
+    }
+    QString filename = path.split("/").takeLast();
+    m_room->send_message(" share : " + filename);
 }

@@ -123,7 +123,8 @@ SOURCES +=  main.cpp\
             sphere.cpp \
     xmpp_client.cpp \
     room.cpp \
-    roominvit.cpp
+    roominvit.cpp \
+    xmlConsoleDialog.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -155,7 +156,8 @@ HEADERS  += mainwindow.h \
     xmpp_client.h \
     global.h \
     room.h \
-    roominvit.h
+    roominvit.h \
+    xmlConsoleDialog.h
 
 win32|macx {
   HEADERS += programupdater.h
@@ -171,7 +173,8 @@ FORMS += mainwindow.ui \
     about.ui \
     account.ui \
     newsphere.ui \
-    roominvit.ui
+    roominvit.ui \
+    xmlConsoleDialog.ui
 
 
 

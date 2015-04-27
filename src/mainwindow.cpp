@@ -33,11 +33,16 @@
 
 
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+    #ifndef QT_NO_SYSTEMTRAYICON
+        m_trayIcon(this), m_trayIconMenu(this),
+    #endif
+        m_quitAction("Quit", this),
+        ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    createTrayIconAndMenu();
+
     QFont font;
     font.setBold(true);
     font.setUnderline(true);
@@ -106,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent) :
     news.scope = Sphere_scope::FIXED;
     news.url = "http://nodecast.wordpress.com";
 
-    m_spheres_private.insert(news.title,new Sphere(news, m_stacked_tab_medias) );
+    m_spheres_private.insert(news.title,new Sphere(news, m_stacked_tab_room, m_stacked_tab_medias) );
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[news.title]);
     connect(m_spheres_private[news.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
     sphere_tab.insert(m_spheres_private[news.title]->index_tab, m_spheres_private[news.title]);
@@ -127,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent) :
     debian.scope = Sphere_scope::PUBLIC;
     debian.url = "http://debian.org";
     debian.directory = "";
-    m_spheres_public.insert(debian.title, new Sphere(debian, m_stacked_tab_medias) );
+    m_spheres_public.insert(debian.title, new Sphere(debian, m_stacked_tab_room, m_stacked_tab_medias) );
     ui->verticalLayout_spherepublic->addWidget(m_spheres_public[debian.title]);
     connect(m_spheres_public[debian.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
     sphere_tab.insert( m_spheres_public[debian.title]->index_tab, m_spheres_public[debian.title]);
@@ -147,21 +152,81 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 
+void MainWindow::createTrayIconAndMenu()
+{
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(shutdownCleanUp()));
+    Q_ASSERT(check);
+
+  //  check = connect(&m_signOutAction, SIGNAL(triggered()), SLOT(action_signOut()));
+  //  Q_ASSERT(check);
+
+#ifndef QT_NO_SYSTEMTRAYICON
+    m_trayIcon.setIcon(QIcon(":/img/logo/nodecast_logo22.png"));
+
+    check = connect(&m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                    SLOT(action_trayIconActivated(QSystemTrayIcon::ActivationReason)));
+    Q_ASSERT(check);
+
+   /* m_trayIconMenu.addAction(&m_signOutAction);
+    m_trayIconMenu.addSeparator();
+  */
+    m_trayIconMenu.addAction(&m_quitAction);
+
+    m_trayIcon.setContextMenu(&m_trayIconMenu);
+    m_trayIcon.show();
+#endif
+}
+
+
+void MainWindow::action_trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason)
+    {
+    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::DoubleClick:
+        show();
+        break;
+    default:
+        ;
+    }
+}
+
 void MainWindow::mapRoom(QString room_name, QXmppMucRoom *room)
 {
     qDebug() << "MainWindow::mapRoom : " << room_name;
-    if (m_rooms.contains(room_name))
-        m_rooms.value(room_name)->setXMPPRoom(room);
+
+    QString sphere_name = room_name.split("_").at(0);
+    if (m_spheres_private.contains(sphere_name))
+        m_spheres_private.value(sphere_name)->connectRoom(room);
 }
 
 
 void MainWindow::receiveMessageChat(QString from, QString message)
 {
-    QString room_dest = from.split("@").at(0);
-    QString from_login = from.split("/").at(1);
+//    RECEIVE from :  "test_9de2d7f88aa54f73945989280bbdcb3a@conference.nodecast.net/fredix"  MESSAGE :  "fsd"
+//    RECEIVE from :  "test_9de2d7f88aa54f73945989280bbdcb3a@conference.nodecast.net"  MESSAGE :  "fredix@nodecast.net/iMac invited you to the room test_9de2d7f88aa54f73945989280bbdcb3a@conference.nodecast.net (invitation)"
 
-    if (m_rooms.contains(room_dest))
-        m_rooms[room_dest]->receiveMessage(from_login + " : " + message);
+    if (!from.contains("@")) return;
+    QString room_dest = from.split("@").at(0);
+    if (!room_dest.contains("_")) return;
+
+    // message from a user's room
+    if (from.contains("/"))
+    {
+        QString from_login = from.split("/").at(1);
+        QString sphere_name = room_dest.split("_").at(0);
+        if (m_spheres_private.contains(sphere_name))
+            m_spheres_private.value(sphere_name)->receive_message(from_login + " : " + message);
+    }
+    else
+    {
+        // message from a room like an invitation
+        qDebug() << "INVITATION FROM : " << from << " MESSAGE : " << message;
+        return;
+    }
 }
 
 
@@ -179,16 +244,17 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
         QList <QString> keys = m_spheres_private.keys();
         qDebug() << "KEYS : " << keys;
 
-        QHashIterator<QString, Sphere*> i(m_spheres_private);
-        while (i.hasNext()) {
-            i.next();
-            qDebug() << "DIR " << i.value()->getDirectory();
+        QHashIterator<QString, Sphere*> sphere(m_spheres_private);
+        while (sphere.hasNext()) {
+            sphere.next();
+            qDebug() << "DIR " << sphere.value()->getDirectory();
 
 
      //   foreach(QString key, keys)
      //   {
           //  qDebug() << " DIR : " << m_spheres_private[key]->get_directory();
-                Xmpp_client::instance()->connectToRoom(i.value()->getDirectory());
+            if (sphere.value()->isScopePrivate())
+                Xmpp_client::instance()->connectToRoom(sphere.value()->getDirectory());
         }
     }
     else
@@ -214,22 +280,21 @@ void MainWindow::changePage(int index)
         ui->groupBox_media->setTitle("news");
         ui->widget_media_tools->hide();
         sphere_tab[index]->reloadWeb();
+
+        m_stacked_tab_room->hide();
     }
     else
     {
         ui->groupBox_media->setTitle(sphere_tab[index]->getTitle());
         ui->widget_media_tools->show();
-    }
 
-
-    // gruick to bypass news sphere
-    if (index != 0 && room_tab.contains(index))
-    {
         m_stacked_tab_room->show();
-        m_stacked_tab_room->setCurrentIndex(room_tab[index]->index_tab);
-    }
-    else m_stacked_tab_room->hide();
+        int room_index = sphere_tab[index]->getRoomIndex();
+        if (room_index != -1)
+            m_stacked_tab_room->setCurrentIndex(room_index);
+        else m_stacked_tab_room->hide();
 
+    }
 
     qDebug() << "QStackedWidget index : " << index;
 }
@@ -484,7 +549,6 @@ void MainWindow::shutdownCleanUp()
     qDebug() << "stop torrent";
     QBtSession::drop();
     Preferences().sync();
-    qDebug() << "exit app";
  //   if (torrent)
  //   {
  //       torrent->deleteLater();
@@ -499,17 +563,16 @@ void MainWindow::shutdownCleanUp()
     //m_godcastapi->deleteLater();
     //qDebug() << "godcast_api deleted";
 
-    foreach(Room* room, m_rooms)
+    foreach (Sphere *sphere, m_spheres_private)
     {
-        delete room;
-        //room->deleteLater();
+        delete sphere;
     }
+
 
     Xmpp_client::drop();
     qDebug() << "xmpp deleted";
-
-    //qApp->quit();
-    //qApp->exit(0);
+    qDebug() << "exit app";
+    qApp->quit();
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -935,29 +998,10 @@ void MainWindow::on_pushButton_spherenew_clicked()
         spublic.title =  "public";
         spublic.scope = Sphere_scope::PUBLIC;
 
-        Sphere *sphere = new Sphere(spublic, m_stacked_tab_medias);
+        Sphere *sphere = new Sphere(spublic, m_stacked_tab_medias, m_stacked_tab_medias);
         ui->verticalLayout_spherepublic->addWidget(sphere);
     }
 
-}
-
-void MainWindow::send_torrent_to_room(QString sphere_dir, QString path)
-{
-    qDebug() << "SEND TORRENT : " << sphere_dir << " DIR : " << path;
-    if (m_rooms.contains(sphere_dir))
-    {
-        qDebug() << "ROOM : " << m_rooms.value(sphere_dir)->get_name();
-        QStringList users_list = m_rooms.value(sphere_dir)->get_users();
-
-        qDebug() << "USERS LIST : " << users_list;
-
-        foreach(QString user, users_list)
-        {
-            Xmpp_client::instance()->sendFile(user, path);
-        }
-        QString filename = path.split("/").takeLast();
-        m_rooms.value(sphere_dir)->send_message(" share : " + filename);
-    }
 }
 
 
@@ -982,17 +1026,12 @@ void MainWindow::load_spheres()
             sphere_datas.title =  sphere_name;
             sphere_datas.directory = sphere_dir;
             sphere_datas.scope = Sphere_scope::PRIVATE;
-            m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_medias) );
+            m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
             ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
             connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
-            connect(m_spheres_private[sphere_name], SIGNAL(send_torrent(QString, QString)), this, SLOT(send_torrent_to_room(QString, QString)));
 
             sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
-
             m_spheres_private[sphere_name]->populate();
-
-            m_rooms.insert(sphere_dir, new Room(sphere_datas, m_stacked_tab_room) );
-            room_tab.insert(m_spheres_private[sphere_name]->index_tab, m_rooms[sphere_dir]);
         }
     }
 }
@@ -1015,21 +1054,14 @@ void MainWindow::create_sphere(QString sphere_name)
         Sphere_data sphere_datas;
         sphere_datas.title =  sphere_name;
         sphere_datas.scope = Sphere_scope::PRIVATE;
-        m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_medias) );
+        m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
         ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
         connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
-        connect(m_spheres_private[sphere_name], SIGNAL(send_torrent(QString, QString)), this, SLOT(send_torrent_to_room(QString, QString)));
 
         sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
 
         QString sphere_dir = m_spheres_private[sphere_name]->getDirectory();
-
-        m_rooms.insert(sphere_dir, new Room(sphere_datas, m_stacked_tab_room) );
-        room_tab.insert(m_spheres_private[sphere_name]->index_tab, m_rooms[sphere_dir]);
-
-
         Xmpp_client::instance()->connectToRoom(sphere_dir);
-
     }
 
     //QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.title + "/" + fileInfo.fileName();
@@ -1083,7 +1115,7 @@ void MainWindow::refresh_spheres(QVariantMap sphere)
     sprivate.title = sphere["spherename"].toString();
     sprivate.scope = Sphere_scope::PRIVATE;
 
-    m_spheres_private.insert(sprivate.title, new Sphere(sprivate, m_stacked_tab_medias));
+    m_spheres_private.insert(sprivate.title, new Sphere(sprivate, m_stacked_tab_room, m_stacked_tab_medias));
     ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sprivate.title]);
 
 
@@ -1098,4 +1130,9 @@ void MainWindow::on_actionTransferts_triggered()
 {
     transferList->isHidden()? transferList->show() : transferList->hide();
     qDebug() << "SHOW TRANSFERT";
+}
+
+void MainWindow::on_actionXml_console_triggered()
+{
+    Xmpp_client::instance()->show_xml_console();
 }
