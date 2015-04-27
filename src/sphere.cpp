@@ -243,6 +243,24 @@ void Sphere::dropEvent(QDropEvent* event)
        QFileInfo fileInfo(localPath);
 
 
+       QString extension = fsutils::fileExtension(fileInfo.fileName());
+       qDebug() << "EXTENSION FILE : " << extension;
+
+       if (extension == "torrent")
+       {
+           if (!fsutils::isValidTorrentFile(localPath))
+           {
+               qDebug() << "torrent is not valid : " << fileInfo.fileName();
+               return;
+           }
+
+           qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
+           QDir nodecast_datas;
+           nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+           QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
+           return;
+       }
+
        QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
        fsutils::forceRemove(target_link);
        QFileInfo fileInfoLink(target_link);
