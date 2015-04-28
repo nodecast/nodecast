@@ -536,13 +536,14 @@ void MainWindow::launch_timer_handle(QTorrentHandle h)
 void MainWindow::shutdownCleanUp()
 {
     qDebug("DESTRUCTEUR");
+/*
     if (videoPlayer != 0)
     {
         //qDebug() << "process ID = " << videoPlayer->processId();
         videoPlayer->kill();
         delete(videoPlayer);
     }
-
+*/
 
     //delete ui;
     qDebug() << "stop torrent";

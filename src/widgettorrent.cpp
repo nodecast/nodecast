@@ -164,7 +164,7 @@ void Widgettorrent::on_media_doubleClicked()
         qDebug() << "program : " << program;
 
         videoPlayer = new QProcess(this);
-        videoPlayer->start(program, arguments);
+        videoPlayer->startDetached(program, arguments);
     }
     else if (torrent_data.type == "binary")
     {
