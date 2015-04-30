@@ -29,8 +29,8 @@ rosterItem::rosterItem(const QString& bareJid)
 {
     setData(bareJid, rosterItem::BareJid);
     setData("Offline", rosterItem::StatusText);
-    setAvatar(QImage(":/icons/resource/avatar.png"));
-    setIcon(QIcon(":/icons/resource/gray.png"));
+    setAvatar(QImage(":/xmpp/resources/avatar.png"));
+    setIcon(QIcon(":/xmpp/resources/gray.png"));
 }
 
 void rosterItem::setName(const QString& name)
@@ -83,7 +83,7 @@ void rosterItem::setPresence(const QXmppPresence &presence)
         icon = "gray";
     }
     if (!icon.isEmpty())
-        setIcon(QIcon(":/icons/resource/"+icon+".png"));
+        setIcon(QIcon(":/xmpp/resources/"+icon+".png"));
 }
 
 void rosterItem::setAvatar(const QImage& image)
@@ -188,7 +188,7 @@ void rosterItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
         image = qvariant_cast<QImage>(value);
     }
 
-    pixmap = QPixmap(":/icons/resource/avatar.png");
+    pixmap = QPixmap(":/xmpp/resources/avatar.png");
     rect = option.rect;
     rect.setWidth(pixmap.width());
     rect.setHeight(pixmap.height());

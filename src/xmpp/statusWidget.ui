@@ -60,6 +60,9 @@
        </property>
        <item>
         <widget class="statusToolButton" name="toolButton_userName">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 0, 0);</string>
+         </property>
          <property name="text">
           <string>toolbutton</string>
          </property>
@@ -144,8 +147,8 @@
   </layout>
   <action name="actionBusy">
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons/resource/red.png</normaloff>:/icons/resource/red.png</iconset>
+    <iconset resource="xmpp.qrc">
+     <normaloff>:/xmpp/resources/red.png</normaloff>:/xmpp/resources/red.png</iconset>
    </property>
    <property name="text">
     <string>Busy</string>
@@ -153,8 +156,8 @@
   </action>
   <action name="actionAvailable">
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons/resource/green.png</normaloff>:/icons/resource/green.png</iconset>
+    <iconset resource="xmpp.qrc">
+     <normaloff>:/xmpp/resources/green.png</normaloff>:/xmpp/resources/green.png</iconset>
    </property>
    <property name="text">
     <string>Available</string>
@@ -162,8 +165,8 @@
   </action>
   <action name="actionInvisible">
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons/resource/gray.png</normaloff>:/icons/resource/gray.png</iconset>
+    <iconset resource="xmpp.qrc">
+     <normaloff>:/xmpp/resources/gray.png</normaloff>:/xmpp/resources/gray.png</iconset>
    </property>
    <property name="text">
     <string>Invisible</string>
@@ -171,8 +174,8 @@
   </action>
   <action name="actionSign_out">
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons/resource/gray.png</normaloff>:/icons/resource/gray.png</iconset>
+    <iconset resource="xmpp.qrc">
+     <normaloff>:/xmpp/resources/gray.png</normaloff>:/xmpp/resources/gray.png</iconset>
    </property>
    <property name="text">
     <string>Sign out</string>
@@ -180,8 +183,8 @@
   </action>
   <action name="actionAway">
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons/resource/orange.png</normaloff>:/icons/resource/orange.png</iconset>
+    <iconset resource="xmpp.qrc">
+     <normaloff>:/xmpp/resources/orange.png</normaloff>:/xmpp/resources/orange.png</iconset>
    </property>
    <property name="text">
     <string>Away</string>

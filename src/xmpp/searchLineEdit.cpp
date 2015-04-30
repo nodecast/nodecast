@@ -42,7 +42,7 @@ void searchLineEdit::paintEvent(QPaintEvent *e) {
     QLineEdit::paintEvent(e);
     QPainter painter(this);
 
-    QImage image(":/icons/resource/searchIcon.png");
+    QImage image(":/xmpp/resources/searchIcon.png");
 
     QRectF target(image.rect());
     target.moveCenter(QPointF(target.center().x()+2, target.center().y()+3));

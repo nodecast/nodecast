@@ -99,6 +99,15 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
                     SLOT(presenceReceived(const QXmppPresence&)));
 
 
+
+    check = connect(this, SIGNAL(connected()), SLOT(updateStatusWidget()));
+    Q_ASSERT(check);
+
+
+   // check = connect(&m_xmppClient, SIGNAL(connected()), SLOT(addAccountToCache()));
+  //  Q_ASSERT(check);
+
+
     check = connect(this, SIGNAL(connected()),
                     SLOT(connectedToServer()));
 
@@ -118,11 +127,12 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
                     SLOT(vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
 
-/*    check = connect(m_vCardCache,
+    check = connect(m_vCardCache,
                     SIGNAL(vCardReadyToUse(QString)),
                     SLOT(updateVCard(QString)));
     Q_ASSERT(check);
-*/
+
+
 
 
     check = connect(QXmppLogger::getLogger(),
@@ -140,12 +150,6 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 
     //this->logger()->setLoggingType(QXmppLogger::FileLogging);
 
-    this->configuration().setPort(m_xmpp_client_port);
-    this->configuration().setJid(m_login);
-    this->configuration().setPassword(m_password);
-    this->configuration().setResource("nodecast");
-
-    this->connectToServer(this->configuration());
 
     m_rosterItemSortFilterModel = new rosterItemSortFilterProxyModel(this);
     m_rosterItemModel = new rosterItemModel(this);
@@ -194,16 +198,14 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     Q_ASSERT(check);
 
 
-    check = connect(&this->vCardManager(),
-                    SIGNAL(vCardReceived(QXmppVCardIq)), m_vCardCache,
-                    SLOT(vCardReceived(QXmppVCardIq)));
-    Q_ASSERT(check);
 
-    check = connect(m_vCardCache,
-                    SIGNAL(vCardReadyToUse(QString)),
-                    SLOT(updateVCard(QString)));
-    Q_ASSERT(check);
 
+    this->configuration().setPort(m_xmpp_client_port);
+    this->configuration().setJid(m_login);
+    this->configuration().setPassword(m_password);
+    this->configuration().setResource("nodecast");
+
+    this->connectToServer(this->configuration());
 }
 
 
@@ -631,6 +633,7 @@ void Xmpp_client::rosterChanged(const QString& bareJid)
 
 void Xmpp_client::updateVCard(const QString& bareJid)
 {
+    qDebug() << "UPDATE VCARD : " << bareJid;
     // determine full name
     const QXmppVCardIq vCard = m_vCardCache->getVCard(bareJid);
     QString fullName = vCard.fullName();
