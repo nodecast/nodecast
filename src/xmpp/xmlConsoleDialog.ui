@@ -14,11 +14,20 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
-    <normaloff>:/icons/resource/icon.png</normaloff>:/icons/resource/icon.png</iconset>
+   <iconset resource="../nodecast.qrc">
+    <normaloff>:/img/logo/nodecast_logo22.png</normaloff>:/img/logo/nodecast_logo22.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
     <number>6</number>
    </property>
    <item>
@@ -84,7 +93,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../nodecast.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Roster</class>
+ <widget class="QWidget" name="Roster">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="pushButton_addContact">
+       <property name="minimumSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="xmpp.qrc">
+         <normaloff>:/xmpp/resources/addButton.png</normaloff>:/xmpp/resources/addButton.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_settings">
+       <property name="minimumSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="xmpp.qrc">
+         <normaloff>:/xmpp/resources/settingsButton.png</normaloff>:/xmpp/resources/settingsButton.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>29</width>
+         <height>29</height>
+        </size>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="searchLineEdit" name="lineEdit_filter">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="rosterListView" name="listView">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>rosterListView</class>
+   <extends>QListView</extends>
+   <header>rosterListView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>searchLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>searchLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="xmpp.qrc"/>
+ </resources>
+ <connections/>
+</ui>

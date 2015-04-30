@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/xmpp">
+        <file>resources/addButton.png</file>
+        <file>resources/ajax-loader.gif</file>
+        <file>resources/avatar.png</file>
+        <file>resources/downArrow.png</file>
+        <file>resources/gray.png</file>
+        <file>resources/green.png</file>
+        <file>resources/icon.png</file>
+        <file>resources/icon.xcf</file>
+        <file>resources/orange.png</file>
+        <file>resources/red.png</file>
+        <file>resources/redred.png</file>
+        <file>resources/searchIcon.png</file>
+        <file>resources/settingsButton.png</file>
+    </qresource>
+</RCC>

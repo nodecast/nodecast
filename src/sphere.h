@@ -65,7 +65,7 @@ public:
     QString getTitle() {return sphere_data.title;}
     QString getDirectory() {return sphere_data.directory;}
     void connectRoom(QXmppMucRoom *room);
-    void receive_message(const QString message);
+    void receive_message(const QString login, const QString message);
     int getRoomIndex();
 
 protected:

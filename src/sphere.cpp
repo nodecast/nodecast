@@ -406,10 +406,10 @@ void Sphere::connectRoom(QXmppMucRoom *room)
 
 
 
-void Sphere::receive_message(const QString message)
+void Sphere::receive_message(const QString login, const QString message)
 {
-    qDebug() << "Sphere::receive_message : " << message;
-    m_room->receiveMessage(message);
+    qDebug() << "Sphere::receive_message : " << login << " : " << message;
+    m_room->receiveMessage(login , message);
 }
 
 

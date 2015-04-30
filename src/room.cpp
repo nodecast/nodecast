@@ -47,6 +47,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     m_room = NULL;
 
     my_nickname = Preferences().getNodecastLogin();
+    my_login = Preferences().getNodecastAccount().value("login");
 
 
     refresh_users = new QTimer(this);
@@ -127,7 +128,38 @@ void Room::send_invitation(QStringList jids)
 
 void Room::sendMessage()
 {
-    if (line_chat->text().isEmpty()) return;
+    QString message = line_chat->text();
+    if (message.isEmpty()) return;
+
+    if (message.startsWith("/msg"))
+    {
+        QStringList msg_dest = message.split(" ");
+        qDebug() << "DEST : " << msg_dest << " SIZE : " << msg_dest.size();
+        if (msg_dest.size() != 3)
+        {
+            line_chat->clear();
+        }
+        else
+        {
+            msg_dest.removeFirst();
+
+            QString dest = msg_dest.takeFirst() + "@";
+
+            QList<QListWidgetItem *> items = w_users_list->findItems(dest, Qt::MatchStartsWith );
+
+            if (!items.isEmpty())
+            {
+                const QString dest_user = items.first()->text();
+                const QString dest_message = msg_dest.takeLast();
+                qDebug() << "USER : " << dest_user << " MSG : " << dest_message;
+
+                Xmpp_client::instance()->sendMessage(dest_user, dest_message);
+                line_chat->clear();
+            }
+        }
+        return;
+    }
+
 
     qDebug() << "Room::sendMessage : " << line_chat->text();
 
@@ -137,10 +169,32 @@ void Room::sendMessage()
 
 
 
-void Room::receiveMessage(QString message)
+void Room::receiveMessage(const QString from, const QString message)
 {
-    chat_room->append(message);
+    if (message.startsWith("/nodecast"))
+        parseCommand(from, message);
+    else
+    {
+        QString login = from.split("/").at(1);
+        chat_room->append(login + " : " + message);
+    }
 }
+void Room::parseCommand(const QString from, const QString message)
+{
+    if (message.contains("help"))
+    {
+        QString user = m_room->participantFullJid(from);
+        qDebug() << "SEND HELP TO " << user;
+      /*  Xmpp_client::instance()->sendMessage(user,
+                                             "nodecast user list\n"
+                                             "nodecast user get filenumber\n"
+                                             "nodecast user getallfile\n"
+                                             );
+        */
+    }
+}
+
+
 
 void Room::setXMPPRoom(QXmppMucRoom* room)
 {

@@ -68,6 +68,7 @@ static QString QDesktopInitServicesDownloadLocation(const QString &save_path);
 /* End of Qt4 code */
 static QString searchEngineLocation();
 static QString BTBackupLocation();
+static QString XmppBackupLocation();
 static QString cacheLocation();
 
 };

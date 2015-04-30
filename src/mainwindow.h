@@ -56,7 +56,6 @@
 
 #include "video.h"
 #include "preferences.h"
-#include "torrent.h"
 #include "qbtsession.h"
 #include "openuritorrent.h"
 #include "downloadfromurldlg.h"
@@ -111,8 +110,6 @@ private slots:
 
     void on_actionQuit_triggered();
 
-    void on_actionOpen_triggered();
-
     void on_actionPreferences_triggered();
 
     void on_pushButton_clicked();
@@ -120,9 +117,6 @@ private slots:
     void on_listWidget_media_doubleClicked(const QModelIndex &index);
 
     void on_pushButton_play_clicked();
-
-    void on_pushButton_torrent_info_clicked();
-
 
     void launch_timer_handle(QTorrentHandle h);
     void update_timer_torrent_progress();
@@ -150,6 +144,7 @@ private slots:
 
     void on_actionXml_console_triggered();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+
 
 private:
     void createTrayIconAndMenu();
@@ -181,7 +176,6 @@ private:
     QHash<int, Sphere *> sphere_tab;
 
     QThread *thread_torrent;
-    Torrent *torrent;
     QTimer *timer_get_torrent_progress;
     QTimer *timer_set_torrent_progress;
 

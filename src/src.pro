@@ -83,6 +83,8 @@ include(libs/tracker/tracker.pri)
 include(libs/geoip/geoip.pri)
 include(preferences/preferences.pri)
 include(torrentcreator/torrentcreator.pri)
+include(xmpp/xmpp.pri)
+
 
 !nox {
 #  include(lineedit/lineedit.pri)
@@ -106,7 +108,6 @@ SOURCES +=  main.cpp\
             mainwindow.cpp \
             ico.cpp \
             video.cpp \
-            torrent.cpp \
             fs_utils.cpp \
             misc.cpp \
             downloadthread.cpp \
@@ -121,15 +122,12 @@ SOURCES +=  main.cpp\
             godcast_api.cpp \
             newsphere.cpp \
             sphere.cpp \
-    xmpp_client.cpp \
     room.cpp \
-    roominvit.cpp \
-    xmlConsoleDialog.cpp
+    roominvit.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
             video.h \
-            torrent.h \
             filesystemwatcher.h \
             fs_utils.h \
             misc.h \
@@ -153,11 +151,10 @@ HEADERS  += mainwindow.h \
             godcast_api.h \
             newsphere.h \
             sphere.h \
-    xmpp_client.h \
     global.h \
     room.h \
-    roominvit.h \
-    xmlConsoleDialog.h
+    roominvit.h
+
 
 win32|macx {
   HEADERS += programupdater.h
@@ -173,9 +170,7 @@ FORMS += mainwindow.ui \
     about.ui \
     account.ui \
     newsphere.ui \
-    roominvit.ui \
-    xmlConsoleDialog.ui
-
+    roominvit.ui
 
 
 # OS specific config

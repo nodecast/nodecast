@@ -32,7 +32,6 @@
 #include "ui_mainwindow.h"
 
 
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     #ifndef QT_NO_SYSTEMTRAYICON
         m_trayIcon(this), m_trayIconMenu(this),
@@ -40,7 +39,38 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
         m_quitAction("Quit", this),
         ui(new Ui::MainWindow)
 {
+    bool check;
+
     ui->setupUi(this);
+
+    /*
+    roster = new Ui::Roster;
+    QWidget *roster_widget= new QWidget;
+    roster->setupUi(roster_widget);
+    QVBoxLayout *layoutRoster = new QVBoxLayout;
+    layoutRoster->addWidget(&m_statusWidget);
+    layoutRoster->addWidget(roster_widget);
+
+
+    QTextEdit * user_chat = new QTextEdit;
+
+    QSplitter *vRosterSplitter = new QSplitter(Qt::Horizontal, this);
+
+    QGroupBox *groupBoxContact = new QGroupBox;
+    groupBoxContact->setLayout(layoutRoster);
+
+    vRosterSplitter->addWidget(groupBoxContact);
+    vRosterSplitter->addWidget(user_chat);
+    ui->horizontalLayout_contact->addWidget(vRosterSplitter);
+*/
+/*
+
+    check = connect(&m_statusWidget, SIGNAL(statusTextChanged(QString)),
+                    SLOT(statusTextChanged(QString)));
+    Q_ASSERT(check);
+*/
+
+
     createTrayIconAndMenu();
     QFont font;
     font.setBold(true);
@@ -62,7 +92,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     // hide tchat room
     //ui->groupBox_tchat->hide();
     //ui->pushButton_play->hide();
-    ui->pushButton_torrent_info->hide();
     ui->widget_media_tools->hide();
     ui->groupBox_media->setTitle("news");
     ui->pushButton_spherenew->setEnabled(false);
@@ -148,6 +177,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     connect(Xmpp_client::instance(), SIGNAL(emit_chat(QString, QString)), this, SLOT(receiveMessageChat(QString, QString)));
     connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
 
+
+    ui->horizontalLayout_contact->addWidget(Xmpp_client::instance()->getRosterSplitter());
 }
 
 
@@ -215,10 +246,10 @@ void MainWindow::receiveMessageChat(QString from, QString message)
     // message from a user's room
     if (from.contains("/"))
     {
-        QString from_login = from.split("/").at(1);
+        //QString from_login = from.split("/").at(1);
         QString sphere_name = room_dest.split("_").at(0);
         if (m_spheres_private.contains(sphere_name))
-            m_spheres_private.value(sphere_name)->receive_message(from_login + " : " + message);
+            m_spheres_private.value(sphere_name)->receive_message(from, message);
     }
     else
     {
@@ -549,11 +580,6 @@ void MainWindow::shutdownCleanUp()
     qDebug() << "stop torrent";
     QBtSession::drop();
     Preferences().sync();
- //   if (torrent)
- //   {
- //       torrent->deleteLater();
- //       thread_torrent->wait();
- //   }
 
     delete transferList;
     //delete transferListFilters;
@@ -577,13 +603,7 @@ void MainWindow::shutdownCleanUp()
 
 void MainWindow::on_actionQuit_triggered()
 {
- //   if (torrent)
- //   {
- //       torrent->deleteLater();
- //       thread_torrent->wait();
- //   }
-   qDebug() << "MainWindow::on_actionQuit_triggered()";
-
+    qDebug() << "MainWindow::on_actionQuit_triggered()";
     qApp->quit();
 }
 
@@ -614,136 +634,6 @@ void MainWindow::on_actionQuit_triggered()
 //  settings.endGroup();
 //}
 
-
-
-void MainWindow::on_actionOpen_triggered()
-{
-    // open TORRENT
-
-    qDebug("OPEN");
-
-
-    if (!downloadFromURLDialog) {
-      downloadFromURLDialog = new downloadFromURL(this);
-      connect(downloadFromURLDialog, SIGNAL(urlsReadyToBeDownloaded(QStringList)), this, SLOT(downloadFromURLList(QStringList)));
-    }
-    return;
-
-    //openuritorrent.show();
-    //return;
-
-
- //   QString link = "magnet:?xt=urn:btih:03de3df2c7339a90926606afb8f8666cd21db06d&dn=The.Anomaly.2014.DVDRip.XviD-EVO&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337";
- //   QBtSession::instance()->addMagnetUri(link);
-
-
-//    connect(QBtSession::instance(), SIGNAL(fullDiskError(QTorrentHandle, QString)), this, SLOT(fullDiskError(QTorrentHandle, QString)));
-//    connect(QBtSession::instance(), SIGNAL(finishedTorrent(QTorrentHandle)), this, SLOT(finishedTorrent(QTorrentHandle)));
-//    connect(QBtSession::instance(), SIGNAL(trackerAuthenticationRequired(QTorrentHandle)), this, SLOT(trackerAuthenticationRequired(QTorrentHandle)));
-//    connect(QBtSession::instance(), SIGNAL(newDownloadedTorrent(QString, QString)), this, SLOT(processDownloadedFiles(QString, QString)));
-//    connect(QBtSession::instance(), SIGNAL(newMagnetLink(QString)), this, SLOT(processNewMagnetLink(QString)));
-//    connect(QBtSession::instance(), SIGNAL(downloadFromUrlFailure(QString, QString)), this, SLOT(handleDownloadFromUrlFailure(QString, QString)));
-//    connect(QBtSession::instance(), SIGNAL(alternativeSpeedsModeChanged(bool)), this, SLOT(updateAltSpeedsBtn(bool)));
-//    connect(QBtSession::instance(), SIGNAL(recursiveTorrentDownloadPossible(QTorrentHandle)), this, SLOT(askRecursiveTorrentDownloadConfirmation(QTorrentHandle)));
-
-
-
-
-    /*
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                                     "torrent",
-                                                     tr("Files (*.torrent)"));
-    */
-
-//    thread_torrent = new QThread(this);
-//    torrent = new Torrent();
-
-//    this->connect(thread_torrent, SIGNAL(started()), torrent, SLOT(init()));
-//    this->connect(torrent, SIGNAL(destroyed()), thread_torrent, SLOT(quit()), Qt::DirectConnection);
-
-//    torrent->moveToThread(thread_torrent);
-//    thread_torrent->start();
-
-
-    //torrent->get_torrent(fileName);
-
-  //  QString torrent_file ="http://www.freetorrent.fr/download.php?id=b4652d4202e4abe57e82411ec32b39bb127da328&f=Framakey+Ubuntu+Remix+12.04.torrent";
-
-    //QString torrent_file = "http://www.freetorrent.fr/download.php?id=07b789accb342ae9c7761e03998f10eaa8ca44aa&f=Copier+n%27est+pas+voler+720p+stfr.torrent";
-
-    //QString torrent_file = "http://cdimage.debian.org/debian-cd/current-live/amd64/bt-hybrid/debian-live-7.6.0-amd64-kde-desktop.iso.torrent";
-
-
-    //QString torrent_file = "http://www.freetorrent.fr/download.php?id=41dc622ea17716a140dbdf8a0b5c445886764e0d&f=Vid%C3%A9os+mp4+Capitole+du+libre+2013.torrent";
-
-
-    //QString torrent_file = "http://download.blender.org/peach/bigbuckbunny_production.torrent";
-
-
-    //QString torrent_file = "magnet:?xt=urn:btih:2ff42e31f1014987e3fbbf7c7bc5544d0ee833d3&dn=Teenage.Mutant.Ninja.Turtles.2014.HDRip.XviD.MP3-RARBG&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337";
-
-
-    //QString torrent_file = "magnet:?xt=urn:btih:03de3df2c7339a90926606afb8f8666cd21db06d&dn=The.Anomaly.2014.DVDRip.XviD-EVO&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337";
-//    torrent_index = torrent->downloadTorrent(torrent_file, "The.Anomaly.2014.DVDRip.XviD-EVO");
-    //torrent_index = torrent->downloadTorrent(torrent_file, "PLOP");
-
-
-
-    //qDebug() << "RES torrent : " << torrent_index;
-
-
-
-
-//    dlInfo stats = torrent->getTorrentInfo(torrent_index);
-
-//    ui->progressBar_torrent->setMaximum(100);
-//    ui->progressBar_torrent->setMinimum(0);
-
-//    qDebug() << "STATS PEERS : " << stats.peers;
-//    qDebug() << "STATS DOWNLOADED : " << stats.downloaded;
-//    qDebug() << "STATS TOTAL : " << stats.total;
-
-
-    //update_timer_torrent_progress();
-
-    //qDebug() << "TORRENT : " << fileName;
-
-/*
-    QString path = QFileDialog::getExistingDirectory (this, tr("Directory"), directory.path());
-    if ( path.isNull() == false )
-    {
-        directory.setPath(path);
-    }
-
-*/
-
-
-/*    QTextEdit textEdit;
-      QPushButton quitButton("Quit");
-
-      //QObject::connect(&quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
-
-      QVBoxLayout layout;
-      layout.addWidget(&textEdit);
-      layout.addWidget(&quitButton);
-
-      QWidget window;
-      window.setLayout(&layout);
-
-      window.show();*/
-
-//    Video video();
-//    video.show();
-
-}
-
-//void MainWindow::processNewMagnetLink(const QString& link) {
-//  Preferences pref;
-//  if (pref.useAdditionDialog())
-//    AddNewTorrentDialog::showMagnet(link, this);
-//  else
-//    QBtSession::instance()->addMagnetUri(link);
-//}
 
 
 
@@ -958,23 +848,6 @@ void MainWindow::on_pushButton_play_clicked()
 //    videoPlayer->start(program, arguments);
 }
 
-void MainWindow::on_pushButton_torrent_info_clicked()
-{
-
-
-    dlInfo stats = torrent->getTorrentInfo(torrent_index);
-
-    qDebug() << "STATS PEERS : " << stats.peers;
-    qDebug() << "STATS SEEDERS : " << stats.seeders;
-
-    qDebug() << "STATS DOWNLOADED : " << stats.downloaded;
-    qDebug() << "STATS TOTAL : " << stats.total;
-    qDebug() << "STATS downloadRateBs : " << stats.downloadRateBs;
-
-
-
-
-}
 
 void MainWindow::on_pushButton_spherenew_clicked()
 {
@@ -1136,3 +1009,4 @@ void MainWindow::on_actionXml_console_triggered()
 {
     Xmpp_client::instance()->show_xml_console();
 }
+

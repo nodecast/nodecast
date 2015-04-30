@@ -540,6 +540,16 @@ QString fsutils::BTBackupLocation() {
   return location;
 }
 
+
+QString fsutils::XmppBackupLocation() {
+  const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
+                                           + QDir::separator() + "xmpp");
+  QDir locationDir(location);
+  if (!locationDir.exists())
+    locationDir.mkpath(locationDir.absolutePath());
+  return location;
+}
+
 QString fsutils::cacheLocation() {
   QString location = QDir::cleanPath(QDesktopServicesCacheLocation());
   QDir locationDir(location);

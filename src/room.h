@@ -54,7 +54,7 @@ class Room : public QWidget
 public:
     Room(Sphere_data a_sphere_data, QStackedWidget *parent = 0);
     ~Room();
-    void receiveMessage(QString message);
+    void receiveMessage(const QString from, const QString message);
     int index_tab;
     void setXMPPRoom(QXmppMucRoom* room);
     QStringList get_users();
@@ -62,7 +62,11 @@ public:
     void send_message(QString message)  {m_room->sendMessage(message);}
 
 private:
+    void parseCommand(const QString from, const QString message);
+
     QString my_nickname;
+    QString my_login;
+
     QTimer *refresh_users;
     QGroupBox *groupBox;
     QVBoxLayout *vbox;
