@@ -145,11 +145,11 @@ void Widgettorrent::on_media_doubleClicked()
 {
 
     // open with VLC if media type is a video or a directory
-    if (torrent_data.type == "video"  || torrent_data.type == "directory")
+    if (torrent_data.type == "video")
     {
 
         qDebug() << "LAUNCH PLAYER : ";
-
+/*
         QString program;
         QStringList arguments;
 
@@ -165,6 +165,14 @@ void Widgettorrent::on_media_doubleClicked()
 
         videoPlayer = new QProcess(this);
         videoPlayer->startDetached(program, arguments);
+  */
+
+        QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
+        QString path = QDir::toNativeSeparators(dir);
+        qDebug() << "OPEN VIDEO TO : " << path;
+        QDesktopServices::openUrl(QUrl("file:///" + path));
+
+
     }
     else if (torrent_data.type == "binary")
     {
@@ -180,7 +188,13 @@ void Widgettorrent::on_media_doubleClicked()
         qDebug() << "OPEN PICTURE/PDF/TEXT TO : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
-
+    else if (torrent_data.type == "directory")
+    {
+        QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
+        QString path = QDir::toNativeSeparators(dir);
+        qDebug() << "OPEN DIRECTORY : " << path;
+        QDesktopServices::openUrl(QUrl("file:///" + path));
+    }
 }
 
 
@@ -267,7 +281,8 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
              mime.inherits("video/x-ms-wmv") ||
              mime.inherits("video/x-msvideo") ||
              mime.inherits("video/x-flv") ||
-             mime.inherits("video/webm")
+             mime.inherits("video/webm") ||
+             mime.inherits("video/x-matroska")
              )
     {
         torrent_data.type = "video";
@@ -277,7 +292,8 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
              mime.inherits("audio/x-ms-wma") ||
              mime.inherits("audio/vnd.rn-realaudio") ||
              mime.inherits("audio/x-wav") ||
-             mime.inherits("audio/wav")
+             mime.inherits("audio/wav") ||
+             mime.inherits("audio/x-matroska")
              )
     {
         torrent_data.type = "audio";

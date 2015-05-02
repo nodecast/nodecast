@@ -66,16 +66,19 @@
 #include <libtorrent/identify_client.hpp>
 #include <libtorrent/alert_types.hpp>
 #include <libtorrent/torrent_info.hpp>
+
+
+#if LIBTORRENT_VERSION_NUM < 10000
 #include <libtorrent/upnp.hpp>
 #include <libtorrent/natpmp.hpp>
+#endif
+
 #if LIBTORRENT_VERSION_NUM < 1600
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #endif
-#if LIBTORRENT_VERSION_NUM >= 1600
 #include "libtorrent/error_code.hpp"
-#endif
 #include <queue>
 #include <string.h>
 //#include "dnsupdater.h"
@@ -113,8 +116,10 @@ QBtSession::QBtSession()
   #ifndef DISABLE_GUI
   , geoipDBLoaded(false), resolve_countries(false)
   #endif
-  , m_tracker(0), m_shutdownAct(NO_SHUTDOWN),
-    m_upnp(0), m_natpmp(0)
+  , m_tracker(0), m_shutdownAct(NO_SHUTDOWN)
+  #if LIBTORRENT_VERSION_NUM < 10000
+  , m_upnp(0), m_natpmp(0)
+  #endif
   //, m_dynDNSUpdater(0)
 {
   BigRatioTimer = new QTimer(this);
@@ -1650,7 +1655,6 @@ void QBtSession::enableUPnP(bool b) {
   Preferences pref;
   if (b)
   {
-    if (!m_upnp) {
       qDebug("Enabling UPnP / NAT-PMP");
 #if LIBTORRENT_VERSION_NUM < 10000
       m_upnp = s->start_upnp();
@@ -1659,18 +1663,21 @@ void QBtSession::enableUPnP(bool b) {
         s->start_upnp();
         s->start_natpmp();
 #endif
-    }
+
     // Use UPnP/NAT-PMP for Tracker
     if (pref.isTrackerEnabled())
     {
       const qint16 port = pref.getTrackerPort();
-      m_upnp->add_mapping(upnp::tcp, port, port);
-      m_natpmp->add_mapping(natpmp::tcp, port, port);
+#if LIBTORRENT_VERSION_NUM < 10000
+            m_upnp->add_mapping(upnp::tcp, port, port);
+            m_natpmp->add_mapping(natpmp::tcp, port, port);
+#else
+            s->add_port_mapping(session::tcp, port, port);
+#endif
     }
   }
   else
   {
-    if (m_upnp) {
       qDebug("Disabling UPnP / NAT-PMP");
       s->stop_upnp();
       s->stop_natpmp();
@@ -1679,7 +1686,6 @@ void QBtSession::enableUPnP(bool b) {
       m_upnp = 0;
       m_natpmp = 0;
 #endif
-    }
   }
 }
 

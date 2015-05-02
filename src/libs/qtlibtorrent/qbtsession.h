@@ -56,6 +56,13 @@
 #define MAX_SAMPLES 20
 
 
+#if LIBTORRENT_VERSION_NUM < 10000
+class upnp;
+class natpmp;
+#endif
+
+
+
 class DownloadThread;
 class FilterParserThread;
 //class HttpServer;
@@ -291,8 +298,10 @@ private:
   TorrentSpeedMonitor *m_speedMonitor;
   shutDownAction m_shutdownAct;
   // Port forwarding
-  libtorrent::upnp *m_upnp;
-  libtorrent::natpmp *m_natpmp;
+#if LIBTORRENT_VERSION_NUM < 10000
+   libtorrent::upnp *m_upnp;
+   libtorrent::natpmp *m_natpmp;
+#endif
   //bool m_upnp;
   // DynDNS
   //DNSUpdater *m_dynDNSUpdater;
