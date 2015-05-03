@@ -98,6 +98,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     videoPlayer = NULL;
 
+    m_scanFolders = ScanFoldersModel::instance(this);
+
 
     //m_godcastapi = new Godcast_api("127.0.0.1", "3000", this);
     //connect(m_godcastapi, SIGNAL(users_Changed(QVariantMap)), this, SLOT(refresh_users(QVariantMap)), Qt::QueuedConnection);

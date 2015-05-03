@@ -70,6 +70,7 @@
 #include "godcast_api.h"
 #include "sphere.h"
 #include "room.h"
+#include "scannedfoldersmodel.h"
 
 #ifdef Q_OS_MAC
 void fixNativeWindow( QMainWindow *window );
@@ -150,6 +151,8 @@ private:
     void createTrayIconAndMenu();
     void populate();
     void load_spheres();
+
+    ScanFoldersModel *m_scanFolders;
 
     QStackedWidget *m_stacked_tab_medias;
     QStackedWidget *m_stacked_tab_room;

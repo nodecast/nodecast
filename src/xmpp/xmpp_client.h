@@ -83,6 +83,7 @@ private:
     QSplitter *vRosterSplitter;
     rosterItemModel *m_rosterItemModel;
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
+    QString sphere_dest;
 
 public slots:
     void init();

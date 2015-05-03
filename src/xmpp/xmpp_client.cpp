@@ -276,10 +276,20 @@ void Xmpp_client::sendFile(const QString jid, const QString path)
 void Xmpp_client::file_received (QXmppTransferJob *job)
 {
     file_name = job->fileName();
+    QString jid = job->jid();
     qint64 file_size = job->fileSize();
 
     qDebug() << "Xmpp_client::file_received : " << file_name << " file size : " << file_size;
     qDebug() << "Got transfer request from:" << job->jid();
+    //Got transfer request from: "potes_93c8d9761e1f4c85829f46c354a723c4@conference.nodecast.net/test"
+
+    if (!jid.contains("_") || !jid.contains("@") || !jid.contains("/"))
+    {
+        qDebug() << "FILE RECEIVED : MALFORMED JID";
+        job->abort();
+        return;
+    }
+
     QXmppTransferFileInfo fileInfo = job->fileInfo();
 
     qDebug() << "FILE INFO DESC : " << fileInfo.description();
@@ -306,6 +316,13 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
+
+
+    sphere_dest = jid.split("@").at(0);
+    QString from = jid.split("/").at(1);
+
+    qDebug() << "RECEIVE from : " << from << " TO : " << sphere_dest;
+
 
 
     bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(job_error(QXmppTransferJob::Error)));
@@ -342,7 +359,20 @@ void Xmpp_client::job_finished ()
 
     //m_buffer->write("/tmp/xmpp_file");
 
-    file = new QFile("/tmp/" + file_name);
+    QDir sphere_dir;
+    sphere_dir = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/";
+    if (!sphere_dir.exists())
+    {
+        qDebug() << "SPHERE DEST NOT EXIST : " << QDir::toNativeSeparators(sphere_dir.absolutePath());
+        m_buffer->close ();
+        delete m_buffer;
+        delete file;
+        return;
+    }
+
+    qDebug() << "WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(sphere_dir.absolutePath());
+
+    file = new QFile(QDir::toNativeSeparators(sphere_dir.absolutePath()+"/") + file_name);
     file->open(QIODevice::WriteOnly);
     file->write(m_buffer->data());
     file->close();

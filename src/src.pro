@@ -2,9 +2,7 @@
 TEMPLATE = app
 CONFIG += qt thread
 CONFIG += c++11
-QMAKE_PKGCONFIG_CFLAGS = -DQXMPP_STATIC
-#QXMPP_LIBRARY_TYPE = "staticlib"
-
+#DEFINES += QXMPP_STATIC
 
 # Windows specific configuration
 win32: include(../winconf.pri)
@@ -100,9 +98,8 @@ include(xmpp/xmpp.pri)
 #INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
 #INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
-#LIBS += $$QXMPP_LIBS
-LIBS += $$PWD/$$LIBS_PATH/qxmpp/src/libqxmpp.a
-
+LIBS += $$QXMPP_LIBS
+#LIBS += $$PWD/$$LIBS_PATH/qxmpp/src/libqxmpp.a
 
 SOURCES +=  main.cpp\
             mainwindow.cpp \

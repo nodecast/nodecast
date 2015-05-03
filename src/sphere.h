@@ -93,7 +93,7 @@ private:
     QPointer<TorrentCreatorDlg> createTorrentDlg;
     Preferences prefs;
     Room *m_room;
-    FileSystemWatcher *m_fsWatcher;
+    ScanFoldersModel *m_scanFolders;
 
 public slots:
 

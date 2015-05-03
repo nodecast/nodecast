@@ -34,7 +34,7 @@
 int Sphere::index = 0;
 
 Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *parent)
-        : m_stacked_room(stacked_room), sphere_data(data), QAbstractButton(parent)
+        :  m_scanFolders(ScanFoldersModel::instance(this)), m_stacked_room(stacked_room), sphere_data(data), QAbstractButton(parent)
 {
 
 //    QPalette pal = palette();
@@ -88,12 +88,8 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
         m_room = new Room(sphere_data, m_stacked_room);
 
-
-        m_fsWatcher = new FileSystemWatcher(this);
-        connect(m_fsWatcher, SIGNAL(torrentsAdded(QStringList&)), this, SLOT(torrentsAdded(QStringList&)));
-        m_fsWatcher->addPath(nodecast_datas.absolutePath() + "/" + sphere_data.directory);
-
         ScanFoldersModel::instance()->addPath(nodecast_datas.absolutePath() + "/" + sphere_data.directory, true);
+        connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), this, SLOT(torrentsAdded(QStringList&)));
 
         break;
 
@@ -449,9 +445,17 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
 void Sphere::torrentsAdded(QStringList &torrents)
 {
+    qDebug() << "SPHERE::TORRENTSADDED" << torrents;
     foreach(QString torrent, torrents)
     {
-       // qDebug() << "torrentsAdded TORRENT : " << torrent;
+        qDebug() << "torrentsAdded TORRENT : " << torrent;
+
+        if (!fsutils::isValidTorrentFile(torrent))
+        {
+            qDebug() << "torrent is not valid : " << torrent;
+            fsutils::forceRemove(torrent);
+            return;
+        }
         addTorrent(torrent, true);
     }
 }

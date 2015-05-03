@@ -163,7 +163,10 @@ QBtSession::QBtSession()
   timerAlerts->start(1000);
   appendLabelToSavePath = pref.appendTorrentLabel();
   appendqBExtension = pref.useIncompleteFilesExtension();
-  connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), SLOT(addTorrentsFromScanFolder(QStringList&)));
+
+  // removed because of spheres catch this signal
+  //connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), SLOT(addTorrentsFromScanFolder(QStringList&)));
+
   // Apply user settings to Bittorrent session
   configureSession();
   // Torrent speed monitor
