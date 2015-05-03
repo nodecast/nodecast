@@ -22,7 +22,9 @@ git submodule update --init
 
 cd src/libs/qxmpp/
 
-qmake QXMPP_LIBRARY_TYPE=staticlib && make
+qmake && make
+
+make install
 
 cd ../../../
 

@@ -1672,8 +1672,8 @@ void QBtSession::enableUPnP(bool b) {
     {
       const qint16 port = pref.getTrackerPort();
 #if LIBTORRENT_VERSION_NUM < 10000
-            m_upnp->add_mapping(upnp::tcp, port, port);
-            m_natpmp->add_mapping(natpmp::tcp, port, port);
+            m_upnp->add_mapping(libtorrent::upnp::tcp, port, port);
+            m_natpmp->add_mapping(libtorrent::natpmp::tcp, port, port);
 #else
             s->add_port_mapping(session::tcp, port, port);
 #endif
