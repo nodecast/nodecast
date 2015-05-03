@@ -255,16 +255,20 @@ void Room::refreshUsers()
 
 QStringList Room::get_users()
 {
+    QString room_jid = m_room->jid();
     QStringList users =  m_room->participants();
     qDebug() << "USERS ROOM LIST : " << users;
-    QStringList users_fulljid;
+    qDebug() << "MY NICK NAME : " << m_room->nickName();
     foreach(QString user, users)
     {
-        if (user.split("/").takeLast() != my_nickname)
-            users_fulljid << m_room->participantFullJid(user);
+        QString tmp = user;
+        tmp.replace(room_jid, "").replace("/", "");
+        qDebug() << "TMP USER : " << tmp;
+        if (tmp == m_room->nickName())
+            users.removeAll(user);
     }
-    qDebug() << "FULL JID LIST : " << users_fulljid;
-    return users_fulljid;
+    qDebug() << "FULL JID LIST : " << users;
+    return users;
 }
 
 
