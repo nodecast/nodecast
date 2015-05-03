@@ -139,6 +139,7 @@ private slots:
     void NatChangeConnectionStatus(bool status);
 
     void receiveMessageChat(QString from, QString message);
+    void receiveInvitation(QString invitation, QString reason);
 
     void on_actionTransferts_triggered();
     void mapRoom(QString room_name, QXmppMucRoom *room);
@@ -151,6 +152,7 @@ private:
     void createTrayIconAndMenu();
     void populate();
     void load_spheres();
+    void create_sphere(QString sphere_name, QString sphere_dir);
 
     ScanFoldersModel *m_scanFolders;
 

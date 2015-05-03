@@ -54,6 +54,7 @@ class Sphere : public QAbstractButton
 public:
     Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *parent = 0);
     ~Sphere();
+    static QString gen_directory(QString sphere_name);
     void addTorrent(const QTorrentHandle &h);
     void populate();
     virtual QSize sizeHint() const;

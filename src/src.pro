@@ -95,9 +95,9 @@ include(xmpp/xmpp.pri)
 }
 
 
-#INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
-#INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
-INCLUDEPATH += $$QXMPP_INCLUDEPATH
+INCLUDEPATH += $$LIBS_PATH/qxmpp/src/base
+INCLUDEPATH += $$LIBS_PATH/qxmpp/src/client
+#INCLUDEPATH += $$QXMPP_INCLUDEPATH
 LIBS += $$QXMPP_LIBS
 #LIBS += $$PWD/$$LIBS_PATH/qxmpp/src/libqxmpp.a
 

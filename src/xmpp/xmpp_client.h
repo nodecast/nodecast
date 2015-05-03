@@ -113,6 +113,7 @@ private slots:
 signals:
     void emit_connected(bool);
     void emit_chat(QString, QString);
+    void emit_invitation(QString, QString);
     void emit_room(QString room_name, QXmppMucRoom* room);
 };
 

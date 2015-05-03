@@ -177,6 +177,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     Xmpp_client::connectXMPP();
     connect(Xmpp_client::instance(), SIGNAL(emit_connected(bool)), this, SLOT(XmppChangeConnectionStatus(bool)));
     connect(Xmpp_client::instance(), SIGNAL(emit_chat(QString, QString)), this, SLOT(receiveMessageChat(QString, QString)));
+    connect(Xmpp_client::instance(), SIGNAL(emit_invitation(QString,QString)), this, SLOT(receiveInvitation(QString, QString)));
+
     connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
 
 
@@ -230,11 +232,27 @@ void MainWindow::mapRoom(QString room_name, QXmppMucRoom *room)
 {
     qDebug() << "MainWindow::mapRoom : " << room_name;
 
-    QString sphere_name = room_name.split("_").at(0);
-    if (m_spheres_private.contains(sphere_name))
-        m_spheres_private.value(sphere_name)->connectRoom(room);
+    //QString sphere_name = room_name.split("_").at(0);
+    if (m_spheres_private.contains(room_name))
+        m_spheres_private.value(room_name)->connectRoom(room);
 }
 
+
+void MainWindow::receiveInvitation(QString invitation, QString reason)
+{
+// INVITATION :  "potes_93c8d9761e1f4c85829f46c354a723c4@conference.nodecast.net"
+// REASON :  "you have been invited to join this sphere, from fredix"
+
+    if (!invitation.contains("@")) return;
+    QString room_dest = invitation.split("@").at(0);
+    if (!room_dest.contains("_")) return;
+
+    //QString from_login = from.split("/").at(1);
+    QString sphere_name = room_dest.split("_").at(0);
+    if (!m_spheres_private.contains(room_dest))
+        create_sphere(sphere_name, room_dest);
+    else return;
+}
 
 void MainWindow::receiveMessageChat(QString from, QString message)
 {
@@ -249,15 +267,8 @@ void MainWindow::receiveMessageChat(QString from, QString message)
     if (from.contains("/"))
     {
         //QString from_login = from.split("/").at(1);
-        QString sphere_name = room_dest.split("_").at(0);
-        if (m_spheres_private.contains(sphere_name))
-            m_spheres_private.value(sphere_name)->receive_message(from, message);
-    }
-    else
-    {
-        // message from a room like an invitation
-        qDebug() << "INVITATION FROM : " << from << " MESSAGE : " << message;
-        return;
+        if (m_spheres_private.contains(room_dest))
+            m_spheres_private.value(room_dest)->receive_message(from, message);
     }
 }
 
@@ -360,12 +371,12 @@ void MainWindow::addTorrent(const QTorrentHandle &h)
     QString sphere_dir = sphere_path.takeAt(sphere_path.size()-2);
     qDebug() << "SPHERE DIR : " << sphere_dir;
 
-    QString sphere = sphere_dir.split("_").at(0);
-    qDebug() << "SPHERE : " << sphere;
+    //QString sphere = sphere_dir.split("_").at(0);
+    //qDebug() << "SPHERE : " << sphere;
 
 
-    m_stacked_tab_medias->setCurrentIndex(m_spheres_private[sphere]->index_tab);
-    m_spheres_private[sphere]->addTorrent(h);
+    m_stacked_tab_medias->setCurrentIndex(m_spheres_private[sphere_dir]->index_tab);
+    m_spheres_private[sphere_dir]->addTorrent(h);
 
 
 
@@ -901,12 +912,12 @@ void MainWindow::load_spheres()
             sphere_datas.title =  sphere_name;
             sphere_datas.directory = sphere_dir;
             sphere_datas.scope = Sphere_scope::PRIVATE;
-            m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
-            ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
-            connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
+            m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
+            ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
+            connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
 
-            sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
-            m_spheres_private[sphere_name]->populate();
+            sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
+            m_spheres_private[sphere_dir]->populate();
         }
     }
 }
@@ -918,41 +929,81 @@ void MainWindow::load_spheres()
 void MainWindow::create_sphere(QString sphere_name)
 {
     qDebug() << "CREATE SHERE : " << sphere_name;
+    if (sphere_name.isEmpty()) return;
+
+    QString sphere_dir = Sphere::gen_directory(sphere_name);
 
 
 //    QDir nodecast_datas(prefs.getSavePath() + "/nodecast/spheres/private/");
 //    QDir check_dir(nodecast_datas.absolutePath() + "/" + sphere_name);
-    if (!m_spheres_private.contains(sphere_name))
-    {
+  //  if (!m_spheres_private.contains(sphere_name))
+  //  {
  //       nodecast_datas.mkdir(sphere_name);
 
         Sphere_data sphere_datas;
         sphere_datas.title =  sphere_name;
+        sphere_datas.directory =  sphere_dir;
         sphere_datas.scope = Sphere_scope::PRIVATE;
-        m_spheres_private.insert(sphere_name, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
-        ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_name]);
-        connect(m_spheres_private[sphere_name], SIGNAL(row(int)), this, SLOT(changePage(int)));
+        m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
+        ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
+        connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
 
-        sphere_tab.insert(m_spheres_private[sphere_name]->index_tab, m_spheres_private[sphere_name]);
+        sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
 
-        QString sphere_dir = m_spheres_private[sphere_name]->getDirectory();
+        //QString sphere_dir = m_spheres_private[sphere_name]->getDirectory();
         Xmpp_client::instance()->connectToRoom(sphere_dir);
-    }
+   // }
 
     //QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.title + "/" + fileInfo.fileName();
 
 
     //QDir::mkdir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_name);
 
+    //m_godcastapi->sphere_post("okok", sphere_name);
+    //m_godcastapi nodeapi->workflow_post(ui->lineEdit_token->text(), workflow_name, owner_email, json);
+
+}
+
+void MainWindow::create_sphere(QString sphere_name, QString sphere_dir)
+{
+    qDebug() << "CREATE SHERE FROM INVITATION : " << sphere_name << " DIR : " << sphere_dir;
+    if (sphere_name.isEmpty()) return;
 
 
+//    QDir nodecast_datas(prefs.getSavePath() + "/nodecast/spheres/private/");
+//    QDir check_dir(nodecast_datas.absolutePath() + "/" + sphere_name);
+  //  if (!m_spheres_private.contains(sphere_name))
+  //  {
+ //       nodecast_datas.mkdir(sphere_name);
+
+        Sphere_data sphere_datas;
+        sphere_datas.title =  sphere_name;
+        sphere_datas.directory =  sphere_dir;
+        sphere_datas.scope = Sphere_scope::PRIVATE;
+        m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
+        ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
+        connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
+
+        sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
+
+        //QString sphere_dir = m_spheres_private[sphere_name]->getDirectory();
+        Xmpp_client::instance()->connectToRoom(sphere_dir);
+   // }
+
+    //QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.title + "/" + fileInfo.fileName();
 
 
+    //QDir::mkdir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_name);
 
     //m_godcastapi->sphere_post("okok", sphere_name);
     //m_godcastapi nodeapi->workflow_post(ui->lineEdit_token->text(), workflow_name, owner_email, json);
 
 }
+
+
+
+
+
 
 void MainWindow::on_actionAccount_triggered()
 {      

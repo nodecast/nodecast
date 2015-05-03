@@ -426,14 +426,19 @@ void Xmpp_client::messageReceived(const QXmppMessage& message)
     qDebug() << "Xmpp_client::messageReceived !!!";
 
     QString from = message.from();
+    QString invitation = message.mucInvitationJid();
+    QString reason = message.mucInvitationReason();
 
-    //QByteArray msg = QByteArray::fromBase64(message.body().toUtf8());
+    qDebug() << "INVITATION : " << invitation;
+    qDebug() << "REASON : " << reason;
 
 
     qDebug() << "RECEIVE from : " << from << " MESSAGE : " << message.body();
 
-
-    if (message.body().size() !=0) emit_chat(message.from(), message.body());
+    if (!invitation.isEmpty())
+        emit_invitation(invitation, reason);
+    else if (message.body().size() !=0)
+        emit_chat(message.from(), message.body());
 }
 
 

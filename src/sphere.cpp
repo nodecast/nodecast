@@ -33,6 +33,15 @@
 
 int Sphere::index = 0;
 
+
+QString Sphere::gen_directory(QString sphere_name)
+{
+    QString uuid = QUuid::createUuid().toString().remove("-").replace(0, 1, "");
+    uuid = uuid.replace(uuid.size()-1, 1, "");
+    return sphere_name.toLower().trimmed() + "_" + uuid;
+}
+
+
 Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *parent)
         :  m_scanFolders(ScanFoldersModel::instance(this)), m_stacked_room(stacked_room), sphere_data(data), QAbstractButton(parent)
 {
@@ -60,9 +69,11 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
         // check directory exist
         if (sphere_data.directory.isEmpty())
         {
-            uuid = QUuid::createUuid().toString().remove("-").replace(0, 1, "");
-            uuid = uuid.replace(uuid.size()-1, 1, "");
-            sphere_data.directory = sphere_data.title.toLower().trimmed() + "_" + uuid;
+            //uuid = QUuid::createUuid().toString().remove("-").replace(0, 1, "");
+            //uuid = uuid.replace(uuid.size()-1, 1, "");
+            //sphere_data.directory = sphere_data.title.toLower().trimmed() + "_" + uuid;
+
+            sphere_data.directory = gen_directory(sphere_data.title);
         }
 
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
