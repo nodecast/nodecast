@@ -1306,7 +1306,8 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
 
   recoverPersistentData(hash, buf);
   QString savePath;
-  if (!from_url.isEmpty() && savepathLabel_fromurl.contains(QUrl::fromEncoded(from_url.toUtf8()))) {
+  if (!from_url.isEmpty() && savepathLabel_fromurl.contains(QUrl::fromEncoded(from_url.toUtf8())))
+  {
     // Enforcing the save path defined before URL download (from RSS for example)
     QPair<QString, QString> savePath_label = savepathLabel_fromurl.take(QUrl::fromEncoded(from_url.toUtf8()));
     if (savePath_label.first.isEmpty())
@@ -1315,8 +1316,25 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
       savePath = savePath_label.first;
     // Remember label
     TorrentTempData::setLabel(hash, savePath_label.second);
-  } else {
+  }
+  else {
     savePath = getSavePath(hash, fromScanDir, path, imported);
+
+    qDebug() << "SAVE PATH from getSavePath : " << savePath;
+
+
+    // if not fromScanDir the torrent was receive from xmpp file, so I need to change his storage
+    // I must have to remove /torrents/user from the path
+    if (!fromScanDir && path.contains("torrents"))
+    {
+        qDebug() << " TORRENT PATH : " << path;
+        savePath = path.remove(QRegExp("torrents/.*$"));
+        qDebug() << " CLEAN PATH2 : " << savePath;
+
+    }
+
+
+
   }
   if (!imported && !defaultTempPath.isEmpty() && !TorrentPersistentData::isSeed(hash)) {
     qDebug("addTorrent::Temp folder is enabled.");
@@ -1391,6 +1409,7 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
     else
       addConsoleMessage(tr("'%1' added to download list.", "'/home/y/xxx.torrent' was added to download list.").arg(fsutils::toDisplayPath(path)));
   }
+
 
   // Send torrent addition signal
   emit addedTorrent(h);

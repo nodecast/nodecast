@@ -139,7 +139,7 @@ private slots:
     void NatChangeConnectionStatus(bool status);
 
     void receiveMessageChat(QString from, QString message);
-    void receiveInvitation(QString invitation, QString reason);
+    void receiveInvitation(QString invitation, QString from, QString reason);
 
     void on_actionTransferts_triggered();
     void mapRoom(QString room_name, QXmppMucRoom *room);

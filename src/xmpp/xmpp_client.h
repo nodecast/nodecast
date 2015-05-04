@@ -3,6 +3,8 @@
 
 #include <QBuffer>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 
 #include "QXmppMessage.h"
 #include "QXmppLogger.h"
@@ -27,7 +29,7 @@
 #include "ui_roster.h"
 #include "rosterItemModel.h"
 #include "rosterItemSortFilterProxyModel.h"
-
+#include "qbtsession.h"
 
 class Xmpp_client : public QXmppClient
 {
@@ -72,7 +74,6 @@ private:
     QXmppLogger m_logger;
     QXmppPresence subscribe;
     QBuffer *m_buffer;
-    QFile *file;
     QString file_name;
     QXmppMucManager *muc_manager;
     QHash <QString, QXmppMucRoom*> rooms;
@@ -83,6 +84,7 @@ private:
     QSplitter *vRosterSplitter;
     rosterItemModel *m_rosterItemModel;
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
+    QDir *file_dir;
     QString sphere_dest;
 
 public slots:
@@ -113,8 +115,9 @@ private slots:
 signals:
     void emit_connected(bool);
     void emit_chat(QString, QString);
-    void emit_invitation(QString, QString);
+    void emit_invitation(QString, QString, QString);
     void emit_room(QString room_name, QXmppMucRoom* room);
+    void emit_receive_file(QString file_path);
 };
 
 

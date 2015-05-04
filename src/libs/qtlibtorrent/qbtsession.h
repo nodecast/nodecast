@@ -39,6 +39,7 @@
 #include <QPointer>
 #include <QTimer>
 #include <QNetworkCookie>
+#include <QRegularExpression>
 
 #include <libtorrent/version.hpp>
 #include <libtorrent/session.hpp>

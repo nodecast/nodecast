@@ -461,6 +461,12 @@ void Sphere::torrentsAdded(QStringList &torrents)
     {
         qDebug() << "torrentsAdded TORRENT : " << torrent;
 
+        if (!torrent.contains(sphere_data.directory))
+        {
+            qDebug() << "THIS TORRENT IS NOT FOR MINE !! : " << torrent;
+            continue;
+        }
+
         if (!fsutils::isValidTorrentFile(torrent))
         {
             qDebug() << "torrent is not valid : " << torrent;

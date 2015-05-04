@@ -177,7 +177,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     Xmpp_client::connectXMPP();
     connect(Xmpp_client::instance(), SIGNAL(emit_connected(bool)), this, SLOT(XmppChangeConnectionStatus(bool)));
     connect(Xmpp_client::instance(), SIGNAL(emit_chat(QString, QString)), this, SLOT(receiveMessageChat(QString, QString)));
-    connect(Xmpp_client::instance(), SIGNAL(emit_invitation(QString,QString)), this, SLOT(receiveInvitation(QString, QString)));
+    connect(Xmpp_client::instance(), SIGNAL(emit_invitation(QString,QString,QString)), this, SLOT(receiveInvitation(QString, QString, QString)));
 
     connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
 
@@ -238,7 +238,7 @@ void MainWindow::mapRoom(QString room_name, QXmppMucRoom *room)
 }
 
 
-void MainWindow::receiveInvitation(QString invitation, QString reason)
+void MainWindow::receiveInvitation(QString invitation, QString from, QString reason)
 {
 // INVITATION :  "potes_93c8d9761e1f4c85829f46c354a723c4@conference.nodecast.net"
 // REASON :  "you have been invited to join this sphere, from fredix"
@@ -247,11 +247,28 @@ void MainWindow::receiveInvitation(QString invitation, QString reason)
     QString room_dest = invitation.split("@").at(0);
     if (!room_dest.contains("_")) return;
 
-    //QString from_login = from.split("/").at(1);
-    QString sphere_name = room_dest.split("_").at(0);
-    if (!m_spheres_private.contains(room_dest))
-        create_sphere(sphere_name, room_dest);
-    else return;
+    QString message = "<B>%1</B> wants to invit you to %2 room, %3";
+
+
+    int retButton = QMessageBox::question(
+            this, "Contact invitation", message.arg(from, room_dest, reason),
+            QMessageBox::Yes, QMessageBox::No);
+
+    switch(retButton)
+    {
+    case QMessageBox::Yes:
+        {
+        QString sphere_name = room_dest.split("_").at(0);
+        if (!m_spheres_private.contains(room_dest))
+            create_sphere(sphere_name, room_dest);
+        else return;
+        }
+        break;
+    default:
+        break;
+    }
+
+
 }
 
 void MainWindow::receiveMessageChat(QString from, QString message)
@@ -347,24 +364,6 @@ void MainWindow::changePage(int index)
 
 void MainWindow::addTorrent(const QTorrentHandle &h)
 {
-
- //   h.filename_at()
- //   list_torrents.insert(i, new Widgettorrent(fileInfo.fileName(), this));
-
-//    qDebug() << "HASH LABEL : " <<  TorrentPersistentData::getLabel(h.hash());
-
-//    qDebug() << "HASH NAME : " <<  TorrentPersistentData::getName(h.hash());
-//    qDebug() << "HASH NAME2 : " << h.name();
-
-
-//    qDebug() << "HASH : " << misc::toQString(h.info_hash());
-
-//    int size = list_torrents.size();
-
-//    list_torrents.append(new Widgettorrent());
-
-//    flowLayout->addWidget(list_torrents.at(size));
-
     qDebug() << "MainWindow::addTorrent";
     qDebug() << " PATH TORRENT : " << h.save_path();
     QStringList sphere_path = h.save_path().split("/");
@@ -375,25 +374,12 @@ void MainWindow::addTorrent(const QTorrentHandle &h)
     //qDebug() << "SPHERE : " << sphere;
 
 
-    m_stacked_tab_medias->setCurrentIndex(m_spheres_private[sphere_dir]->index_tab);
-    m_spheres_private[sphere_dir]->addTorrent(h);
+    if (m_spheres_private.contains(sphere_dir))
+    {
+        m_stacked_tab_medias->setCurrentIndex(m_spheres_private[sphere_dir]->index_tab);
+        m_spheres_private[sphere_dir]->addTorrent(h);
+    }
 
-
-
-
-//    Widgettorrent *wt = new Widgettorrent();
-//    wt->addTorrent(h);
-    // force stacked to sphere test
-//    m_stacked_tab_medias->setCurrentIndex(1);
-    //flowLayout->addWidget(wt);
-
-  //  sphere_tab[m_stacked_tab_medias->currentIndex()]->flowLayout->addWidget(wt);
-
-
- //   sphere_tab[m_stacked_tab_medias->currentIndex()]->addTorrent(h);
-
-
-    //ui->label_counter_medias->setText(QString::number(list_torrents.size()));
 }
 
 
