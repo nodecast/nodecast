@@ -408,9 +408,24 @@ void Sphere::populate()
 void Sphere::connectRoom(QXmppMucRoom *room)
 {
     qDebug() << "Sphere::connectRoom";
-    m_room->setXMPPRoom(room);
+    if (m_room) m_room->setXMPPRoom(room);
 }
 
+
+void Sphere::joinRoom()
+{
+    qDebug() << "Sphere::joinRoom";
+    if (m_room) m_room->joinXMPPRoom();
+}
+
+
+
+
+void Sphere::flushRoom()
+{
+    qDebug() << "Sphere::flushRoom";
+    if (m_room) m_room->flushRoom();
+}
 
 
 void Sphere::receive_message(const QString login, const QString message)

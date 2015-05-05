@@ -57,6 +57,8 @@ public:
     void receiveMessage(const QString from, const QString message);
     int index_tab;
     void setXMPPRoom(QXmppMucRoom* room);
+    void joinXMPPRoom();
+    void flushRoom();
     QStringList get_users();
     QString get_name() { return sphere_data.title;}
     void send_message(QString message)  {m_room->sendMessage(message);}

@@ -56,7 +56,6 @@ private slots:
 private:
     Preferences pref;
     Ui::account *ui;
-    Xmpp_client *m_xmpp_client;
 };
 
 #endif // ACCOUNT_H

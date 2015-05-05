@@ -95,6 +95,7 @@ public slots:
     void presenceReceived(const QXmppPresence& presence);
 
 private slots:
+    void disconnectedToServer();
     void job_finished();
     void file_received(QXmppTransferJob *job);
     void job_error(QXmppTransferJob::Error error);

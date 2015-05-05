@@ -17,23 +17,21 @@ void Xmpp_client::connectXMPP()
     QHash<QString, QString> account;
     Preferences prefs;
     account = prefs.getNodecastAccount();
-    if (account.size() == 0) return;
 
-    if (Xmpp_client::m_instance && !account.isEmpty())
+    if (Xmpp_client::m_instance)
     {
         //delete m_instance;
         //m_instance = NULL;
 
         Xmpp_client::m_instance->reload(account["login"], account["password"]);
     }
-    else if (!Xmpp_client::m_instance && !account.isEmpty())
+    else
     {
         qDebug() << "XMPP BEFORE : " << account["login"]  << " PASS : " << account["password"];
         m_instance = new Xmpp_client(account["login"], account["password"], 5223);
         //connect(m_xmpp_client, SIGNAL(emit_tchat(QString)), SLOT(receive_tchat(QString)));
         qDebug() << "XMPP AFTER";
     }
-    else qDebug() << "CONFIG IS EMPTY";
 }
 
 void Xmpp_client::drop()
@@ -110,6 +108,11 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 
     check = connect(this, SIGNAL(connected()),
                     SLOT(connectedToServer()));
+
+
+    check = connect(this, SIGNAL(disconnected()),
+                    SLOT(disconnectedToServer()));
+
 
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
@@ -230,6 +233,17 @@ void Xmpp_client::show_xml_console()
 
 void Xmpp_client::reload(QString login, QString password)
 {
+
+
+    foreach(QXmppMucRoom* room, rooms)
+    {
+        if (room->isJoined()) room->leave("I'll be back");
+        qDebug() << "DELETE ROOM :" << room->name();
+        delete room;
+    }
+    rooms.clear();
+
+
     m_instance->disconnectFromServer();
 
     m_login = login;
@@ -282,6 +296,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     qDebug() << "Xmpp_client::file_received : " << file_name << " file size : " << file_size;
     qDebug() << "Got transfer request from:" << job->jid();
     //Got transfer request from: "potes_93c8d9761e1f4c85829f46c354a723c4@conference.nodecast.net/test"
+
 
     if (!from_jid.contains("_") || !from_jid.contains("@") || !from_jid.contains("/"))
     {
@@ -411,7 +426,6 @@ void Xmpp_client::connectedError()
     qDebug() << "Xmpp_client::connectedError";
     qDebug() << "Connection failed !";
     connection_failed = true;
-    emit emit_connected(false);
 }
 
 void Xmpp_client::connectedToServer()
@@ -427,6 +441,21 @@ void Xmpp_client::connectedToServer()
     emit emit_connected(true);
 }
 
+
+void Xmpp_client::disconnectedToServer()
+{
+    connection_failed = true;
+    qDebug() << "Xmpp_client::disconnectedToServer";
+
+
+    foreach(QXmppMucRoom* room, rooms)
+    {
+        qDebug() << "DELETE ROOM :" << room->name();
+        delete room;
+    }
+    rooms.clear();
+    emit emit_connected(false);
+}
 
 
 void Xmpp_client::connectToRoom(QString room_name)

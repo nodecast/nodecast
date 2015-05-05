@@ -245,7 +245,6 @@ public:
 
       hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
       hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
-      if (hash["login"].isEmpty() || hash["password"].isEmpty()) hash.clear();
       return hash;
   }
 

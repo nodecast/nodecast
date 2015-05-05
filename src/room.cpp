@@ -83,6 +83,9 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     groupBox->setLayout(vbox);
     index_tab = parent->addWidget(groupBox);
 
+    line_chat->setEnabled(false);
+
+
  //   connect(refresh_users, SIGNAL(timeout()), this, SLOT(refreshUsers()));
  //   refresh_users->start(1000);
 }
@@ -194,17 +197,36 @@ void Room::parseCommand(const QString from, const QString message)
     }
 }
 
+void Room::flushRoom()
+{
+    if (m_room)
+    {
+        m_room=NULL;
+        qDebug() << "Room::flushRoom";
+        w_users_list->clear();
+        chat_room->clear();
+        line_chat->setEnabled(false);
+    }
+}
 
 
 void Room::setXMPPRoom(QXmppMucRoom* room)
 {
+    qDebug() << "Room::setXMPPRoom";
+    if (m_room) m_room=NULL;
     m_room = room;
-
     connect(m_room, SIGNAL(participantAdded(QString)), this, SLOT(newUser(QString)));
     connect(m_room, SIGNAL(participantRemoved(QString)), this, SLOT(delUser(QString)));
-
-
+    line_chat->setEnabled(true);
 }
+
+
+void Room::joinXMPPRoom()
+{
+    qDebug() << "ROOM JOIN : " << m_room->name();
+    if (m_room) m_room->join();
+}
+
 
 void Room::newUser(const QString &jid)
 {

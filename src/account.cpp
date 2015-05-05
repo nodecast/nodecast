@@ -48,7 +48,6 @@ account::account(QWidget *parent) :
 account::~account()
 {
     qDebug() << "DELETE ACCOUNT";
-    m_xmpp_client->deleteLater();
     delete ui;
 }
 

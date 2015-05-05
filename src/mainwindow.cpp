@@ -248,8 +248,6 @@ void MainWindow::receiveInvitation(QString invitation, QString from, QString rea
     if (!room_dest.contains("_")) return;
 
     QString message = "<B>%1</B> wants to invit you to %2 room, %3";
-
-
     int retButton = QMessageBox::question(
             this, "Contact invitation", message.arg(from, room_dest, reason),
             QMessageBox::Yes, QMessageBox::No);
@@ -261,7 +259,8 @@ void MainWindow::receiveInvitation(QString invitation, QString from, QString rea
         QString sphere_name = room_dest.split("_").at(0);
         if (!m_spheres_private.contains(room_dest))
             create_sphere(sphere_name, room_dest);
-        else return;
+        else
+            m_spheres_private.value(room_dest)->joinRoom();
         }
         break;
     default:
@@ -318,8 +317,14 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
         }
     }
     else
-        ui->pushButton_spherenew->setEnabled(false);
+    {
+        foreach (Sphere *sphere , m_spheres_private)
+        {
+            sphere->flushRoom();
+        }
 
+        ui->pushButton_spherenew->setEnabled(false);
+    }
 }
 
 
