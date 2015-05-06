@@ -316,7 +316,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
-    else if (file_size > 100000 || file_size == 0)
+    else if (file_size > 500000 || file_size == 0)
     {
         qDebug() << "file too big";
         job->abort();
@@ -411,10 +411,13 @@ void Xmpp_client::job_finished ()
     //nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
     //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
 
-
-    QBtSession::instance()->addTorrent(file_path, false);
-
-//    emit emit_receive_file(file_path);
+    if (fsutils::isValidTorrentFile(file_path))
+        QBtSession::instance()->addTorrent(file_path, false);
+    else
+    {
+        qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_path;
+        fsutils::forceRemove(file_path);
+    }
 }
 
 

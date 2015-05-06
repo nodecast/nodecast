@@ -213,7 +213,7 @@ void Room::flushRoom()
 void Room::setXMPPRoom(QXmppMucRoom* room)
 {
     qDebug() << "Room::setXMPPRoom";
-    if (m_room) m_room=NULL;
+    if (m_room) m_room=NULL; // should be useless
     m_room = room;
     connect(m_room, SIGNAL(participantAdded(QString)), this, SLOT(newUser(QString)));
     connect(m_room, SIGNAL(participantRemoved(QString)), this, SLOT(delUser(QString)));
@@ -233,7 +233,10 @@ void Room::newUser(const QString &jid)
     qDebug() << "USER JOINED : " << jid;
     //QString l_jid = jid.split("/").at(1);
      QString l_jid = m_room->participantFullJid(jid);
-        w_users_list->addItem(l_jid);
+
+     // sometimes participantFullJid return an empty string ... wtf.
+     if (l_jid.isEmpty()) l_jid = jid;
+     w_users_list->addItem(l_jid);
 }
 
 
