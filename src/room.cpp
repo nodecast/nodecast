@@ -235,14 +235,15 @@ void Room::joinXMPPRoom()
 
 void Room::newUser(const QString &jid)
 {
-    qDebug() << "USER JOINED : " << jid;
+    qDebug() << "USER JOINED : " << jid + " ROOM : " + m_room->name();
     //QString l_jid = jid.split("/").at(1);
      QString l_jid = m_room->participantFullJid(jid);
 
      // sometimes participantFullJid return an empty string ... wtf. nickname is missing I suppose.
      if (l_jid.isEmpty()) l_jid = jid;
      w_users_list->addItem(l_jid);
-     m_room->sendMessage("/nodecast info " + l_jid + " joined the room");
+     //m_room->sendMessage("/nodecast info " + l_jid + " joined the room");
+     chat_room->append(l_jid + " joined the room");
 }
 
 
@@ -256,7 +257,8 @@ void Room::delUser(const QString &jid)
 
     if (!items.isEmpty())
         delete items.first();
-    m_room->sendMessage("/nodecast info " + l_jid + " leave the room");
+    //m_room->sendMessage("/nodecast info " + l_jid + " leave the room");
+    chat_room->append(l_jid + " leave the room");
 
 
     /*foreach(QListWidgetItem *item, items)
