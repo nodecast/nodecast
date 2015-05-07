@@ -1327,8 +1327,9 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
     // I must have to remove /torrents/user from the path
     if (!fromScanDir && path.contains("torrents"))
     {
-        qDebug() << " TORRENT PATH : " << path;
-        savePath = path.remove(QRegExp("torrents/.*$"));
+        QString tmp_path = path;
+        qDebug() << " TORRENT PATH : " << tmp_path;
+        savePath = tmp_path.remove(QRegExp("torrents/.*$"));
         qDebug() << " CLEAN PATH2 : " << savePath;
 
     }
@@ -1381,6 +1382,7 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
     // Backup torrent file
     const QString newFile = torrentBackup.absoluteFilePath(hash + ".torrent");
 
+    qDebug() << "PATH : " << path << " NEW FILE : " << newFile;
     if (path != newFile)
       QFile::copy(path, newFile);
     // Copy the torrent file to the export folder

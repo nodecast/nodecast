@@ -412,7 +412,7 @@ void Xmpp_client::job_finished ()
     //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
 
     if (fsutils::isValidTorrentFile(file_path))
-        QBtSession::instance()->addTorrent(file_path, false);
+        QBtSession::instance()->addTorrent(file_path);
     else
     {
         qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_path;

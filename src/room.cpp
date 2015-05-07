@@ -243,11 +243,13 @@ void Room::newUser(const QString &jid)
 void Room::delUser(const QString &jid)
 {
     qDebug() << "USER QUIT : " << jid;
-    const QString l_jid = m_room->participantFullJid(jid);
+    QString l_jid = m_room->participantFullJid(jid);
+    if (l_jid.isEmpty()) l_jid = jid;
     qDebug() << "L JID : " << l_jid;
     QList<QListWidgetItem *> items = w_users_list->findItems(l_jid, Qt::MatchFixedString);
 
-    delete items.first();
+    if (!items.isEmpty())
+        delete items.first();
 
 
     /*foreach(QListWidgetItem *item, items)
