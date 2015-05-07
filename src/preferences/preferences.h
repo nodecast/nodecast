@@ -245,12 +245,23 @@ public:
 
       hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
       hash["password"]  = value(QString::fromUtf8("Preferences/Nodecast/Password")).toString();
+      hash["nickname"]  = value(QString::fromUtf8("Preferences/Nodecast/Nickname")).toString();
       return hash;
   }
 
   void setNodecastAccount(const QHash<QString, QString> &account) {
     setValue(QString::fromUtf8("Preferences/Nodecast/Login"), account.value("login"));
     setValue(QString::fromUtf8("Preferences/Nodecast/Password"), account.value("password"));
+    setValue(QString::fromUtf8("Preferences/Nodecast/Nickname"), account.value("nickname"));
+  }
+
+  QString getNodecastNickname() const {
+      QHash<QString, QString> hash;
+      QString nickname;
+
+      hash["nickname"] = value(QString::fromUtf8("Preferences/Nodecast/Nickname")).toString();
+      nickname = hash["nickname"].isEmpty()? hash["login"].split("@").at(0) : hash["nickname"];
+      return nickname;
   }
 
   QString getNodecastLogin() const {
@@ -262,7 +273,6 @@ public:
       login = hash["login"].isEmpty()? "" : hash["login"].split("@").at(0);
       return login;
   }
-
 
 
   // Downloads

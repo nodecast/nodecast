@@ -40,6 +40,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="inputMask">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="maxLength">
+           <number>200</number>
+          </property>
          </widget>
         </item>
         <item row="1" column="0">
@@ -57,8 +66,44 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="inputMask">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="maxLength">
+           <number>50</number>
+          </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="lineEdit_nickname">
+          <property name="inputMask">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="maxLength">
+           <number>50</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>nickname</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;(if you can't login to a chat room&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;change your nickname to &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;nickname_XXX&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;where XXX is a number)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>

@@ -41,6 +41,7 @@ account::account(QWidget *parent) :
 
     ui->lineEdit_login->setText(account.value("login") );
     ui->lineEdit_password->setText(account.value("password"));
+    ui->lineEdit_nickname->setText(account.value("nickname"));
 
     show();
 }
@@ -58,6 +59,7 @@ void account::on_buttonBox_accepted()
 
     hash["login"] = ui->lineEdit_login->text();
     hash["password"]  = ui->lineEdit_password->text();
+    hash["nickname"]  = ui->lineEdit_nickname->text();
 
     pref.setNodecastAccount(hash);
     pref.sync();

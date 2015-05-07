@@ -46,8 +46,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 
     m_room = NULL;
 
-    my_nickname = Preferences().getNodecastLogin();
-    my_login = Preferences().getNodecastAccount().value("login");
+    my_nickname = Preferences().getNodecastNickname();
 
 
     refresh_users = new QTimer(this);
