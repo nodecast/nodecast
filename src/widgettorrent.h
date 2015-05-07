@@ -51,6 +51,7 @@ signals:
     void emit_title();
 
 private:
+    void update_torrent_type_thumbnail();
     QTorrentHandle m_torrent;
     Ui::widgettorrent *ui;
     QPixmap *myPix;

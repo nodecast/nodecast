@@ -243,78 +243,18 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     timer_get_torrent_progress->start(1000);
 
 
-    qDebug() << " save_path_parsed : " << h.save_path_parsed();
+    qDebug() << "Widgettorrent::addTorrent save_path_parsed : " << h.save_path_parsed();
 
-
-
-    QMimeType mime = m_mime_db.mimeTypeForFile(h.save_path_parsed());
-
-
-    if (mime.inherits("image/gif") ||
-             mime.inherits("image/jpeg") ||
-             mime.inherits("image/png") ||
-             mime.inherits("image/tiff"))
+    QFileInfo fileInfo(h.save_path_parsed());
+    if(fileInfo.isFile())
     {
-        QByteArray imageFormat = QImageReader::imageFormat(h.save_path_parsed()); //Where fileName - path to your file
-        qDebug() << "imageFormat : " << imageFormat;
-
-        QPixmap img;
-
-        if (imageFormat.size() != 0 && img.load(h.save_path_parsed()))
-        {
-            QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-            ui->label_thumbnail->setPixmap(thumbnail);
-        }
-        torrent_data.type = "image";
+        // torrent is a file but unknown type at this moment
+        torrent_data.type = "binary";
     }
-    else if (mime.inherits("text/css") ||
-             mime.inherits("text/csv") ||
-             mime.inherits("text/html") ||
-             mime.inherits("text/plain") ||
-             mime.inherits("text/xml"))
+    else if(fileInfo.isDir())
     {
-        torrent_data.type = "text";
-    }
-    else if (mime.inherits("video/mpeg") ||
-             mime.inherits("video/mp4") ||
-             mime.inherits("video/quicktime") ||
-             mime.inherits("video/x-ms-wmv") ||
-             mime.inherits("video/x-msvideo") ||
-             mime.inherits("video/x-flv") ||
-             mime.inherits("video/webm") ||
-             mime.inherits("video/x-matroska")
-             )
-    {
-        torrent_data.type = "video";
-    }
-    else if (mime.inherits("audio/mpeg") ||
-             mime.inherits("audio/mp3") ||
-             mime.inherits("audio/x-ms-wma") ||
-             mime.inherits("audio/vnd.rn-realaudio") ||
-             mime.inherits("audio/x-wav") ||
-             mime.inherits("audio/wav") ||
-             mime.inherits("audio/x-matroska")
-             )
-    {
-        torrent_data.type = "audio";
-    }
-    else if (mime.inherits("application/pdf"))
-    {
-        torrent_data.type = "pdf";
-    }
-    else
-    {
-        QFileInfo fileInfo(h.save_path_parsed());
-        if(fileInfo.isFile())
-        {
-            // torrent is a file but unknown type, maybe a binary file
-            torrent_data.type = "binary";
-        }
-        else if(fileInfo.isDir())
-        {
-            // torrent is a directory
-            torrent_data.type = "directory";
-        }
+        // torrent is a directory
+        torrent_data.type = "directory";
     }
 
 
@@ -348,5 +288,93 @@ void Widgettorrent::update_timer_torrent_progress()
     int progress = int(tmp + 0.5);
     ui->progressBar_torrent->setValue(progress);
 
-    if (tmp >= 100) this->timer_get_torrent_progress->stop();
+    if (tmp >= 100)
+    {
+        this->timer_get_torrent_progress->stop();
+        update_torrent_type_thumbnail();
+    }
+}
+
+
+// when torrent is completly download, I can check his mime type.
+void Widgettorrent::update_torrent_type_thumbnail()
+{
+
+    qDebug() << "Widgettorrent::update_torrent_type_thumbnail";
+
+    if (torrent_data.type != "directory")
+    {
+
+        QMimeType mime = m_mime_db.mimeTypeForFile(m_torrent.save_path_parsed());
+
+        if (mime.inherits("image/gif") ||
+                 mime.inherits("image/jpeg") ||
+                 mime.inherits("image/png") ||
+                 mime.inherits("image/tiff"))
+        {
+            QByteArray imageFormat = QImageReader::imageFormat(m_torrent.save_path_parsed()); //Where fileName - path to your file
+            qDebug() << "imageFormat : " << imageFormat;
+
+            QPixmap img;
+
+            if (imageFormat.size() != 0 && img.load(m_torrent.save_path_parsed()))
+            {
+                QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+                ui->label_thumbnail->setPixmap(thumbnail);
+            }
+            torrent_data.type = "image";
+        }
+        else if (mime.inherits("text/css") ||
+                 mime.inherits("text/csv") ||
+                 mime.inherits("text/html") ||
+                 mime.inherits("text/plain") ||
+                 mime.inherits("text/xml"))
+        {
+            torrent_data.type = "text";
+        }
+        else if (mime.inherits("video/mpeg") ||
+                 mime.inherits("video/mp4") ||
+                 mime.inherits("video/quicktime") ||
+                 mime.inherits("video/x-ms-wmv") ||
+                 mime.inherits("video/x-msvideo") ||
+                 mime.inherits("video/x-flv") ||
+                 mime.inherits("video/webm") ||
+                 mime.inherits("video/x-matroska")
+                 )
+        {
+            torrent_data.type = "video";
+        }
+        else if (mime.inherits("audio/mpeg") ||
+                 mime.inherits("audio/mp3") ||
+                 mime.inherits("audio/x-ms-wma") ||
+                 mime.inherits("audio/vnd.rn-realaudio") ||
+                 mime.inherits("audio/x-wav") ||
+                 mime.inherits("audio/wav") ||
+                 mime.inherits("audio/x-matroska")
+                 )
+        {
+            torrent_data.type = "audio";
+        }
+        else if (mime.inherits("application/pdf"))
+        {
+            torrent_data.type = "pdf";
+        }
+        else
+        {
+            QFileInfo fileInfo(m_torrent.save_path_parsed());
+            if(fileInfo.isFile())
+            {
+                // torrent is a file but unknown type, maybe a binary file
+                torrent_data.type = "binary";
+            }
+            else if(fileInfo.isDir())
+            {
+                // torrent is a directory
+                torrent_data.type = "directory";
+            }
+        }
+
+    }
+
+    qDebug() << "Widgettorrent::update_torrent_type_thumbnail DATA TYPE : " << torrent_data.type;
 }
