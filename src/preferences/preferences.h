@@ -256,21 +256,16 @@ public:
   }
 
   QString getNodecastNickname() const {
-      QHash<QString, QString> hash;
-      QString nickname;
-
-      hash["nickname"] = value(QString::fromUtf8("Preferences/Nodecast/Nickname")).toString();
-      nickname = hash["nickname"].isEmpty()? hash["login"].split("@").at(0) : hash["nickname"];
+      QString login = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
+      QString nickname = value(QString::fromUtf8("Preferences/Nodecast/Nickname")).toString();
+      nickname = nickname.isEmpty()? login.split("@").at(0) : nickname;
       return nickname;
   }
 
   QString getNodecastLogin() const {
-      QHash<QString, QString> hash;
-      QString login;
-
-      hash["login"] = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
-      if (!hash["login"].contains("@")) return "";
-      login = hash["login"].isEmpty()? "" : hash["login"].split("@").at(0);
+      QString login = value(QString::fromUtf8("Preferences/Nodecast/Login")).toString();
+      if (!login.contains("@")) return "";
+      login = login.isEmpty()? "" : login.split("@").at(0);
       return login;
   }
 

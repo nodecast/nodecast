@@ -194,6 +194,12 @@ void Room::parseCommand(const QString from, const QString message)
                                              );
         */
     }
+    else if (message.contains("info"))
+    {
+        QString msg = message;
+        msg.replace("/nodecast info ", "");
+        chat_room->append(msg);
+    }
 }
 
 void Room::flushRoom()
@@ -233,9 +239,10 @@ void Room::newUser(const QString &jid)
     //QString l_jid = jid.split("/").at(1);
      QString l_jid = m_room->participantFullJid(jid);
 
-     // sometimes participantFullJid return an empty string ... wtf.
+     // sometimes participantFullJid return an empty string ... wtf. nickname is missing I suppose.
      if (l_jid.isEmpty()) l_jid = jid;
      w_users_list->addItem(l_jid);
+     m_room->sendMessage("/nodecast info " + l_jid + " joined the room");
 }
 
 
@@ -249,6 +256,7 @@ void Room::delUser(const QString &jid)
 
     if (!items.isEmpty())
         delete items.first();
+    m_room->sendMessage("/nodecast info " + l_jid + " leave the room");
 
 
     /*foreach(QListWidgetItem *item, items)

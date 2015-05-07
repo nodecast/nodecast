@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>507</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,6 +25,12 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QFormLayout" name="formLayout_3">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <property name="formAlignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
@@ -80,6 +86,13 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>nickname</string>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="lineEdit_nickname">
           <property name="inputMask">
@@ -90,13 +103,6 @@
           </property>
           <property name="maxLength">
            <number>50</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>nickname</string>
           </property>
          </widget>
         </item>
