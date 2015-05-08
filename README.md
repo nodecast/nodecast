@@ -30,6 +30,12 @@ cd ../../../
 
 qmake && make
 
+Mac OSX :
+========
+
+mkdir -p src/nodecast.app/Contents/PlugIns/platforms
+
+cp /Users/youraccount/Qt/5.4/clang_64/plugins/platforms/libqcocoa.dylib src/nodecast.app/Contents/PlugIns/platforms
 
 USE
 ====

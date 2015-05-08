@@ -28,7 +28,7 @@ void Xmpp_client::connectXMPP()
     else
     {
         qDebug() << "XMPP BEFORE : " << account["login"]  << " PASS : " << account["password"];
-        m_instance = new Xmpp_client(account["login"], account["password"], 5223);
+        m_instance = new Xmpp_client(account["login"], account["password"], 5222);
         //connect(m_xmpp_client, SIGNAL(emit_tchat(QString)), SLOT(receive_tchat(QString)));
         qDebug() << "XMPP AFTER";
     }
@@ -207,6 +207,8 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     this->configuration().setJid(m_login);
     this->configuration().setPassword(m_password);
     this->configuration().setResource("nodecast");
+    this->configuration().setDomain("nodecast.net");
+    this->configuration().setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode::TLSRequired);
 
     this->connectToServer(this->configuration());
 }
@@ -251,6 +253,9 @@ void Xmpp_client::reload(QString login, QString password)
     this->configuration().setJid(m_login);
     this->configuration().setPassword(m_password);
     this->configuration().setResource("nodecast");
+    this->configuration().setDomain("nodecast.net");
+    this->configuration().setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode::TLSRequired);
+
     this->connectToServer(this->configuration());
 }
 
