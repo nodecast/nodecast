@@ -249,56 +249,68 @@ void Sphere::dropEvent(QDropEvent* event)
        QString localPath = droppedUrls[i].toLocalFile();
        QFileInfo fileInfo(localPath);
 
-
-       QString extension = fsutils::fileExtension(fileInfo.fileName());
-       qDebug() << "EXTENSION FILE : " << extension;
-
-       if (extension == "torrent")
+       if(fileInfo.isFile())
        {
-           if (!fsutils::isValidTorrentFile(localPath))
+           QString extension = fsutils::fileExtension(fileInfo.fileName());
+           qDebug() << "EXTENSION FILE : " << extension;
+
+           if (extension == "torrent")
            {
-               qDebug() << "torrent is not valid : " << fileInfo.fileName();
+               if (!fsutils::isValidTorrentFile(localPath))
+               {
+                   qDebug() << "torrent is not valid : " << fileInfo.fileName();
+                   return;
+               }
+
+               qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
+               QDir nodecast_datas;
+               nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+               QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
                return;
            }
 
-           qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
-           QDir nodecast_datas;
-           nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
-           QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
-           return;
-       }
+           QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
+           fsutils::forceRemove(target_link);
+           QFileInfo fileInfoLink(target_link);
 
-       QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
-       fsutils::forceRemove(target_link);
-       QFileInfo fileInfoLink(target_link);
+           bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
+           QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
+           qDebug() << link_status;
+           if (!check_link)
+           {
+               QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+               return;
+           }
 
-       bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
-       QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
-       qDebug() << link_status;
-       if (!check_link)
-       {
-           QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
-           return;
-       }
-
-       if(fileInfo.isFile())
-       {
-           // file
            createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
            connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
            //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else if(fileInfo.isDir())
        {
-           // directory
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+           QDir take_dir = fileInfo.dir();
+           QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
+           fsutils::forceRemove(target_link);
+           qDebug() << "TARGET LINK : " << target_link;
+           QFileInfo fileInfoLink(target_link);
+
+           bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
+           QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
+           qDebug() << link_status;
+           if (!check_link)
+           {
+               QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+               return;
+           }
+
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.canonicalFilePath(), this);
            connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
            //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else
        {
            // none
-           QMessageBox::information(this, tr("Dropped, but unknown in %1 sphere").arg(sphere_data.title), tr("Unknown: %1").arg(fileInfo.absoluteFilePath()));
+           QMessageBox::information(this, tr("Dropped, but unknown in %1 sphere").arg(sphere_data.title), tr("Unknown: %1").arg(fileInfo.canonicalFilePath()));
        }
     }
 
@@ -439,7 +451,8 @@ void Sphere::receive_message(const QString login, const QString message)
 
 void Sphere::addTorrent(QString path, bool fromScanDir)
 {
-    qDebug() << "SEND TORRENT : " << path;
+    qDebug() << "SEND TORRENT : " << path;     
+    QString path_dest = path;
 
     if (fromScanDir)
     {
@@ -449,17 +462,18 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
         QDir nodecast_datas;
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
-        QFile::copy(fi_torrent.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/torrents/" + fi_torrent.fileName() );
+        path_dest = nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/torrents/" + fi_torrent.fileName();
+        QFile::copy(fi_torrent.absoluteFilePath(), path_dest);
     }
 
     qDebug() << "ROOM : " << m_room->get_name();
     QStringList users_list = m_room->get_users();
 
-    qDebug() << "USERS LIST : " << users_list;
+    qDebug() << "Sphere::addTorrent USERS LIST : " << users_list;
 
     foreach(QString user, users_list)
     {
-        Xmpp_client::instance()->sendFile(user, path);
+        Xmpp_client::instance()->sendFile(user, path_dest);
     }
     QString filename = path.split("/").takeLast();
     m_room->send_message(" share : " + filename);

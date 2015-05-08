@@ -62,9 +62,10 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 
     // uncomment one of the following if you only want to use a specific transfer method:
     //
-     transfer_manager->setSupportedMethods(QXmppTransferJob::InBandMethod);
+     //transfer_manager->setSupportedMethods(QXmppTransferJob::InBandMethod);
     // manager->setSupportedMethods(QXmppTransferJob::SocksMethod);
      transfer_manager->setProxy("proxy.nodecast.net");
+     transfer_manager->setSupportedMethods(QXmppTransferJob::InBandMethod);
 
      muc_manager = new QXmppMucManager;
      this->addExtension(muc_manager);
