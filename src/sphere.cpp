@@ -247,6 +247,7 @@ void Sphere::dropEvent(QDropEvent* event)
     for(int i = 0; i < droppedUrlCnt; i++)
     {
        QString localPath = droppedUrls[i].toLocalFile();
+       if (!localPath.endsWith("/")) localPath.append("/"); // workaround a strange behaviour between Mac and Linux ...
        QFileInfo fileInfo(localPath);
 
        if(fileInfo.isFile())
@@ -303,7 +304,7 @@ void Sphere::dropEvent(QDropEvent* event)
                return;
            }
 
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.canonicalFilePath(), this);
+           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
            connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
            //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
