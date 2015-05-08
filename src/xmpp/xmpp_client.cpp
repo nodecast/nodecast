@@ -207,7 +207,6 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     this->configuration().setJid(m_login);
     this->configuration().setPassword(m_password);
     this->configuration().setResource("nodecast");
-    this->configuration().setDomain("nodecast.net");
     this->configuration().setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode::TLSRequired);
 
     this->connectToServer(this->configuration());
@@ -253,7 +252,6 @@ void Xmpp_client::reload(QString login, QString password)
     this->configuration().setJid(m_login);
     this->configuration().setPassword(m_password);
     this->configuration().setResource("nodecast");
-    this->configuration().setDomain("nodecast.net");
     this->configuration().setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode::TLSRequired);
 
     this->connectToServer(this->configuration());
