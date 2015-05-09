@@ -10,11 +10,15 @@
 #include <QImageReader>
 #include <QMimeDatabase>
 #include <QDesktopServices>
+#include <QMenu>
+#include <QMessageBox>
 
 //#include "torrentpersistentdata.h"
 #include "qtorrenthandle.h"
 #include "qbtsession.h"
 #include "global.h"
+#include "iconprovider.h"
+#include "deletionconfirmationdlg.h"
 
 namespace Ui {
 class widgettorrent;
@@ -25,6 +29,7 @@ struct Torrent_data {
     QString file="";
     QString type="";
     qint64 size=0;
+    QString hash="";
 };
 
 
@@ -49,8 +54,10 @@ protected:
 
 signals:
     void emit_title();
+    void emit_deleted(Widgettorrent* wt);
 
 private:
+    void displayListMenu();
     void update_torrent_type_thumbnail();
     QTorrentHandle m_torrent;
     Ui::widgettorrent *ui;
@@ -68,6 +75,12 @@ private:
 private slots:
     void on_media_doubleClicked();
     void update_timer_torrent_progress();
+
+    void startSelectedTorrents();
+    void pauseSelectedTorrents();
+    void deleteSelectedTorrents();
+    void openSelectedTorrentsFolder() const;
+    void recheckSelectedTorrents();
 
 public slots:
     void addTorrent(const QTorrentHandle &h);

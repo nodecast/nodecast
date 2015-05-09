@@ -111,6 +111,12 @@ void Widgettorrent::mousePressEvent(QMouseEvent *e)
 
         unckeck_widget_selected(this);
     }
+    else if(e->button() == Qt::RightButton)
+    {
+        qDebug() << "MOUSE RIGHT PRESSED : " << ui->label_title->text();
+
+        displayListMenu();
+    }
 
 }
 
@@ -237,6 +243,7 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     m_title.setText(h.name());
     ui->label_title->setText(h.name());
     torrent_data.file = h.name();
+    torrent_data.hash = h.hash();
 
     timer_get_torrent_progress = new QTimer(this);
     connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));
@@ -377,4 +384,225 @@ void Widgettorrent::update_torrent_type_thumbnail()
     }
 
     qDebug() << "Widgettorrent::update_torrent_type_thumbnail DATA TYPE : " << torrent_data.type;
+}
+
+
+
+
+void Widgettorrent::displayListMenu() {
+  // Create actions
+  QAction actionStart(IconProvider::instance()->getIcon("media-playback-start"), tr("Resume", "Resume/start the torrent"), 0);
+  connect(&actionStart, SIGNAL(triggered()), this, SLOT(startSelectedTorrents()));
+  QAction actionPause(IconProvider::instance()->getIcon("media-playback-pause"), tr("Pause", "Pause the torrent"), 0);
+  connect(&actionPause, SIGNAL(triggered()), this, SLOT(pauseSelectedTorrents()));
+  QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), 0);
+  connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
+  QAction actionPreview_file(IconProvider::instance()->getIcon("view-preview"), tr("Preview file..."), 0);
+  QAction actionSet_max_ratio(QIcon(QString::fromUtf8(":/Icons/skin/ratio.png")), tr("Limit share ratio..."), 0);
+  connect(&actionSet_max_ratio, SIGNAL(triggered()), this, SLOT(setMaxRatioSelectedTorrents()));
+  QAction actionSet_upload_limit(QIcon(QString::fromUtf8(":/Icons/skin/seeding.png")), tr("Limit upload rate..."), 0);
+  connect(&actionSet_upload_limit, SIGNAL(triggered()), this, SLOT(setUpLimitSelectedTorrents()));
+  QAction actionSet_download_limit(QIcon(QString::fromUtf8(":/Icons/skin/download.png")), tr("Limit download rate..."), 0);
+  connect(&actionSet_download_limit, SIGNAL(triggered()), this, SLOT(setDlLimitSelectedTorrents()));
+  QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
+  connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedTorrentsFolder()));
+  QAction actionIncreasePriority(IconProvider::instance()->getIcon("go-up"), tr("Move up", "i.e. move up in the queue"), 0);
+  connect(&actionIncreasePriority, SIGNAL(triggered()), this, SLOT(increasePrioSelectedTorrents()));
+  QAction actionDecreasePriority(IconProvider::instance()->getIcon("go-down"), tr("Move down", "i.e. Move down in the queue"), 0);
+  connect(&actionDecreasePriority, SIGNAL(triggered()), this, SLOT(decreasePrioSelectedTorrents()));
+  QAction actionTopPriority(IconProvider::instance()->getIcon("go-top"), tr("Move to top", "i.e. Move to top of the queue"), 0);
+  connect(&actionTopPriority, SIGNAL(triggered()), this, SLOT(topPrioSelectedTorrents()));
+  QAction actionBottomPriority(IconProvider::instance()->getIcon("go-bottom"), tr("Move to bottom", "i.e. Move to bottom of the queue"), 0);
+  connect(&actionBottomPriority, SIGNAL(triggered()), this, SLOT(bottomPrioSelectedTorrents()));
+  QAction actionSetTorrentPath(IconProvider::instance()->getIcon("inode-directory"), tr("Set location..."), 0);
+  QAction actionForce_recheck(IconProvider::instance()->getIcon("document-edit-verify"), tr("Force recheck"), 0);
+  connect(&actionForce_recheck, SIGNAL(triggered()), this, SLOT(recheckSelectedTorrents()));
+  QAction actionCopy_magnet_link(QIcon(":/Icons/magnet.png"), tr("Copy magnet link"), 0);
+  QAction actionSuper_seeding_mode(tr("Super seeding mode"), 0);
+  actionSuper_seeding_mode.setCheckable(true);
+  connect(&actionSuper_seeding_mode, SIGNAL(triggered()), this, SLOT(toggleSelectedTorrentsSuperSeeding()));
+  QAction actionRename(IconProvider::instance()->getIcon("edit-rename"), tr("Rename..."), 0);
+  connect(&actionRename, SIGNAL(triggered()), this, SLOT(renameSelectedTorrent()));
+  QAction actionSequential_download(tr("Download in sequential order"), 0);
+  actionSequential_download.setCheckable(true);
+  connect(&actionSequential_download, SIGNAL(triggered()), this, SLOT(toggleSelectedTorrentsSequentialDownload()));
+  QAction actionFirstLastPiece_prio(tr("Download first and last piece first"), 0);
+  actionFirstLastPiece_prio.setCheckable(true);
+  connect(&actionFirstLastPiece_prio, SIGNAL(triggered()), this, SLOT(toggleSelectedFirstLastPiecePrio()));
+  // End of actions
+  QMenu listMenu(this);
+  // Enable/disable pause/start action given the DL state
+  bool has_pause = false, has_start = false, has_preview = false;
+  bool all_same_super_seeding = true;
+  bool super_seeding_mode = false;
+  bool all_same_sequential_download_mode = true, all_same_prio_firstlast = true;
+  bool sequential_download_mode = false, prioritize_first_last = false;
+  bool one_has_metadata = false, one_not_seed = false;
+  bool first = true;
+  QTorrentHandle h;
+  qDebug("Displaying menu");
+    // Get the file name
+    QString hash = torrent_data.hash;
+    qDebug() << "HASH : " << hash;
+    // Get handle and pause the torrent
+   // h = BTSession->getTorrentHandle(hash);
+    h =  QBtSession::instance()->getTorrentHandle(hash);
+    if (!h.is_valid()) return;
+    if (h.has_metadata())
+      one_has_metadata = true;
+    if (!h.is_seed()) {
+      one_not_seed = true;
+      if (h.has_metadata()) {
+        if (first) {
+          sequential_download_mode = h.is_sequential_download();
+          prioritize_first_last = h.first_last_piece_first();
+        } else {
+          if (sequential_download_mode != h.is_sequential_download()) {
+            all_same_sequential_download_mode = false;
+          }
+          if (prioritize_first_last != h.first_last_piece_first()) {
+            all_same_prio_firstlast = false;
+          }
+        }
+      }
+    }
+    else {
+      if (!one_not_seed && all_same_super_seeding && h.has_metadata()) {
+        if (first) {
+          super_seeding_mode = h.super_seeding();
+        } else {
+          if (super_seeding_mode != h.super_seeding()) {
+            all_same_super_seeding = false;
+          }
+        }
+      }
+    }
+    if (h.is_paused()) {
+      if (!has_start) {
+        listMenu.addAction(&actionStart);
+        has_start = true;
+      }
+    }else{
+      if (!has_pause) {
+        listMenu.addAction(&actionPause);
+        has_pause = true;
+      }
+    }
+    if (h.has_metadata() && QBtSession::instance()->isFilePreviewPossible(hash) && !has_preview) {
+      has_preview = true;
+    }
+    first = false;
+  //  if (has_pause && has_start && has_preview && one_not_seed) break;
+
+
+
+  listMenu.addSeparator();
+  listMenu.addAction(&actionDelete);
+  listMenu.addSeparator();
+  listMenu.addAction(&actionSetTorrentPath);
+  //if (selectedIndexes.size() == 1)
+  //  listMenu.addAction(&actionRename);
+  // Label Menu
+/*  QStringList customLabels = getCustomLabels();
+  customLabels.sort();
+  QList<QAction*> labelActions;
+  QMenu *labelMenu = listMenu.addMenu(IconProvider::instance()->getIcon("view-categories"), tr("Label"));
+  labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("list-add"), tr("New...", "New label..."));
+  labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("edit-clear"), tr("Reset", "Reset label"));
+  labelMenu->addSeparator();
+  foreach (const QString &label, customLabels) {
+    labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("inode-directory"), label);
+  }
+  */
+  listMenu.addSeparator();
+  if (one_not_seed)
+    listMenu.addAction(&actionSet_download_limit);
+  listMenu.addAction(&actionSet_max_ratio);
+  listMenu.addAction(&actionSet_upload_limit);
+  if (!one_not_seed && all_same_super_seeding && one_has_metadata) {
+    actionSuper_seeding_mode.setChecked(super_seeding_mode);
+    listMenu.addAction(&actionSuper_seeding_mode);
+  }
+  listMenu.addSeparator();
+  bool added_preview_action = false;
+  if (has_preview) {
+    listMenu.addAction(&actionPreview_file);
+    added_preview_action = true;
+  }
+  if (one_not_seed && one_has_metadata) {
+    if (all_same_sequential_download_mode) {
+      actionSequential_download.setChecked(sequential_download_mode);
+      listMenu.addAction(&actionSequential_download);
+      added_preview_action = true;
+    }
+    if (all_same_prio_firstlast) {
+      actionFirstLastPiece_prio.setChecked(prioritize_first_last);
+      listMenu.addAction(&actionFirstLastPiece_prio);
+      added_preview_action = true;
+    }
+  }
+  if (added_preview_action)
+    listMenu.addSeparator();
+  if (one_has_metadata) {
+    listMenu.addAction(&actionForce_recheck);
+    listMenu.addSeparator();
+  }
+  listMenu.addAction(&actionOpen_destination_folder);
+  if (QBtSession::instance()->isQueueingEnabled() && one_not_seed) {
+    listMenu.addSeparator();
+    QMenu *prioMenu = listMenu.addMenu(tr("Priority"));
+    prioMenu->addAction(&actionTopPriority);
+    prioMenu->addAction(&actionIncreasePriority);
+    prioMenu->addAction(&actionDecreasePriority);
+    prioMenu->addAction(&actionBottomPriority);
+  }
+  listMenu.addSeparator();
+  listMenu.addAction(&actionCopy_magnet_link);
+  // Call menu
+  QAction *act = 0;
+  act = listMenu.exec(QCursor::pos());
+}
+
+
+
+
+void Widgettorrent::startSelectedTorrents() {
+    QBtSession::instance()->resumeTorrent(torrent_data.hash);
+}
+
+
+void Widgettorrent::pauseSelectedTorrents() {
+    QBtSession::instance()->pauseTorrent(torrent_data.hash);
+}
+
+
+void Widgettorrent::deleteSelectedTorrents() {
+  QTorrentHandle torrent = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
+  bool delete_local_files = false;
+  if (Preferences().confirmTorrentDeletion() &&
+      !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
+    return;
+    QBtSession::instance()->deleteTorrent(torrent_data.hash, delete_local_files);
+    emit emit_deleted(this);
+}
+
+
+void Widgettorrent::openSelectedTorrentsFolder() const {
+    const QTorrentHandle h = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
+    if (h.is_valid()) {
+      QString rootFolder = h.root_path();
+      qDebug("Opening path at %s", qPrintable(rootFolder));
+      //if (!pathsList.contains(rootFolder)) {
+       // pathsList.insert(rootFolder);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(rootFolder));
+      //}
+    }
+}
+
+
+void Widgettorrent::recheckSelectedTorrents() {
+  QMessageBox::StandardButton ret = QMessageBox::question(this, tr("Recheck confirmation"), tr("Are you sure you want to recheck the selected torrent(s)?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+  if (ret != QMessageBox::Yes)
+    return;
+    QBtSession::instance()->recheckTorrent(torrent_data.hash);
 }

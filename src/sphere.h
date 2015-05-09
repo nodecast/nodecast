@@ -104,6 +104,8 @@ private slots:
     void selected();
     void addTorrent(QString path, bool fromScandir);
     void torrentsAdded(QStringList &torrents);
+    void removeTorrent(Widgettorrent *widgetTorrent);
+
 
 signals:
     void row(int);

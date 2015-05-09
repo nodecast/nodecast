@@ -322,9 +322,9 @@ void TransferListWidget::deleteSelectedTorrents() {
   if (hashes.empty()) return;
   QTorrentHandle torrent = BTSession->getTorrentHandle(hashes[0]);
   bool delete_local_files = false;
- // if (Preferences().confirmTorrentDeletion() &&
- //     !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, hashes.size(), torrent.name()))
- //   return;
+  if (Preferences().confirmTorrentDeletion() &&
+      !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, hashes.size(), torrent.name()))
+    return;
   foreach (const QString &hash, hashes) {
     BTSession->deleteTorrent(hash, delete_local_files);
   }

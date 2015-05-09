@@ -150,7 +150,8 @@ HEADERS  += mainwindow.h \
             sphere.h \
     global.h \
     room.h \
-    roominvit.h
+    roominvit.h \
+    deletionconfirmationdlg.h
 
 
 win32|macx {
@@ -167,7 +168,8 @@ FORMS += mainwindow.ui \
     about.ui \
     account.ui \
     newsphere.ui \
-    roominvit.ui
+    roominvit.ui \
+    confirmdeletiondlg.ui
 
 
 # OS specific config

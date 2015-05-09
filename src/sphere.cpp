@@ -247,7 +247,6 @@ void Sphere::dropEvent(QDropEvent* event)
     for(int i = 0; i < droppedUrlCnt; i++)
     {
        QString localPath = droppedUrls[i].toLocalFile();
-       if (!localPath.endsWith("/")) localPath.append("/"); // workaround a strange behaviour between Mac and Linux ...
        QFileInfo fileInfo(localPath);
 
        if(fileInfo.isFile())
@@ -289,6 +288,9 @@ void Sphere::dropEvent(QDropEvent* event)
        }
        else if(fileInfo.isDir())
        {
+           if (!localPath.endsWith("/")) localPath.append("/"); // workaround a strange behaviour between Mac and Linux ...
+           QFileInfo fileInfo(localPath);
+
            QDir take_dir = fileInfo.dir();
            QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
            fsutils::forceRemove(target_link);
@@ -405,9 +407,19 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     this->setChecked(true);
 
     Widgettorrent *wt = new Widgettorrent(sphere_data);
+    connect(wt, SIGNAL(emit_deleted(Widgettorrent*)), this, SLOT(removeTorrent(Widgettorrent*)));
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
 }
+
+void Sphere::removeTorrent(Widgettorrent *widgetTorrent)
+{
+    qDebug() << "SPHERE::removeTorrent";
+    flowLayout->removeWidget(widgetTorrent);
+    //delete widgetTorrent;
+}
+
+
 
 
 
