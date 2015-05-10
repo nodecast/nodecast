@@ -2593,6 +2593,8 @@ void QBtSession::readAlerts() {
         }
       }
       else if (torrent_deleted_alert* p = dynamic_cast<torrent_deleted_alert*>(a.get())) {
+      // NODECAST DO NOT DELETE THE ROOT FOLDER
+      /*
         qDebug("A torrent was deleted from the hard disk, attempting to remove the root folder too...");
         QString hash = misc::toQString(p->info_hash);
         if (!hash.isEmpty()) {
@@ -2613,6 +2615,8 @@ void QBtSession::readAlerts() {
             }
           }
         }
+
+        */
       }
       else if (storage_moved_alert* p = dynamic_cast<storage_moved_alert*>(a.get())) {
         QTorrentHandle h(p->handle);

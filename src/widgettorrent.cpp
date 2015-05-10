@@ -504,7 +504,7 @@ void Widgettorrent::displayListMenu() {
   listMenu.addSeparator();
   listMenu.addAction(&actionDelete);
   listMenu.addSeparator();
-  listMenu.addAction(&actionSetTorrentPath);
+  //listMenu.addAction(&actionSetTorrentPath);
   //if (selectedIndexes.size() == 1)
   //  listMenu.addAction(&actionRename);
   // Label Menu
@@ -519,7 +519,7 @@ void Widgettorrent::displayListMenu() {
     labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("inode-directory"), label);
   }
   */
-  listMenu.addSeparator();
+  /*listMenu.addSeparator();
   if (one_not_seed)
     listMenu.addAction(&actionSet_download_limit);
   listMenu.addAction(&actionSet_max_ratio);
@@ -547,7 +547,7 @@ void Widgettorrent::displayListMenu() {
     }
   }
   if (added_preview_action)
-    listMenu.addSeparator();
+    listMenu.addSeparator();*/
   if (one_has_metadata) {
     listMenu.addAction(&actionForce_recheck);
     listMenu.addSeparator();
@@ -561,8 +561,8 @@ void Widgettorrent::displayListMenu() {
     prioMenu->addAction(&actionDecreasePriority);
     prioMenu->addAction(&actionBottomPriority);
   }
-  listMenu.addSeparator();
-  listMenu.addAction(&actionCopy_magnet_link);
+  //listMenu.addSeparator();
+  //listMenu.addAction(&actionCopy_magnet_link);
   // Call menu
   QAction *act = 0;
   act = listMenu.exec(QCursor::pos());
