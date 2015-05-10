@@ -211,3 +211,11 @@ int FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
     }
 }
 //! [12]
+
+void FlowLayout::delItem(QWidget *item)
+{
+    qDebug() << "FlowLayout::delItem";
+    item->hide();
+    this->removeWidget(item);
+    item->deleteLater();
+}

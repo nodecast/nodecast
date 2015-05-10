@@ -407,19 +407,10 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     this->setChecked(true);
 
     Widgettorrent *wt = new Widgettorrent(sphere_data);
-    connect(wt, SIGNAL(emit_deleted(Widgettorrent*)), this, SLOT(removeTorrent(Widgettorrent*)));
+    connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
 }
-
-void Sphere::removeTorrent(Widgettorrent *widgetTorrent)
-{
-    qDebug() << "SPHERE::removeTorrent";
-    flowLayout->removeWidget(widgetTorrent);
-    //delete widgetTorrent;
-}
-
-
 
 
 

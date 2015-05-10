@@ -42,7 +42,7 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 }
 
 
-void Widgettorrent::populate(Sphere_data a_sphere_data, QLayout *parent)
+void Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 {
 
     std::vector<libtorrent::torrent_handle> torrents = QBtSession::instance()->getSession()->get_torrents();
@@ -66,6 +66,8 @@ void Widgettorrent::populate(Sphere_data a_sphere_data, QLayout *parent)
 
         qDebug() << "PATH : " << path << " TITLE " << a_sphere_data.title;
         Widgettorrent *wt = new Widgettorrent(a_sphere_data);
+        QObject::connect(wt, SIGNAL(emit_deleted(QWidget*)), parent, SLOT(delItem(QWidget*)));
+
         parent->addWidget(wt);
         qDebug() << "Widgettorrent::populate";
         wt->addTorrent(h);
@@ -89,6 +91,9 @@ Widgettorrent::Widgettorrent(Sphere_data a_sphere_data) : sphere_data(a_sphere_d
 
 Widgettorrent::~Widgettorrent()
 {
+    qDebug() << "DELETE WIDGET TORRENT";
+    last_widget = NULL;
+
     if (videoPlayer != 0)
     {
         //qDebug() << "process ID = " << videoPlayer->processId();
@@ -583,6 +588,7 @@ void Widgettorrent::deleteSelectedTorrents() {
       !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
     return;
     QBtSession::instance()->deleteTorrent(torrent_data.hash, delete_local_files);
+    qDebug() << "Widgettorrent::deleteSelectedTorrents";
     emit emit_deleted(this);
 }
 

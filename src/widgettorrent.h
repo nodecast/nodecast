@@ -19,6 +19,7 @@
 #include "global.h"
 #include "iconprovider.h"
 #include "deletionconfirmationdlg.h"
+#include "flowlayout.h"
 
 namespace Ui {
 class widgettorrent;
@@ -40,7 +41,7 @@ class Widgettorrent : public QWidget
 public:
     explicit Widgettorrent(Sphere_data a_sphere_data);
     ~Widgettorrent();    
-    static void populate(Sphere_data a_sphere_data, QLayout *parent = 0);
+    static void populate(Sphere_data a_sphere_data, FlowLayout *parent = 0);
     static void unckeck_widget_selected(Widgettorrent *wt);
 
     Sphere_data sphere_data;
@@ -54,7 +55,7 @@ protected:
 
 signals:
     void emit_title();
-    void emit_deleted(Widgettorrent* wt);
+    void emit_deleted(QWidget* wt);
 
 private:
     void displayListMenu();
