@@ -320,9 +320,9 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
-    else if (file_size > 500000 || file_size == 0)
+    else if (file_size > 3000000 || file_size == 0)
     {
-        qDebug() << "file too big";
+        qDebug() << "file too big > 3 Mo";
         job->abort();
         return;
     }
