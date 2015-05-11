@@ -372,7 +372,8 @@ void Sphere::mousePressEvent(QMouseEvent *e)
     {
         qDebug() << "MOUSE RIGHT PRESSED : " << sphere_data.directory;
 
-        displayListMenu();
+        if (isScopePrivate())
+            displayListMenu();
     }
 }
 
@@ -522,7 +523,7 @@ void Sphere::displayListMenu() {
 
 
 void Sphere::deleteSelectedSphere() {
-    qDebug() << "Sphere::deleteSelectedSphere";
+    qDebug() << "Sphere::deleteSelectedSphere : "  << sphere_data.title;
 }
 
 
@@ -536,7 +537,7 @@ void Sphere::openSelectedSphereFolder() const
 
 void Sphere::renameSelectedSphere()
 {
-    qDebug() << "Sphere::renameSelectedSphere";
+    qDebug() << "Sphere::renameSelectedSphere : " << sphere_data.title;
 }
 
 
