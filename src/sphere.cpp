@@ -167,12 +167,6 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
     m_index = index++;
 
-    connect(this, SIGNAL(clicked()), this, SLOT(selected()));
-
-
-
-
-
 
 //    initStyleOption(QStyleOptionButton::Flat);
 }
@@ -361,43 +355,26 @@ void Sphere::paintEvent(QPaintEvent *e)
 }
 
 
-void Sphere::selected()
+
+void Sphere::mousePressEvent(QMouseEvent *e)
 {
-    this->setChecked(true);
-    //this->update();
-    qDebug() << "selected : " << sphere_data.title << " index : " << m_index;
-    emit row(m_index);
+
+    if(e->button() == Qt::LeftButton)
+    {
+        qDebug() << "MOUSE RIGHT PRESSED : " << sphere_data.directory;
+
+        this->setChecked(true);
+        //this->update();
+        qDebug() << "selected : " << sphere_data.title << " index : " << m_index;
+        emit row(m_index);
+    }
+    else if(e->button() == Qt::RightButton)
+    {
+        qDebug() << "MOUSE RIGHT PRESSED : " << sphere_data.directory;
+
+        displayListMenu();
+    }
 }
-
-//void Sphere::mousePressEvent(QMouseEvent *e)
-//{
-//    mFirstX=0;
-//    mFirstY=0;
-////    mFirstClick=true;
-////    mpaintflag=false;
-
-
-//    if(e->button() == Qt::LeftButton)
-//    {
-//        qDebug() << "SPHERE CLICKED";
-//        m_color = QColor(105,105,105);
-//        this->setChecked(true);
-//        //this->update();
-
-//                //store 1st point
-//              //  if(mFirstClick)
-//              //  {
-//                    mFirstX = e->x();
-//                    mFirstY = e->y();
-//                  //  mFirstClick = false;
-//                  //  mpaintflag = true;
-//                    qDebug() << "First image's coordinates" << mFirstX << "," << mFirstY << " title " << m_title;
-//                  //  update();
-
-//                //}
-
-//            }
-//}
 
 
 
@@ -509,4 +486,57 @@ void Sphere::torrentsAdded(QStringList &torrents)
         addTorrent(torrent, true);
     }
 }
+
+
+
+
+
+void Sphere::displayListMenu() {
+    // Create actions
+
+    QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
+    connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedSphereFolder()));
+
+    QAction actionRename(IconProvider::instance()->getIcon("edit-rename"), tr("Rename..."), 0);
+    connect(&actionRename, SIGNAL(triggered()), this, SLOT(renameSelectedSphere()));
+
+    QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), 0);
+    connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedSphere()));
+    // End of actions
+    QMenu listMenu(this);
+    qDebug("Displaying menu");
+    listMenu.addSeparator();
+    listMenu.addAction(&actionOpen_destination_folder);
+    listMenu.addAction(&actionRename);
+
+    listMenu.addSeparator();
+    listMenu.addAction(&actionDelete);
+    listMenu.addSeparator();
+
+    // Call menu
+    QAction *act = 0;
+    act = listMenu.exec(QCursor::pos());
+}
+
+
+
+
+void Sphere::deleteSelectedSphere() {
+    qDebug() << "Sphere::deleteSelectedSphere";
+}
+
+
+void Sphere::openSelectedSphereFolder() const
+{
+      QString sphereFolder =  prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory;
+      qDebug("Opening path at %s", qPrintable(sphereFolder));
+      QDesktopServices::openUrl(QUrl::fromLocalFile(sphereFolder));
+}
+
+
+void Sphere::renameSelectedSphere()
+{
+    qDebug() << "Sphere::renameSelectedSphere";
+}
+
 

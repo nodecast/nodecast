@@ -444,14 +444,13 @@ void Widgettorrent::displayListMenu() {
   bool sequential_download_mode = false, prioritize_first_last = false;
   bool one_has_metadata = false, one_not_seed = false;
   bool first = true;
-  QTorrentHandle h;
   qDebug("Displaying menu");
     // Get the file name
     QString hash = torrent_data.hash;
     qDebug() << "HASH : " << hash;
     // Get handle and pause the torrent
    // h = BTSession->getTorrentHandle(hash);
-    h =  QBtSession::instance()->getTorrentHandle(hash);
+    QTorrentHandle h =  QBtSession::instance()->getTorrentHandle(hash);
     if (!h.is_valid()) return;
     if (h.has_metadata())
       one_has_metadata = true;

@@ -75,9 +75,11 @@ protected:
     virtual void paintEvent(QPaintEvent *e);
     virtual void dropEvent(QDropEvent* event);
     virtual void dragEnterEvent(QDragEnterEvent *event);
-    //virtual void mousePressEvent(QMouseEvent * e);
+    virtual void mousePressEvent(QMouseEvent * e);
 
 private:
+    void displayListMenu();
+
     QStackedWidget *m_stacked_room;
     FlowLayout *flowLayout;
     QSplitter *hSplitter;
@@ -101,9 +103,13 @@ private:
 public slots:
 
 private slots:
-    void selected();
     void addTorrent(QString path, bool fromScandir);
     void torrentsAdded(QStringList &torrents);
+
+
+    void deleteSelectedSphere();
+    void openSelectedSphereFolder() const;
+    void renameSelectedSphere();
 
 signals:
     void row(int);
