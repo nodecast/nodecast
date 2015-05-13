@@ -46,7 +46,7 @@
         <string notr="true"/>
        </property>
        <property name="pixmap">
-        <pixmap resource="nodecast.qrc">:/img/32x32/movies.png</pixmap>
+        <pixmap resource="icons.qrc">:/Icons/oxygen/inode-directory.png</pixmap>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -78,7 +78,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="nodecast.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>

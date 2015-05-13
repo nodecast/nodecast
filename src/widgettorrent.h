@@ -31,6 +31,7 @@ struct Torrent_data {
     QString type="";
     qint64 size=0;
     QString hash="";
+    QString extension="";
 };
 
 

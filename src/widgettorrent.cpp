@@ -253,20 +253,6 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     torrent_data.file = h.name();
     torrent_data.hash = h.hash();
 
-    QString extension = fsutils::fileExtension(h.name());
-    qDebug() << "TORRENT EXTENSION : " << extension;
-
-    if (!extension.isEmpty())
-    {
-        QString extension_thumbnail_path = ":/img/32x32/file_extension/file_extension_" + extension + ".png";
-        QPixmap pic = QPixmap(extension_thumbnail_path);
-        ui->label_thumbnail->setPixmap(pic);
-    }
-
-
-    timer_get_torrent_progress = new QTimer(this);
-    connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));
-    timer_get_torrent_progress->start(1000);
 
 
     qDebug() << "Widgettorrent::addTorrent save_path_parsed : " << h.save_path_parsed();
@@ -287,6 +273,11 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     qDebug() << "DATA TYPE : " << torrent_data.type;
 
 
+    timer_get_torrent_progress = new QTimer(this);
+    connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));
+    timer_get_torrent_progress->start(1000);
+
+
 //  if (torrentRow(h.hash()) < 0) {
 //    beginInsertTorrent(m_torrents.size());
 //    TorrentModelItem *item = new TorrentModelItem(h);
@@ -302,9 +293,28 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
 void Widgettorrent::update_timer_torrent_progress()
 {
 
-    // check name because of torrent magnet
+    // check name because of torrent metadata lag
     if (ui->label_title->text().isEmpty()  && !m_torrent.name().isEmpty())
         ui->label_title->setText(m_torrent.name());
+
+
+    // set the torrent's thumbnail according extension file
+    if (torrent_data.type != "directory" && torrent_data.extension.isEmpty()  && !m_torrent.name().isEmpty())
+    {
+        QString extension = fsutils::fileExtension(m_torrent.name());
+        qDebug() << "TORRENT EXTENSION : " << extension;
+
+        if (!extension.isEmpty())
+        {
+            torrent_data.extension=extension;
+
+            QString extension_thumbnail_path = ":/img/32x32/file_extension/file_extension_" + extension + ".png";
+            QPixmap pic = QPixmap(extension_thumbnail_path);
+            ui->label_thumbnail->setPixmap(pic);
+        }
+    }
+
+
 
  //   qDebug() << "PROGRESS : " << m_torrent.progress();;
 
@@ -322,7 +332,7 @@ void Widgettorrent::update_timer_torrent_progress()
 }
 
 
-// when torrent is completly download, I can check his mime type.
+// when torrent is completly download, I can check his mime type. do not use extension file
 void Widgettorrent::update_torrent_type_thumbnail()
 {
 
@@ -399,7 +409,6 @@ void Widgettorrent::update_torrent_type_thumbnail()
                 torrent_data.type = "directory";
             }
         }
-
     }
 
     qDebug() << "Widgettorrent::update_torrent_type_thumbnail DATA TYPE : " << torrent_data.type;
