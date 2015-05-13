@@ -75,7 +75,8 @@ class about : public QDialog, private Ui::AboutDlg{
       thanks_txt += QString::fromUtf8("<li><a href=\"http://www.libtorrent.org\"><span style=\" text-decoration: underline; color:#ffffff;\">libtorrent rasterbar</span></a></li>");
       thanks_txt += QString::fromUtf8("<li><a href=\"http://www.qxmpp.org\"><span style=\" text-decoration: underline; color:#ffffff;\">Qxmpp</span></a></li>");
       thanks_txt += QString::fromUtf8("<li><a href=\"http://www.qt.io\"><span style=\" text-decoration: underline; color:#ffffff;\">Qt</span></a></li></ul>");
-      thanks_txt += QString::fromUtf8("and many others");
+      thanks_txt += QString::fromUtf8("and many others</br>");
+      thanks_txt += QString::fromUtf8("<br>Some icons come from <a href=\"http://www.fatcow.com/free-icons\"><span style=\" text-decoration: underline; color:#ffffff;\">fatcow</span></a>");
       thanks_txt += QString::fromUtf8("</p></body></html>");
       lb_thanks->setText(thanks_txt);
       // Translation

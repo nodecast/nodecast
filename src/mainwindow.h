@@ -147,7 +147,6 @@ private slots:
     void on_actionXml_console_triggered();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-
 private:
     void createTrayIconAndMenu();
     void populate();

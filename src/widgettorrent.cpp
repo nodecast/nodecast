@@ -42,13 +42,14 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 }
 
 
-void Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
+int Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 {
 
     std::vector<libtorrent::torrent_handle> torrents = QBtSession::instance()->getSession()->get_torrents();
 
     std::vector<libtorrent::torrent_handle>::const_iterator it = torrents.begin();
     std::vector<libtorrent::torrent_handle>::const_iterator itend = torrents.end();
+    int counter=0;
     for ( ; it != itend; ++it)
     {
         const QTorrentHandle h(*it);
@@ -64,6 +65,8 @@ void Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 
         if (dir != a_sphere_data.directory) continue;
 
+        counter++;
+
         qDebug() << "PATH : " << path << " TITLE " << a_sphere_data.title;
         Widgettorrent *wt = new Widgettorrent(a_sphere_data);
         QObject::connect(wt, SIGNAL(emit_deleted(QWidget*)), parent, SLOT(delItem(QWidget*)));
@@ -74,7 +77,7 @@ void Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
        // QObject::connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), wt, SLOT(addTorrent(QTorrentHandle)));
 
     }
-
+    return counter;
 }
 
 
@@ -249,6 +252,17 @@ void Widgettorrent::addTorrent(const QTorrentHandle &h)
     ui->label_title->setText(h.name());
     torrent_data.file = h.name();
     torrent_data.hash = h.hash();
+
+    QString extension = fsutils::fileExtension(h.name());
+    qDebug() << "TORRENT EXTENSION : " << extension;
+
+    if (!extension.isEmpty())
+    {
+        QString extension_thumbnail_path = ":/img/32x32/file_extension/file_extension_" + extension + ".png";
+        QPixmap pic = QPixmap(extension_thumbnail_path);
+        ui->label_thumbnail->setPixmap(pic);
+    }
+
 
     timer_get_torrent_progress = new QTimer(this);
     connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));

@@ -218,4 +218,5 @@ void FlowLayout::delItem(QWidget *item)
     item->hide();
     this->removeWidget(item);
     item->deleteLater();
+    emit emit_deleted_torrent();
 }

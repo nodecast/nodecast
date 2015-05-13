@@ -197,7 +197,7 @@ void TorrentCreatorDlg::handleCreationSuccess(QString path, QString branch_path)
     //if (checkIgnoreShareLimits->isChecked())
     QBtSession::instance()->setMaxRatioPerTorrent(hash, -1);
   //}
-  QMessageBox::information(0, tr("Torrent creation"), tr("Torrent was created successfully:")+" "+path);
+  //QMessageBox::information(0, tr("Torrent creation"), tr("Torrent was created successfully:")+" "+path);
   close();
 }
 

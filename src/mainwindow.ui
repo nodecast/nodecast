@@ -91,8 +91,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>102</width>
-                    <height>443</height>
+                    <width>104</width>
+                    <height>421</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -191,122 +191,7 @@
                   <layout class="QVBoxLayout" name="verticalLayout_medias">
                    <item>
                     <widget class="QWidget" name="widget_media_tools" native="true">
-                     <layout class="QHBoxLayout" name="horizontalLayout">
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_media_filter">
-                        <item>
-                         <widget class="QLabel" name="label_filter">
-                          <property name="text">
-                           <string>Filter :</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QToolButton" name="toolButton_video">
-                          <property name="text">
-                           <string>video</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="nodecast.qrc">
-                            <normaloff>:/img/24x24/ic_video_collection_24px.svg</normaloff>:/img/24x24/ic_video_collection_24px.svg</iconset>
-                          </property>
-                          <property name="checkable">
-                           <bool>true</bool>
-                          </property>
-                          <property name="toolButtonStyle">
-                           <enum>Qt::ToolButtonIconOnly</enum>
-                          </property>
-                          <property name="arrowType">
-                           <enum>Qt::NoArrow</enum>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QToolButton" name="toolButton_photo">
-                          <property name="text">
-                           <string>photo</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="nodecast.qrc">
-                            <normaloff>:/img/24x24/ic_photo_library_24px.svg</normaloff>:/img/24x24/ic_photo_library_24px.svg</iconset>
-                          </property>
-                          <property name="checkable">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QToolButton" name="toolButton_audio">
-                          <property name="text">
-                           <string>audio</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="nodecast.qrc">
-                            <normaloff>:/img/24x24/ic_my_library_music_24px.svg</normaloff>:/img/24x24/ic_my_library_music_24px.svg</iconset>
-                          </property>
-                          <property name="checkable">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_2">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_medias">
-                          <property name="text">
-                           <string>medias :</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_counter_medias">
-                          <property name="text">
-                           <string>0</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_download">
-                          <property name="text">
-                           <string>download :</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_counter_download">
-                          <property name="text">
-                           <string>0</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_upload">
-                          <property name="text">
-                           <string>upload :</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_counter_upload">
-                          <property name="text">
-                           <string>0</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
+                     <layout class="QHBoxLayout" name="horizontalLayout"/>
                     </widget>
                    </item>
                   </layout>
@@ -443,7 +328,7 @@
      <x>0</x>
      <y>0</y>
      <width>1166</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuNodecast">

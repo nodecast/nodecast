@@ -41,7 +41,7 @@ class Widgettorrent : public QWidget
 public:
     explicit Widgettorrent(Sphere_data a_sphere_data);
     ~Widgettorrent();    
-    static void populate(Sphere_data a_sphere_data, FlowLayout *parent = 0);
+    static int populate(Sphere_data a_sphere_data, FlowLayout *parent = 0);
     static void unckeck_widget_selected(Widgettorrent *wt);
 
     Sphere_data sphere_data;

@@ -99,6 +99,24 @@ private:
     Preferences prefs;
     Room *m_room;
     ScanFoldersModel *m_scanFolders;
+    int nb_torrent;
+
+
+    QWidget *widget_container;
+    QVBoxLayout *vbox;
+    QWidget *widget;
+    QHBoxLayout *hbox;
+    QLabel *filter_label;
+    QToolButton *toolButton_video;
+    QToolButton *toolButton_image;
+    QToolButton *toolButton_audio;
+    QLabel *media_label;
+    QLabel *media_label_counter;
+    QLabel *upload_label;
+    QLabel *upload_label_counter;
+    QLabel *download_label;
+    QLabel *download_label_counter;
+
 
 public slots:
 
@@ -110,6 +128,7 @@ private slots:
     void deleteSelectedSphere();
     void openSelectedSphereFolder() const;
     void renameSelectedSphere();
+    void deleted_torrent();
 
 signals:
     void row(int);

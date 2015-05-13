@@ -55,6 +55,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
    // content = new QWidget(parent);
 
+    nb_torrent = 0;
     m_room = NULL;
 
     qDebug() << "NEW SPHERE DIRECTORY : " << sphere_data.directory;
@@ -62,6 +63,58 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
     QString uuid;
     QDir nodecast_datas;
     QDir check_dir;
+
+    widget_container = new QWidget;
+    vbox = new QVBoxLayout(widget_container);
+    widget = new QWidget;
+    hbox = new QHBoxLayout(widget);
+
+
+    filter_label = new QLabel;
+    filter_label->setText("Filter : ");
+
+    media_label = new QLabel;
+    media_label->setText("medias : ");
+    media_label_counter = new QLabel;
+    media_label_counter->setText("0");
+
+    upload_label = new QLabel;
+    upload_label->setText("upload : ");
+    upload_label_counter = new QLabel;
+    upload_label_counter->setText("0");
+
+    download_label = new QLabel;
+    download_label->setText("download : ");
+    download_label_counter = new QLabel;
+    download_label_counter->setText("0");
+
+
+    toolButton_video = new QToolButton;
+    toolButton_video->setIcon(QIcon(":/img/32x32/movies.png"));
+    toolButton_video->setToolTip("video");
+
+    toolButton_image = new QToolButton;
+    toolButton_image->setIcon(QIcon("qrc:/img/24x24/ic_photo_library_24px.svg"));
+    toolButton_image->setToolTip("image");
+
+    toolButton_audio = new QToolButton;
+    toolButton_audio->setIcon(QIcon(":/img/32x32/music.png"));
+    toolButton_audio->setToolTip("audio");
+
+    hbox->addWidget(filter_label);
+    hbox->addWidget(toolButton_video);
+    hbox->addWidget(toolButton_image);
+    hbox->addWidget(toolButton_audio);
+    //hbox->addSpacing(100);
+    hbox->addWidget(media_label);
+    hbox->addWidget(media_label_counter);
+    hbox->addWidget(upload_label);
+    hbox->addWidget(upload_label_counter);
+    hbox->addWidget(download_label);
+    hbox->addWidget(download_label_counter);
+
+    vbox->addWidget(widget);
+
 
     switch(sphere_data.scope)
     {
@@ -83,18 +136,23 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
             nodecast_datas.mkdir(sphere_data.directory);
             nodecast_datas.mkdir(sphere_data.directory + "/torrents");
         }
-
-
         m_color = new QColor(105,105,105);
 
-        media_scroll = new QScrollArea();
+
+
+
+        media_scroll = new QScrollArea;
         media_scroll->setWidgetResizable(true);
         media_scroll->setFrameStyle(QFrame::NoFrame);
         media_container = new QWidget(media_scroll);
         flowLayout = new FlowLayout(media_container);
+        connect(flowLayout, SIGNAL(emit_deleted_torrent()), this, SLOT(deleted_torrent()));
 
         media_scroll->setWidget(media_container);
-        index_tab = parent->addWidget(media_scroll);
+
+        vbox->addWidget(media_scroll);
+
+        index_tab = parent->addWidget(widget_container);
         qDebug() << "INDEX TAB : " << index_tab;
 
         m_room = new Room(sphere_data, m_stacked_room);
@@ -394,8 +452,9 @@ void Sphere::addTorrent(const QTorrentHandle &h)
 
 void Sphere::populate()
 {
-    qDebug() << "Sphere::polulate";
-    Widgettorrent::populate(sphere_data, flowLayout);
+    qDebug() << "Sphere::polulate";   
+    nb_torrent = Widgettorrent::populate(sphere_data, flowLayout);
+    media_label_counter->setText(QString::number(nb_torrent));
 }
 
 
@@ -463,6 +522,8 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
     // add torrent to seed file
     QBtSession::instance()->addTorrent(path, fromScanDir);
+    nb_torrent++;
+    media_label_counter->setText(QString::number(nb_torrent));
 }
 
 void Sphere::torrentsAdded(QStringList &torrents)
@@ -523,7 +584,37 @@ void Sphere::displayListMenu() {
 
 
 void Sphere::deleteSelectedSphere() {
-    qDebug() << "Sphere::deleteSelectedSphere : "  << sphere_data.title;
+
+
+    QString message = "are you sure you want delete <B>%1</B> sphere ?";
+
+    int retButton = QMessageBox::question(
+            new QWidget, "Delete sphere", message.arg(sphere_data.title),
+            QMessageBox::Yes, QMessageBox::No);
+
+
+    switch(retButton)
+    {
+    case QMessageBox::Yes:
+        {
+            qDebug() << "Sphere::deleteSelectedSphere : "  << sphere_data.title;
+
+            if (nb_torrent > 0)
+            {
+                QMessageBox::warning(this, tr("Failure"), tr("please delete %1 torrent(s) before.").arg(nb_torrent));
+                return;
+            }
+        }
+        break;
+    case QMessageBox::No:
+        {
+            return;
+        }
+        break;
+    default:
+        break;
+    }
+
 }
 
 
@@ -540,4 +631,10 @@ void Sphere::renameSelectedSphere()
     qDebug() << "Sphere::renameSelectedSphere : " << sphere_data.title;
 }
 
+
+void Sphere::deleted_torrent()
+{
+    if (nb_torrent > 0) nb_torrent--;
+    media_label_counter->setText(QString::number(nb_torrent));
+}
 

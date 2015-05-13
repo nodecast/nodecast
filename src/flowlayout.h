@@ -79,6 +79,9 @@ private:
 public slots:
     void delItem(QWidget *item);
 
+
+signals:
+    void emit_deleted_torrent();
 };
 //! [0]
 
