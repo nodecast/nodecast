@@ -94,7 +94,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
     toolButton_video->setToolTip("video");
 
     toolButton_image = new QToolButton;
-    toolButton_image->setIcon(QIcon("qrc:/img/24x24/ic_photo_library_24px.svg"));
+    toolButton_image->setIcon(QIcon(":/img/32x32/camera_black.png"));
     toolButton_image->setToolTip("image");
 
     toolButton_audio = new QToolButton;
@@ -349,7 +349,7 @@ void Sphere::dropEvent(QDropEvent* event)
            qDebug() << "TARGET LINK : " << target_link;
            QFileInfo fileInfoLink(target_link);
 
-           bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
+           bool check_link = fsutils::createLinkDir(localPath, fileInfoLink.absoluteFilePath());
            QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
            qDebug() << link_status;
            if (!check_link)

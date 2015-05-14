@@ -33,6 +33,7 @@
 
 #include <QString>
 #include <QCoreApplication>
+#include <QDirIterator>
 
 /**
  * Utility functions related to file system.
@@ -58,6 +59,7 @@ static bool isValidTorrentFile(const QString& path);
 static bool smartRemoveEmptyFolderTree(const QString& dir_path);
 static bool forceRemove(const QString& file_path);
 static bool createLink(const QString &filename_source, const QString &filename_target);
+static bool createLinkDir(QString filename_source, QString filename_target);
 
 /* Ported from Qt4 to drop dependency on QtGui */
 static QString QDesktopServicesDataLocation();

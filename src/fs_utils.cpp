@@ -382,6 +382,49 @@ bool fsutils::createLink(const QString& filename_source, const QString& filename
 }
 
 
+bool fsutils::createLinkDir(QString filename_source, QString filename_target) {
+  qDebug() << "CREATE LINK source : " << filename_source << " TARGET : " << filename_target;
+  QFile f(filename_source);
+  if (!f.exists())
+    return false;
+
+
+  bool link = true;
+
+  QDir target_dir(filename_target);
+  target_dir.mkdir(target_dir.absolutePath());
+
+
+  QDirIterator directory_walker(filename_source, QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
+  while (directory_walker.hasNext()) {
+      //qDebug() << "SUB DIRECTORY : " << directory_walker.next();
+      directory_walker.next();
+      if (directory_walker.fileInfo().isDir())
+      {
+          QString new_directory = filename_target + QDir::separator() + directory_walker.fileInfo().fileName();
+          QDir dir_new_directory(new_directory);
+          dir_new_directory.mkdir(dir_new_directory.absolutePath());
+
+          filename_target = new_directory;
+
+          qDebug() << "DIR NEW TARGET : " << filename_target;
+          qDebug() << " DIR : " << directory_walker.fileInfo().fileName();
+      }
+      else
+      {
+          QString new_target = filename_target  + QDir::separator() + directory_walker.fileInfo().fileName();
+          qDebug() << "NEW TARGET : " << new_target;
+          link = createLink(directory_walker.fileInfo().absoluteFilePath(), new_target);
+          qDebug() << " FILE : " << directory_walker.fileInfo().absoluteFilePath();
+          if (!link) break;
+      }
+  }
+
+return link;
+}
+
+
+
 QString fsutils::QDesktopServicesDataLocation() {
 #ifdef Q_WS_WIN
   LPWSTR path=new WCHAR[256];
