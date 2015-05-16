@@ -202,7 +202,13 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     Q_ASSERT(check);
 
 
+    check = connect(roster->listView, SIGNAL(showProfile(QString)),
+                    this, SLOT(showProfile(QString)));
+    Q_ASSERT(check);
 
+    check = connect(roster->listView, SIGNAL(removeContact(QString)),
+                    this, SLOT(action_removeContact(QString)));
+    Q_ASSERT(check);
 
     this->configuration().setPort(m_xmpp_client_port);
     this->configuration().setJid(m_login);
@@ -838,3 +844,26 @@ void Xmpp_client::updateStatusWidget()
     // fetch own vCard
     m_vCardCache->requestVCard(bareJid);
 }
+
+
+
+void Xmpp_client::showProfile(const QString& bareJid)
+{
+    if(bareJid.isEmpty())
+        return;
+
+    profileDialog dlg(new QWidget, bareJid, this, m_capabilitiesCache);
+    dlg.setBareJid(bareJid);
+    // TODO use original image
+    if(!m_vCardCache->getAvatar(bareJid).isNull())
+        dlg.setAvatar(m_vCardCache->getAvatar(bareJid));
+    QStringList resources = this->rosterManager().getResources(bareJid);
+
+    dlg.setFullName(m_vCardCache->getVCard(bareJid).fullName());
+
+    if(m_vCardCache->getVCard(bareJid).fullName().isEmpty())
+        dlg.setFullName(this->rosterManager().getRosterEntry(bareJid).name());
+
+    dlg.exec();
+}
+

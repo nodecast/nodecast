@@ -2,7 +2,8 @@ INCLUDEPATH += $$PWD
 
 FORMS += $$PWD/xmlConsoleDialog.ui \
     xmpp/statusWidget.ui \
-    xmpp/roster.ui
+    xmpp/roster.ui \
+    $$PWD/profileDialog.ui
 
 HEADERS += $$PWD/xmpp_client.h \
            $$PWD/xmlConsoleDialog.h \
@@ -17,7 +18,8 @@ HEADERS += $$PWD/xmpp_client.h \
     xmpp/statusWidget.h \
     xmpp/statusAvatarWidget.h \
     xmpp/statusTextWidget.h \
-    xmpp/statusToolButton.h
+    xmpp/statusToolButton.h \
+    $$PWD/profileDialog.h
 
 SOURCES += $$PWD/xmpp_client.cpp \
            $$PWD/xmlConsoleDialog.cpp \
@@ -32,7 +34,8 @@ SOURCES += $$PWD/xmpp_client.cpp \
     xmpp/statusWidget.cpp \
     xmpp/statusAvatarWidget.cpp \
     xmpp/statusTextWidget.cpp \
-    xmpp/statusToolButton.cpp
+    xmpp/statusToolButton.cpp \
+    $$PWD/profileDialog.cpp
 
 RESOURCES += \
     xmpp/xmpp.qrc

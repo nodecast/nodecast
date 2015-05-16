@@ -30,6 +30,7 @@
 #include "rosterItemModel.h"
 #include "rosterItemSortFilterProxyModel.h"
 #include "qbtsession.h"
+#include "profileDialog.h"
 
 class Xmpp_client : public QXmppClient
 {
@@ -113,7 +114,7 @@ private slots:
     void avatarChanged(const QImage&);
     void presenceStatusTypeChanged(QXmppPresence::AvailableStatusType);
     void presenceTypeChanged(QXmppPresence::Type);
-
+    void showProfile(const QString& bareJid);
 
 signals:
     void emit_connected(bool);
