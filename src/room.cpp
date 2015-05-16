@@ -93,6 +93,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 
 Room::~Room()
 {
+    qDebug() << "DELETED ROOM : " << sphere_data.title;;
     if (m_room && m_room->isJoined())
         m_room->leave("I'll be back");
 }

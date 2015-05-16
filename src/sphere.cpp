@@ -604,6 +604,24 @@ void Sphere::deleteSelectedSphere() {
                 QMessageBox::warning(this, tr("Failure"), tr("please delete %1 torrent(s) before.").arg(nb_torrent));
                 return;
             }
+            else
+            {
+                bool res = Xmpp_client::instance()->deleteRoom(sphere_data.directory);
+                if (res)
+                {
+                    qDebug() << "SPHERE DELETED ROOM : " << m_room->get_name();
+                    m_room->flushRoom();
+
+                    QDir sphere_directory(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory);
+                    if (sphere_directory.exists())
+                    {
+                        bool bool_delete = sphere_directory.removeRecursively();
+                        QString res_deleted = bool_delete? "TRUE" : "FALSE";
+                        qDebug() << "SPHERE DIR DELETED : " << res_deleted;
+                    }
+                    emit emit_deleted(this);
+                }
+            }
         }
         break;
     case QMessageBox::No:
@@ -636,5 +654,10 @@ void Sphere::deleted_torrent()
 {
     if (nb_torrent > 0) nb_torrent--;
     media_label_counter->setText(QString::number(nb_torrent));
+}
+
+QGroupBox * Sphere::getRoomWidget()
+{
+    if (m_room) return m_room->getWidget();
 }
 

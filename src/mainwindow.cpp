@@ -191,7 +191,7 @@ void MainWindow::createTrayIconAndMenu()
     bool check;
     Q_UNUSED(check);
 
-    check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(shutdownCleanUp()));
+    check = connect(&m_quitAction, SIGNAL(triggered()), this, SLOT(on_actionQuit_triggered()));
     Q_ASSERT(check);
 
   //  check = connect(&m_signOutAction, SIGNAL(triggered()), SLOT(action_signOut()));
@@ -906,6 +906,7 @@ void MainWindow::load_spheres()
             m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
             ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
             connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
+            connect(m_spheres_private[sphere_dir], SIGNAL(emit_deleted(Sphere*)), this, SLOT(delete_sphere(Sphere*)));
 
             sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
             m_spheres_private[sphere_dir]->populate();
@@ -938,6 +939,7 @@ void MainWindow::create_sphere(QString sphere_name)
         m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
         ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
         connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
+        connect(m_spheres_private[sphere_dir], SIGNAL(emit_deleted(Sphere*)), this, SLOT(delete_sphere(Sphere*)));
 
         sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
 
@@ -974,6 +976,7 @@ void MainWindow::create_sphere(QString sphere_name, QString sphere_dir)
         m_spheres_private.insert(sphere_dir, new Sphere(sphere_datas, m_stacked_tab_room, m_stacked_tab_medias) );
         ui->verticalLayout_sphereprivate->addWidget(m_spheres_private[sphere_dir]);
         connect(m_spheres_private[sphere_dir], SIGNAL(row(int)), this, SLOT(changePage(int)));
+        connect(m_spheres_private[sphere_dir], SIGNAL(emit_deleted(Sphere*)), this, SLOT(delete_sphere(Sphere*)));
 
         sphere_tab.insert(m_spheres_private[sphere_dir]->index_tab, m_spheres_private[sphere_dir]);
 
@@ -994,6 +997,25 @@ void MainWindow::create_sphere(QString sphere_name, QString sphere_dir)
 
 
 
+
+void MainWindow::delete_sphere(Sphere *sphere)
+{        
+    QString sphere_dir = sphere->getDirectory();
+
+    if (m_spheres_private.contains(sphere_dir))
+    {
+        qDebug() << "DELETE SHERE : " << sphere->getTitle() << " DIR : " << sphere_dir;
+
+        m_stacked_tab_room->removeWidget(sphere->getRoomWidget());
+        m_stacked_tab_medias->removeWidget(sphere);
+
+        ui->verticalLayout_sphereprivate->removeWidget(m_spheres_private.value(sphere_dir));
+        sphere_tab.remove(sphere->index_tab);
+        m_spheres_private.remove(sphere_dir);
+        sphere->hide();
+        sphere->deleteLater();
+    }
+}
 
 
 void MainWindow::on_actionAccount_triggered()

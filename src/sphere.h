@@ -70,6 +70,7 @@ public:
     void flushRoom();
     void receive_message(const QString login, const QString message);
     int getRoomIndex();
+    QGroupBox * getRoomWidget();
 
 protected:
     virtual void paintEvent(QPaintEvent *e);
@@ -132,6 +133,7 @@ private slots:
 
 signals:
     void row(int);
+    void emit_deleted(Sphere*);
 };
 
 

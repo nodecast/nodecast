@@ -43,6 +43,8 @@ public:
     static bool connection_failed;
     static Xmpp_client *instance();
     void connectToRoom(QString room_name);
+    bool deleteRoom(QString room_name);
+
     void sendFile(const QString jid, const QString path);
     void sendMessage(const QString jid, const QString message);
     void addRoster(const QString jid);

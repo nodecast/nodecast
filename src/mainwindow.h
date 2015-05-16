@@ -146,6 +146,7 @@ private slots:
 
     void on_actionXml_console_triggered();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void delete_sphere(Sphere *sphere);
 
 private:
     void createTrayIconAndMenu();

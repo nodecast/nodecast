@@ -59,6 +59,7 @@ public:
     void setXMPPRoom(QXmppMucRoom* room);
     void joinXMPPRoom();
     void flushRoom();
+    QGroupBox* getWidget() { return groupBox;}
     QStringList get_users();
     QString get_name() { return sphere_data.title;}
     void send_message(QString message)  {m_room->sendMessage(message);}

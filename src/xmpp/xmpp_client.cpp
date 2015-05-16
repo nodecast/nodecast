@@ -478,6 +478,21 @@ void Xmpp_client::connectToRoom(QString room_name)
 }
 
 
+bool Xmpp_client::deleteRoom(QString room_name)
+{
+    qDebug() << "Xmpp_client::deleteRoom : " << room_name;
+
+    if (room_name.isEmpty() || !rooms.contains(room_name)) return false;
+
+    if (rooms.value(room_name)->isJoined())
+        rooms.value(room_name)->leave("I'll be back");
+    rooms[room_name]->deleteLater();
+    rooms.remove(room_name);
+    return true;
+}
+
+
+
 void Xmpp_client::messageReceived(const QXmppMessage& message)
 {
     qDebug() << "Xmpp_client::messageReceived !!!";
