@@ -13,12 +13,15 @@
 #include <QXmppMucManager.h>
 #include <QXmppRosterManager.h>
 #include <QXmppVCardManager.h>
+#include <QXmppUtils.h>
 //#include <QXmppMessageReceiptManager.h>
 #include <QHash>
 #include <QMessageBox>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QGroupBox>
+#include <QStackedWidget>
+#include <QItemSelection>
 
 #include "preferences.h"
 #include "xmlConsoleDialog.h"
@@ -47,7 +50,6 @@ public:
     bool deleteRoom(QString room_name);
 
     void sendFile(const QString jid, const QString path);
-    void sendMessage(const QString jid, const QString message);
     void addRoster(const QString jid);
 
     //QXmppMucRoom* get_room(QString room) { if (rooms.contains(room)) return rooms.value(room); else return NULL;}
@@ -58,11 +60,12 @@ public:
 private:
     void reload(QString login, QString password);
     void addPhotoHash(QXmppPresence&);
+    void new_chat(const QString& bareJid);
 
     QWidget *roster_widget;
     QVBoxLayout *layoutRoster;
-    QTextEdit * user_chat = new QTextEdit;
-    QGroupBox *groupBoxContact = new QGroupBox;
+    QGroupBox *groupBoxContact;
+    QStackedWidget *m_stacked_tab_chat;
 
     Ui::Roster *roster;
     static Xmpp_client* m_instance;
@@ -89,6 +92,10 @@ private:
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
     QDir *file_dir;
     QString sphere_dest;
+    QHash <QString, int> itemMapChat;
+    QHash <int, QTextEdit*> chatroomMap;
+    QHash <int, QLineEdit*> linechatMap;
+
 
 public slots:
     void init();
@@ -115,6 +122,8 @@ private slots:
     void presenceStatusTypeChanged(QXmppPresence::AvailableStatusType);
     void presenceTypeChanged(QXmppPresence::Type);
     void showProfile(const QString& bareJid);
+    void rosterItemSelectionChanged(const QItemSelection &selection);
+    void sendMessageToJid();
 
 signals:
     void emit_connected(bool);

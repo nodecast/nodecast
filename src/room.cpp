@@ -69,6 +69,9 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     scrollArea_chat->setWidgetResizable(true);
     w_users_list = new QListWidget;
     chat_room = new QTextEdit;
+    chat_room->setReadOnly(true);
+    chat_room->setAcceptRichText(true);
+
     line_chat = new QLineEdit;
 
     connect(line_chat, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
@@ -238,7 +241,7 @@ void Room::newUser(const QString &jid)
 {
     qDebug() << "USER JOINED : " << jid + " ROOM : " + m_room->name();
     //QString l_jid = jid.split("/").at(1);
-     QString l_jid = m_room->participantFullJid(jid);
+     QString l_jid = QXmppUtils::jidToUser(m_room->participantFullJid(jid));
 
      // sometimes participantFullJid return an empty string ... wtf. nickname is missing I suppose.
      if (l_jid.isEmpty()) l_jid = jid;
@@ -251,7 +254,7 @@ void Room::newUser(const QString &jid)
 void Room::delUser(const QString &jid)
 {
     qDebug() << "USER QUIT : " << jid;
-    QString l_jid = m_room->participantFullJid(jid);
+    QString l_jid = QXmppUtils::jidToUser(m_room->participantFullJid(jid));
     if (l_jid.isEmpty()) l_jid = jid;
     qDebug() << "L JID : " << l_jid;
     QList<QListWidgetItem *> items = w_users_list->findItems(l_jid, Qt::MatchFixedString);

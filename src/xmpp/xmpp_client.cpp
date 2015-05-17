@@ -164,13 +164,14 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     layoutRoster->addWidget(&m_statusWidget);
     layoutRoster->addWidget(roster_widget);
 
-    user_chat = new QTextEdit;
+    m_stacked_tab_chat = new QStackedWidget;
+
     vRosterSplitter = new QSplitter(Qt::Horizontal);
     groupBoxContact = new QGroupBox;
     groupBoxContact->setLayout(layoutRoster);
 
     vRosterSplitter->addWidget(groupBoxContact);
-    vRosterSplitter->addWidget(user_chat);
+    vRosterSplitter->addWidget(m_stacked_tab_chat);
 
     check = connect(roster->lineEdit_filter, SIGNAL(textChanged(QString)),
                     this, SLOT(filterChanged(QString)));
@@ -180,6 +181,14 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     m_rosterItemSortFilterModel->setSourceModel(m_rosterItemModel);
     roster->listView->setModel(m_rosterItemSortFilterModel);
     m_rosterItemSortFilterModel->sort(0);
+
+
+    connect(roster->listView->selectionModel(),
+            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(rosterItemSelectionChanged(QItemSelection)));
+
+
+
 
     rosterItemDelegate *delegate = new rosterItemDelegate();
     roster->listView->setItemDelegate(delegate);
@@ -281,13 +290,6 @@ void Xmpp_client::addRoster(const QString jid)
     roster_manager->addItem(jid);
 }
 */
-
-void Xmpp_client::sendMessage(const QString jid, const QString message)
-{
-    qDebug() << "send message to : " << jid << " MESSAGE : " << message;
-    this->sendMessage(jid, message);
-    return;
-}
 
 
 void Xmpp_client::sendFile(const QString jid, const QString path)
@@ -504,6 +506,7 @@ void Xmpp_client::messageReceived(const QXmppMessage& message)
     qDebug() << "Xmpp_client::messageReceived !!!";
 
     QString from = message.from();
+    QString jid = QXmppUtils::jidToBareJid(message.from());
     QString invitation = message.mucInvitationJid();
     QString reason = message.mucInvitationReason();
 
@@ -516,7 +519,16 @@ void Xmpp_client::messageReceived(const QXmppMessage& message)
     if (!invitation.isEmpty())
         emit_invitation(invitation, from, reason);
     else if (message.body().size() !=0)
-        emit_chat(message.from(), message.body());
+    {
+        // if from is not in the roster it should be a message room
+        if (this->rosterManager().getRosterEntry(jid).bareJid().isEmpty())
+            emit_chat(message.from(), message.body());
+        else if (itemMapChat.contains(jid))
+        {
+            int stacked_index = itemMapChat.value(jid);
+            chatroomMap.value(stacked_index)->append(QXmppUtils::jidToUser(jid) + " : " + message.body());
+        }
+    }
 }
 
 
@@ -733,13 +745,18 @@ void Xmpp_client::rosterReceived()
 
 
 void Xmpp_client::rosterChanged(const QString& bareJid)
-{
+{    
     m_rosterItemModel->updateRosterEntry(bareJid, this->rosterManager().
                                         getRosterEntry(bareJid));
 
     // if available in cache, update it else based on presence it will request if not available
     if(m_vCardCache->isVCardAvailable(bareJid))
         updateVCard(bareJid);
+
+    qDebug() << "ITEM JID : " << bareJid;
+
+//    m_rosterItemModel->indexFromItem()
+    new_chat(bareJid);
 }
 
 
@@ -867,3 +884,88 @@ void Xmpp_client::showProfile(const QString& bareJid)
     dlg.exec();
 }
 
+
+void Xmpp_client::new_chat(const QString& bareJid)
+{
+    qDebug() << "NEW USER CHAT WITH : " << bareJid;
+    QGroupBox *groupBox = new QGroupBox;
+    QVBoxLayout *box_chat = new QVBoxLayout;
+
+    QLabel *jid = new QLabel;
+    jid->setText(bareJid);
+    QTextEdit *chat_room = new QTextEdit;
+    chat_room->setAcceptRichText(true);
+    chat_room->setReadOnly(true);
+    QLineEdit *line_chat = new QLineEdit;
+    connect(line_chat, SIGNAL(returnPressed()), this, SLOT(sendMessageToJid()));
+
+    box_chat->addWidget(jid);
+    box_chat->addWidget(chat_room);
+    box_chat->addWidget(line_chat);
+    groupBox->setLayout(box_chat);
+
+    int tab_index = m_stacked_tab_chat->addWidget(groupBox);
+    itemMapChat.insert(bareJid, tab_index);
+    chatroomMap.insert(tab_index, chat_room);
+    linechatMap.insert(tab_index, line_chat);
+}
+
+
+void Xmpp_client::rosterItemSelectionChanged(const QItemSelection& selection)
+{
+   if(!selection.indexes().isEmpty())
+   {
+       QString jid = selection.indexes().first().data(rosterItem::BareJid).toString();
+       if (itemMapChat.contains(jid)) m_stacked_tab_chat->setCurrentIndex(itemMapChat.value(jid));
+   }
+}
+
+
+
+void Xmpp_client::sendMessageToJid()
+{
+    QString jid = itemMapChat.key(m_stacked_tab_chat->currentIndex());
+    int stacked_index = m_stacked_tab_chat->currentIndex();
+
+    QString message = linechatMap.value(stacked_index)->text();
+    if (message.isEmpty()) return;
+
+    if (message.startsWith("/msg"))
+    {
+        QStringList msg_dest = message.split(" ");
+        qDebug() << "DEST : " << msg_dest << " SIZE : " << msg_dest.size();
+        if (msg_dest.size() != 3)
+        {
+            linechatMap.value(stacked_index)->clear();
+        }
+        else
+        {
+            /*
+            msg_dest.removeFirst();
+
+            QString dest = msg_dest.takeFirst() + "@";
+
+            QList<QListWidgetItem *> items = w_users_list->findItems(dest, Qt::MatchStartsWith );
+
+            if (!items.isEmpty())
+            {
+                const QString dest_user = items.first()->text();
+                const QString dest_message = msg_dest.takeLast();
+                qDebug() << "USER : " << dest_user << " MSG : " << dest_message;
+
+                Xmpp_client::instance()->sendMessage(dest_user, dest_message);
+                linechatMap.value(stacked_index)->clear();
+            }
+            */
+        }
+        return;
+    }
+
+
+    qDebug() << "Xmpp_client::sendMessage : " << message << " TO : " << jid;
+
+
+    this->sendMessage(jid, message);
+    chatroomMap.value(stacked_index)->append("Me : " + message);
+    linechatMap.value(stacked_index)->clear();
+}
