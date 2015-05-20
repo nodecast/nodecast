@@ -92,6 +92,7 @@ private:
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
     QDir *file_dir;
     QString sphere_dest;
+    QString file_extension;
     QHash <QString, int> itemMapChat;
     QHash <int, QTextEdit*> chatroomMap;
     QHash <int, QLineEdit*> linechatMap;
@@ -131,6 +132,7 @@ signals:
     void emit_invitation(QString, QString, QString);
     void emit_room(QString room_name, QXmppMucRoom* room);
     void emit_receive_file(QString file_path);
+    void emit_receive_rawfile(QString sphere_dest, QString file_path);
 };
 
 

@@ -334,12 +334,21 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
-    QString extension = file_name.split(".").takeLast();
-    qDebug() << "RECEIVE FILE WITH EXTENSION : " << extension;
+    //QString extension = file_name.split(".").takeLast();
+    file_extension = fsutils::fileExtension(file_name);
+    qDebug() << "RECEIVE FILE WITH EXTENSION : " << file_extension;
 
-    if (extension != "torrent")
+
+    if (file_extension.isEmpty())
     {
-        qDebug() << "file without .torrent";
+        qDebug() << "file without extension";
+        job->abort();
+        return;
+    }
+
+    if (file_extension != "torrent" && file_size > 1000000)
+    {
+        qDebug() << "file size > 1Mo and not torrent";
         job->abort();
         return;
     }
@@ -389,7 +398,6 @@ void Xmpp_client::job_finished ()
 {
     qDebug() << "Xmpp_client::job_finished";
 
-    //m_buffer->write("/tmp/xmpp_file");
 /*
     QDir sphere_dir;
     sphere_dir = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/";
@@ -402,19 +410,19 @@ void Xmpp_client::job_finished ()
         return;
     }
 */
-    qDebug() << "WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath());
+    qDebug() << "WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
 
     QFile file_torrent(QDir::toNativeSeparators(file_dir->absolutePath() + QDir::separator()) + file_name);
     if (!file_torrent.open(QIODevice::WriteOnly))
         return;
 
     file_torrent.write(m_buffer->data());
+    file_torrent.close();
+    m_buffer->close ();
 
     QFileInfo file_info(file_torrent.fileName());
     QString file_path = file_info.canonicalFilePath();
     qDebug() << "FILE PATH : " << file_path;
-    file_torrent.close();
-    m_buffer->close ();
     delete m_buffer;
     delete file_dir;
 
@@ -423,8 +431,22 @@ void Xmpp_client::job_finished ()
     //nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
     //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
 
-    if (fsutils::isValidTorrentFile(file_path))
+    if (file_extension == "torrent" && fsutils::isValidTorrentFile(file_path))
+    {
         QBtSession::instance()->addTorrent(file_path);
+    }
+    else if (file_extension != "torrent")
+    {
+        qDebug() << "RECEIVE A RAW FILE < 1Mo : " << file_path;
+
+        qDebug() << "FILE NAME : " << file_torrent.fileName();
+
+        // move file to sphere directory
+        QString new_file_path = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + QDir::separator() + file_info.fileName();
+        file_torrent.rename(new_file_path);
+        qDebug() << "MOVE FILE TO : " << new_file_path;
+        emit emit_receive_rawfile(sphere_dest, new_file_path);        
+    }     
     else
     {
         qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_path;
@@ -539,7 +561,7 @@ void Xmpp_client::messageReceived(const QXmppMessage& message)
 void Xmpp_client::presenceReceived(const QXmppPresence& presence)
 {
     QString from = presence.from();
-    qDebug() << "Xmpp_client::presenceReceived !!! : " << from;
+    //qDebug() << "Xmpp_client::presenceReceived !!! : " << from;
 
     QString message;
     switch(presence.type())

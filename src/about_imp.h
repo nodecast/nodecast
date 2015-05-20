@@ -58,7 +58,7 @@ class about : public QDialog, private Ui::AboutDlg{
           tr("Home Page: ") +
           QString::fromUtf8("<a href=\"http://www.nodecast.net\"><span style=\" text-decoration: underline; color:#ffffff;\">http://www.nodecast.net</span></a></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">") +
           tr("Source code: ") +
-          QString::fromUtf8("<a href=\"https://github.com/pcodeio/nodecast\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/pcodeio/nodecast</span></a><br />") +
+          QString::fromUtf8("<a href=\"https://github.com/nodecast/nodecast\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/nodecast/nodecast</span></a><br />") +
           tr("IRC: #nodecast on Freenode") +
           QString::fromUtf8(
               "</p></body></html>");

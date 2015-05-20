@@ -56,6 +56,7 @@ public:
     ~Sphere();
     static QString gen_directory(QString sphere_name);
     void addTorrent(const QTorrentHandle &h);
+    void addFile(const QString &file_path);
     void populate();
     virtual QSize sizeHint() const;
     int index_tab;
@@ -80,6 +81,7 @@ protected:
 
 private:
     void displayListMenu();
+    void sendXmppFile(QString path_file);
 
     QStackedWidget *m_stacked_room;
     FlowLayout *flowLayout;

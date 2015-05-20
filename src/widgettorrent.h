@@ -20,6 +20,7 @@
 #include "iconprovider.h"
 #include "deletionconfirmationdlg.h"
 #include "flowlayout.h"
+#include "preferences.h"
 
 namespace Ui {
 class widgettorrent;
@@ -28,10 +29,13 @@ class widgettorrent;
 
 struct Torrent_data {
     QString file="";
+    QString filepath="";
+    QString dirpath="";
     QString type="";
     qint64 size=0;
     QString hash="";
     QString extension="";
+    bool is_torrent=true;
 };
 
 
@@ -59,7 +63,8 @@ signals:
     void emit_deleted(QWidget* wt);
 
 private:
-    void displayListMenu();
+    void displayListMenuTorrent();
+    void displayListMenuFile();
     void update_torrent_type_thumbnail();
     QTorrentHandle m_torrent;
     Ui::widgettorrent *ui;
@@ -86,6 +91,7 @@ private slots:
 
 public slots:
     void addTorrent(const QTorrentHandle &h);
+    void addFile(const QFileInfo &file);
 };
 
 #endif // WIDGETTORRENT_H

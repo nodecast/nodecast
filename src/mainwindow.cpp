@@ -181,6 +181,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
 
+    connect(Xmpp_client::instance(), SIGNAL(emit_receive_rawfile(QString,QString)), this, SLOT(receiveRawFile(QString, QString)));
+
+
+
 
     ui->horizontalLayout_contact->addWidget(Xmpp_client::instance()->getRosterSplitter());
 }
@@ -266,9 +270,19 @@ void MainWindow::receiveInvitation(QString invitation, QString from, QString rea
     default:
         break;
     }
+}
 
+
+
+void MainWindow::receiveRawFile(QString sphere_dest, QString file_path)
+{
+    qDebug() << "MainWindow::ReceiveRawFile : " << file_path;
+
+    if (m_spheres_private.contains(sphere_dest))
+        m_spheres_private.value(sphere_dest)->addFile(file_path);
 
 }
+
 
 void MainWindow::receiveMessageChat(QString from, QString message)
 {

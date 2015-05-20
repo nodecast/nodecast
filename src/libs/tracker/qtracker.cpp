@@ -83,6 +83,7 @@ QTracker::~QTracker()
 bool QTracker::start()
 {
     const int listen_port = Preferences().getTrackerPort();
+    qDebug() << "TRACKER LISTEN PORT : " << listen_port;
 
     if (m_server->isListening()) {
         if (m_server->serverPort() == listen_port) {

@@ -334,8 +334,25 @@ void Sphere::dropEvent(QDropEvent* event)
                return;
            }
 
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
-           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
+           qDebug() << "FILE SIZE : " << fileInfo.size();
+
+           if (fileInfo.size() < 1000000)
+           {
+               // if file size < 1Mo send it through XMPP.
+               qDebug() << "FILE SIZE < 1Mo : " << fileInfo.size();
+               sendXmppFile(fileInfoLink.absoluteFilePath());
+
+               Widgettorrent *wt = new Widgettorrent(sphere_data);
+               connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
+               wt->addFile(target_link);
+               flowLayout->addWidget(wt);
+           }
+           else
+           {
+               createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+               connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
+           }
+
            //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
        }
        else if(fileInfo.isDir())
@@ -437,18 +454,6 @@ void Sphere::mousePressEvent(QMouseEvent *e)
 
 
 
-void Sphere::addTorrent(const QTorrentHandle &h)
-{
-    // active sphere on new torrent
-    this->setChecked(true);
-
-    Widgettorrent *wt = new Widgettorrent(sphere_data);
-    connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
-    wt->addTorrent(h);
-    flowLayout->addWidget(wt);
-}
-
-
 
 void Sphere::populate()
 {
@@ -489,6 +494,18 @@ void Sphere::receive_message(const QString login, const QString message)
 
 
 
+void Sphere::addTorrent(const QTorrentHandle &h)
+{
+    // active sphere on new torrent
+    this->setChecked(true);
+
+    Widgettorrent *wt = new Widgettorrent(sphere_data);
+    connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
+    wt->addTorrent(h);
+    flowLayout->addWidget(wt);
+}
+
+
 
 void Sphere::addTorrent(QString path, bool fromScanDir)
 {
@@ -508,8 +525,9 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
     }
 
     qDebug() << "ROOM : " << m_room->get_name();
-    QStringList users_list = m_room->get_users();
 
+    /*
+    QStringList users_list = m_room->get_users();
     qDebug() << "Sphere::addTorrent USERS LIST : " << users_list;
 
     foreach(QString user, users_list)
@@ -518,6 +536,8 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
     }
     QString filename = path.split("/").takeLast();
     m_room->send_message(" share : " + filename);
+    */
+    sendXmppFile(path_dest);
 
 
     // add torrent to seed file
@@ -525,6 +545,45 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
     nb_torrent++;
     media_label_counter->setText(QString::number(nb_torrent));
 }
+
+
+
+void Sphere::addFile(const QString &file_path)
+{
+    qDebug() << "Sphere::addFile : " << file_path;
+
+    // active sphere on new torrent
+    this->setChecked(true);
+
+    const QFileInfo fileInfo(file_path);
+
+    Widgettorrent *wt = new Widgettorrent(sphere_data);
+    connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
+    wt->addFile(fileInfo);
+    flowLayout->addWidget(wt);
+}
+
+
+void Sphere::sendXmppFile(QString path_file)
+{
+    // send file through XMPP. Torrent file or direct file if < 1Mo
+
+    QStringList users_list = m_room->get_users();
+
+    qDebug() << "Sphere::sendXmppFile USERS LIST : " << users_list;
+
+    foreach(QString user, users_list)
+    {
+        Xmpp_client::instance()->sendFile(user, path_file);
+    }
+    if (!users_list.isEmpty())
+    {
+        QString filename = path_file.split("/").takeLast();
+        m_room->send_message(" share : " + filename);
+    }
+
+}
+
 
 void Sphere::torrentsAdded(QStringList &torrents)
 {

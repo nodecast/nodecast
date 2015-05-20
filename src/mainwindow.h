@@ -106,7 +106,7 @@ protected slots:
 private slots:
     void create_sphere(QString sphere_name);
     void addTorrent(const QTorrentHandle &h);
-
+    void receiveRawFile(QString sphere_dest, QString file_path);
     void shutdownCleanUp();
 
     void on_actionQuit_triggered();

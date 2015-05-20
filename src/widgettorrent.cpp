@@ -44,6 +44,13 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 
 int Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 {
+    Preferences prefs;
+
+    qDebug() << "POPULATE : " << prefs.getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory;
+
+    QDir sphere_dir(prefs.getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory);
+    QFileInfoList file_list = sphere_dir.entryInfoList(QDir::NoDotAndDotDot |QDir::Files);
+    //qDebug() << "Widgettorrent::populate FILE LIST : " << file_list.first().fileName();
 
     std::vector<libtorrent::torrent_handle> torrents = QBtSession::instance()->getSession()->get_torrents();
 
@@ -58,6 +65,9 @@ int Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 
         // get path
         qDebug() << "SAVE PATH : "<< h.save_path();
+
+        QFileInfo torrent_info(h.save_path_parsed());
+        qDebug() << "TORRENT INFO : " << torrent_info.fileName();
 
         QString path = h.save_path();
         // remove last / of the path, split on / and take the directory name
@@ -74,9 +84,32 @@ int Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
         parent->addWidget(wt);
         qDebug() << "Widgettorrent::populate";
         wt->addTorrent(h);
+
+        int index = file_list.indexOf(torrent_info);
+        if(index != -1)
+            file_list.removeAt(index);
+
+
        // QObject::connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), wt, SLOT(addTorrent(QTorrentHandle)));
 
     }
+
+    foreach (QFileInfo file, file_list)
+    {
+        qDebug() << "FILE NOT TORRENT : " << file.fileName();
+        counter++;
+
+        Widgettorrent *wt = new Widgettorrent(a_sphere_data);
+        QObject::connect(wt, SIGNAL(emit_deleted(QWidget*)), parent, SLOT(delItem(QWidget*)));
+
+        parent->addWidget(wt);
+        qDebug() << "Widgettorrent::populate addFIle : " << file.fileName();
+        wt->addFile(file);
+    }
+
+
+
+
     return counter;
 }
 
@@ -90,6 +123,7 @@ Widgettorrent::Widgettorrent(Sphere_data a_sphere_data) : sphere_data(a_sphere_d
     setMinimumSize(200, 130);
     setMaximumSize(200, 130);
     videoPlayer = NULL;
+    timer_get_torrent_progress = NULL;
 }
 
 Widgettorrent::~Widgettorrent()
@@ -104,9 +138,11 @@ Widgettorrent::~Widgettorrent()
         delete(videoPlayer);
     }
 
-    timer_get_torrent_progress->stop();
+    if (timer_get_torrent_progress)
+        timer_get_torrent_progress->stop();
 
     delete ui;
+    qDebug() << "DELETE WIDGET TORRENT UI";
 }
 
 
@@ -123,7 +159,10 @@ void Widgettorrent::mousePressEvent(QMouseEvent *e)
     {
         qDebug() << "MOUSE RIGHT PRESSED : " << ui->label_title->text();
 
-        displayListMenu();
+        if (torrent_data.is_torrent)
+            displayListMenuTorrent();
+        else
+            displayListMenuFile();
     }
 
 }
@@ -146,7 +185,7 @@ void Widgettorrent::mouseDoubleClickEvent(QMouseEvent *e)
                     mFirstY = e->y();
                   //  mFirstClick = false;
                   //  mpaintflag = true;
-                    qDebug() << "First image's coordinates" << mFirstX << "," << mFirstY << " title " << m_torrent.name();
+                    qDebug() << "First image's coordinates" << mFirstX << "," << mFirstY << " title " << torrent_data.file;
                     emit emit_title();
                   //  update();
 
@@ -240,6 +279,39 @@ void Widgettorrent::on_media_doubleClicked()
 //  connect(QBtSession::instance(), SIGNAL(pausedTorrent(QTorrentHandle)), SLOT(handleTorrentUpdate(QTorrentHandle)));
 //  connect(QBtSession::instance(), SIGNAL(torrentFinishedChecking(QTorrentHandle)), SLOT(handleTorrentUpdate(QTorrentHandle)));
 //}
+
+
+void Widgettorrent::addFile(const QFileInfo &file)
+{
+    qDebug() << "Widgettorrent::addFile";
+    connect(this, SIGNAL(emit_title()), this, SLOT(on_media_doubleClicked()));
+
+    m_title.setText(file.fileName());
+    ui->label_title->setText(file.fileName());
+    torrent_data.file = file.fileName();
+    torrent_data.filepath = file.absoluteFilePath();
+    torrent_data.dirpath = file.absolutePath();
+    torrent_data.is_torrent = false;
+
+
+
+    qDebug() << "Widgettorrent::addFile save_path_parsed : " << file.absoluteFilePath();
+
+    QString extension = fsutils::fileExtension(file.fileName());
+    qDebug() << "FILE EXTENSION : " << extension;
+
+    if (!extension.isEmpty())
+    {
+        torrent_data.extension=extension;
+
+        QString extension_thumbnail_path = ":/img/32x32/file_extension/file_extension_" + extension + ".png";
+        QPixmap pic = QPixmap(extension_thumbnail_path);
+        ui->label_thumbnail->setPixmap(pic);
+    }
+    torrent_data.type = "binary";
+
+    update_torrent_type_thumbnail();
+}
 
 
 void Widgettorrent::addTorrent(const QTorrentHandle &h)
@@ -341,19 +413,27 @@ void Widgettorrent::update_torrent_type_thumbnail()
     if (torrent_data.type != "directory")
     {
 
-        QMimeType mime = m_mime_db.mimeTypeForFile(m_torrent.save_path_parsed());
+        QString save_path;
+        if (torrent_data.is_torrent)
+            save_path = m_torrent.save_path_parsed();
+        else
+            save_path = torrent_data.filepath;
+
+        qDebug() << "Widgettorrent::update_torrent_type_thumbnail : " << save_path;
+
+        QMimeType mime = m_mime_db.mimeTypeForFile(save_path);
 
         if (mime.inherits("image/gif") ||
                  mime.inherits("image/jpeg") ||
                  mime.inherits("image/png") ||
                  mime.inherits("image/tiff"))
         {
-            QByteArray imageFormat = QImageReader::imageFormat(m_torrent.save_path_parsed()); //Where fileName - path to your file
+            QByteArray imageFormat = QImageReader::imageFormat(save_path); //Where fileName - path to your file
             qDebug() << "imageFormat : " << imageFormat;
 
             QPixmap img;
 
-            if (imageFormat.size() != 0 && img.load(m_torrent.save_path_parsed()))
+            if (imageFormat.size() != 0 && img.load(save_path))
             {
                 QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
                 ui->label_thumbnail->setPixmap(thumbnail);
@@ -397,7 +477,7 @@ void Widgettorrent::update_torrent_type_thumbnail()
         }
         else
         {
-            QFileInfo fileInfo(m_torrent.save_path_parsed());
+            QFileInfo fileInfo(save_path);
             if(fileInfo.isFile())
             {
                 // torrent is a file but unknown type, maybe a binary file
@@ -417,7 +497,7 @@ void Widgettorrent::update_torrent_type_thumbnail()
 
 
 
-void Widgettorrent::displayListMenu() {
+void Widgettorrent::displayListMenuTorrent() {
   // Create actions
   QAction actionStart(IconProvider::instance()->getIcon("media-playback-start"), tr("Resume", "Resume/start the torrent"), 0);
   connect(&actionStart, SIGNAL(triggered()), this, SLOT(startSelectedTorrents()));
@@ -593,6 +673,31 @@ void Widgettorrent::displayListMenu() {
 
 
 
+void Widgettorrent::displayListMenuFile() {
+  // Create actions
+  QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete file"), 0);
+  connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
+  QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
+  connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedTorrentsFolder()));
+  // End of actions
+  QMenu listMenu(this);
+  // Enable/disable pause/start action given the DL state
+  qDebug("Displaying menu");
+
+
+
+  listMenu.addSeparator();
+  listMenu.addAction(&actionDelete);
+  listMenu.addSeparator();
+
+  listMenu.addAction(&actionOpen_destination_folder);
+  //listMenu.addSeparator();
+  // Call menu
+  QAction *act = 0;
+  act = listMenu.exec(QCursor::pos());
+}
+
+
 void Widgettorrent::startSelectedTorrents() {
     QBtSession::instance()->resumeTorrent(torrent_data.hash);
 }
@@ -603,27 +708,51 @@ void Widgettorrent::pauseSelectedTorrents() {
 }
 
 
-void Widgettorrent::deleteSelectedTorrents() {
-  QTorrentHandle torrent = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
-  bool delete_local_files = false;
-  if (Preferences().confirmTorrentDeletion() &&
-      !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
-    return;
-    QBtSession::instance()->deleteTorrent(torrent_data.hash, delete_local_files);
-    qDebug() << "Widgettorrent::deleteSelectedTorrents";
-    emit emit_deleted(this);
+void Widgettorrent::deleteSelectedTorrents() {                    
+    if (torrent_data.is_torrent)
+    {
+        QTorrentHandle torrent = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
+        bool delete_local_files = false;
+        if (Preferences().confirmTorrentDeletion() &&
+                !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
+            return;
+        QBtSession::instance()->deleteTorrent(torrent_data.hash, delete_local_files);
+        qDebug() << "Widgettorrent::deleteSelectedTorrents";
+        emit emit_deleted(this);
+    }
+    else
+    {
+        bool delete_local_files = true;
+        if (Preferences().confirmTorrentDeletion() &&
+                !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
+            return;
+        qDebug() << "DELETE FILE : " << torrent_data.filepath;
+        fsutils::forceRemove(torrent_data.filepath);
+        emit emit_deleted(this);
+    }
 }
 
 
 void Widgettorrent::openSelectedTorrentsFolder() const {
-    const QTorrentHandle h = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
-    if (h.is_valid()) {
-      QString rootFolder = h.root_path();
-      qDebug("Opening path at %s", qPrintable(rootFolder));
-      //if (!pathsList.contains(rootFolder)) {
-       // pathsList.insert(rootFolder);
-        QDesktopServices::openUrl(QUrl::fromLocalFile(rootFolder));
-      //}
+
+    if (torrent_data.is_torrent)
+    {
+        const QTorrentHandle h = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
+        if (h.is_valid()) {
+          QString rootFolder = h.root_path();
+          qDebug("Opening path at %s", qPrintable(rootFolder));
+          //if (!pathsList.contains(rootFolder)) {
+           // pathsList.insert(rootFolder);
+            QDesktopServices::openUrl(QUrl::fromLocalFile(rootFolder));
+          //}
+        }
+    }
+    else
+    {
+        qDebug("Opening path at %s", qPrintable(torrent_data.dirpath));
+        //if (!pathsList.contains(rootFolder)) {
+         // pathsList.insert(rootFolder);
+          QDesktopServices::openUrl(QUrl::fromLocalFile(torrent_data.dirpath));
     }
 }
 

@@ -2824,6 +2824,7 @@ void QBtSession::readAlerts() {
         }
       }
       else if (portmap_error_alert* p = dynamic_cast<portmap_error_alert*>(a.get())) {
+          qDebug("UPnP FAILED, msg: %s", p->message().c_str());
         addConsoleMessage(tr("UPnP/NAT-PMP: Port mapping failure, message: %1").arg(misc::toQStringU(p->message())), "red");
         //emit UPnPError(QString(p->msg().c_str()));
         emit UPnPSuccess(false);
