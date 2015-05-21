@@ -26,6 +26,9 @@
 #define ROSTERITEMMODEL_H
 
 #include <QStandardItemModel>
+#include <QMimeData>
+#include <QDebug>
+
 #include "rosterItem.h"
 #include "QXmppRosterManager.h"
 #include "QXmppPresence.h"
@@ -48,6 +51,10 @@ public:
 private:
     rosterItem* getOrCreateItem(const QString& bareJid);
     QMap<QString, rosterItem*> m_jidRosterItemMap;
+
+protected:
+    QStringList mimeTypes() const;
+    QMimeData *mimeData(const QModelIndexList &indexes) const;
 };
 
 #endif // ROSTERITEMMODEL_H

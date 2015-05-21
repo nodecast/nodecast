@@ -91,3 +91,29 @@ void rosterItemModel::removeRosterEntry(const QString& bareJid)
         removeRow(item->row());
     }
 }
+
+
+QStringList rosterItemModel::mimeTypes() const
+ {
+     QStringList types;
+     types << "application/vnd.text.list";
+     return types;
+ }
+
+QMimeData *rosterItemModel::mimeData(const QModelIndexList &indexes) const
+ {
+     QMimeData *mimeData = new QMimeData();
+     QByteArray encodedData;
+
+     QDataStream stream(&encodedData, QIODevice::WriteOnly);
+
+     foreach (QModelIndex index, indexes) {
+         if (index.isValid()) {
+             QString text = data(index, rosterItem::BareJid).toString();
+             stream << text;
+         }
+     }
+
+     mimeData->setData("application/vnd.text.list", encodedData);
+     return mimeData;
+ }

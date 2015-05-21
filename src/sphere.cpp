@@ -286,12 +286,29 @@ void Sphere::dragEnterEvent(QDragEnterEvent *event)
 {
     if (sphere_data.scope == Sphere_scope::FIXED) return;
 
-    if(event->mimeData()->hasUrls())
+    if(event->mimeData()->hasUrls() || event->mimeData()->hasFormat("application/vnd.text.list"))
         event->acceptProposedAction();
 }
 
 void Sphere::dropEvent(QDropEvent* event)
 {
+
+    if (event->mimeData()->hasFormat("application/vnd.text.list"))
+    {
+        QByteArray encodedData = event->mimeData()->data("application/vnd.text.list");
+
+        QDataStream stream(&encodedData, QIODevice::ReadOnly);
+        QStringList newItems;
+
+        while (!stream.atEnd()) {
+                QString text;
+                stream >> text;
+                newItems << text;
+            }
+
+        qDebug() << " Sphere::dropEvent application/vnd.text.list : " << newItems;
+        return;
+    }
 
     QList<QUrl> droppedUrls = event->mimeData()->urls();
     int droppedUrlCnt = droppedUrls.size();

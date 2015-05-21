@@ -57,6 +57,9 @@ rosterListView::rosterListView(QWidget* parent)
     check = connect(&m_removeContact, SIGNAL(triggered()), this,
                          SLOT(removeContact_helper()));
     Q_ASSERT(check);
+
+    setDragEnabled(true);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 bool rosterListView::event(QEvent* e)

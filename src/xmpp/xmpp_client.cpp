@@ -775,7 +775,7 @@ void Xmpp_client::rosterChanged(const QString& bareJid)
     if(m_vCardCache->isVCardAvailable(bareJid))
         updateVCard(bareJid);
 
-    qDebug() << "ITEM JID : " << bareJid;
+    //qDebug() << "ITEM JID : " << bareJid;
 
 //    m_rosterItemModel->indexFromItem()
     new_chat(bareJid);
@@ -785,7 +785,7 @@ void Xmpp_client::rosterChanged(const QString& bareJid)
 
 void Xmpp_client::updateVCard(const QString& bareJid)
 {
-    qDebug() << "UPDATE VCARD : " << bareJid;
+    //qDebug() << "UPDATE VCARD : " << bareJid;
     // determine full name
     const QXmppVCardIq vCard = m_vCardCache->getVCard(bareJid);
     QString fullName = vCard.fullName();
