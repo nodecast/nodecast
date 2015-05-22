@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QInputDialog>
 
 #include "QXmppMessage.h"
 #include "QXmppLogger.h"
@@ -125,6 +126,8 @@ private slots:
     void showProfile(const QString& bareJid);
     void rosterItemSelectionChanged(const QItemSelection &selection);
     void sendMessageToJid();
+
+    void action_addContact();
 
 signals:
     void emit_connected(bool);

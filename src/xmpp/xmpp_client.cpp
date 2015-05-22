@@ -219,6 +219,10 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
                     this, SLOT(action_removeContact(QString)));
     Q_ASSERT(check);
 
+    check = connect(roster->pushButton_addContact, SIGNAL(clicked()), SLOT(action_addContact()));
+    Q_ASSERT(check);
+
+
     this->configuration().setPort(m_xmpp_client_port);
     this->configuration().setJid(m_login);
     this->configuration().setPassword(m_password);
@@ -909,7 +913,7 @@ void Xmpp_client::showProfile(const QString& bareJid)
 
 void Xmpp_client::new_chat(const QString& bareJid)
 {
-    qDebug() << "NEW USER CHAT WITH : " << bareJid;
+    //qDebug() << "NEW USER CHAT WITH : " << bareJid;
     QGroupBox *groupBox = new QGroupBox;
     QVBoxLayout *box_chat = new QVBoxLayout;
 
@@ -990,4 +994,28 @@ void Xmpp_client::sendMessageToJid()
     this->sendMessage(jid, message);
     chatroomMap.value(stacked_index)->append("Me : " + message);
     linechatMap.value(stacked_index)->clear();
+}
+
+void Xmpp_client::action_addContact()
+{
+    bool ok;
+    QString bareJid = QInputDialog::getText(new QWidget, "Add a jabber contact",
+                                            "Contact ID:", QLineEdit::Normal, "", &ok);
+
+    if(!ok)
+        return;
+
+    if(!isValidBareJid(bareJid))
+    {
+        QMessageBox::information(new QWidget, "Invalid ID", "Specified ID <I>"+bareJid + " </I> is invalid.");
+        return;
+    }
+
+    if(ok && !bareJid.isEmpty())
+    {
+        QXmppPresence subscribe;
+        subscribe.setTo(bareJid);
+        subscribe.setType(QXmppPresence::Subscribe);
+        this->sendPacket(subscribe);
+    }
 }
