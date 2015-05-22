@@ -27,7 +27,6 @@
 
 #include <QStandardItemModel>
 #include <QMimeData>
-#include <QDebug>
 
 #include "rosterItem.h"
 #include "QXmppRosterManager.h"

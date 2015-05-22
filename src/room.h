@@ -91,6 +91,8 @@ private slots:
     void delUser(const QString &jid);
     void sendMessage();
     void sendInvitation();
+
+public slots:
     void send_invitation(QStringList jids);
 };
 

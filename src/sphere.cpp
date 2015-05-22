@@ -292,115 +292,116 @@ void Sphere::dragEnterEvent(QDragEnterEvent *event)
 
 void Sphere::dropEvent(QDropEvent* event)
 {
-
     if (event->mimeData()->hasFormat("application/vnd.text.list"))
     {
         QByteArray encodedData = event->mimeData()->data("application/vnd.text.list");
-
         QDataStream stream(&encodedData, QIODevice::ReadOnly);
-        QStringList newItems;
+        QStringList jids;
 
         while (!stream.atEnd()) {
                 QString text;
                 stream >> text;
-                newItems << text;
+                jids << text;
             }
+        qDebug() << " Sphere::dropEvent application/vnd.text.list : " << jids;
 
-        qDebug() << " Sphere::dropEvent application/vnd.text.list : " << newItems;
-        return;
+        m_room->send_invitation(jids);
     }
-
-    QList<QUrl> droppedUrls = event->mimeData()->urls();
-    int droppedUrlCnt = droppedUrls.size();
-
-    for(int i = 0; i < droppedUrlCnt; i++)
+    else if (event->mimeData()->hasUrls())
     {
-       QString localPath = droppedUrls[i].toLocalFile();
-       QFileInfo fileInfo(localPath);
 
-       if(fileInfo.isFile())
-       {
-           QString extension = fsutils::fileExtension(fileInfo.fileName());
-           qDebug() << "EXTENSION FILE : " << extension;
+        QList<QUrl> droppedUrls = event->mimeData()->urls();
+        int droppedUrlCnt = droppedUrls.size();
 
-           if (extension == "torrent")
+        for(int i = 0; i < droppedUrlCnt; i++)
+        {
+           QString localPath = droppedUrls[i].toLocalFile();
+           QFileInfo fileInfo(localPath);
+
+           if(fileInfo.isFile())
            {
-               if (!fsutils::isValidTorrentFile(localPath))
+               QString extension = fsutils::fileExtension(fileInfo.fileName());
+               qDebug() << "EXTENSION FILE : " << extension;
+
+               if (extension == "torrent")
                {
-                   qDebug() << "torrent is not valid : " << fileInfo.fileName();
+                   if (!fsutils::isValidTorrentFile(localPath))
+                   {
+                       qDebug() << "torrent is not valid : " << fileInfo.fileName();
+                       return;
+                   }
+
+                   qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
+                   QDir nodecast_datas;
+                   nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+                   QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
                    return;
                }
 
-               qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
-               QDir nodecast_datas;
-               nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
-               QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
-               return;
+               QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
+               fsutils::forceRemove(target_link);
+               QFileInfo fileInfoLink(target_link);
+
+               bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
+               QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
+               qDebug() << link_status;
+               if (!check_link)
+               {
+                   QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+                   return;
+               }
+
+               qDebug() << "FILE SIZE : " << fileInfo.size();
+
+               if (fileInfo.size() < 1000000)
+               {
+                   // if file size < 1Mo send it through XMPP.
+                   qDebug() << "FILE SIZE < 1Mo : " << fileInfo.size();
+                   sendXmppFile(fileInfoLink.absoluteFilePath());
+
+                   Widgettorrent *wt = new Widgettorrent(sphere_data);
+                   connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
+                   wt->addFile(target_link);
+                   flowLayout->addWidget(wt);
+               }
+               else
+               {
+                   createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+                   connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
+               }
+
+               //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
            }
-
-           QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
-           fsutils::forceRemove(target_link);
-           QFileInfo fileInfoLink(target_link);
-
-           bool check_link = fsutils::createLink(localPath, fileInfoLink.absoluteFilePath());
-           QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
-           qDebug() << link_status;
-           if (!check_link)
+           else if(fileInfo.isDir())
            {
-               QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
-               return;
-           }
+               if (!localPath.endsWith("/")) localPath.append("/"); // workaround a strange behaviour between Mac and Linux ...
+               QFileInfo fileInfo(localPath);
 
-           qDebug() << "FILE SIZE : " << fileInfo.size();
+               QDir take_dir = fileInfo.dir();
+               QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
+               fsutils::forceRemove(target_link);
+               qDebug() << "TARGET LINK : " << target_link;
+               QFileInfo fileInfoLink(target_link);
 
-           if (fileInfo.size() < 1000000)
-           {
-               // if file size < 1Mo send it through XMPP.
-               qDebug() << "FILE SIZE < 1Mo : " << fileInfo.size();
-               sendXmppFile(fileInfoLink.absoluteFilePath());
+               bool check_link = fsutils::createLinkDir(localPath, fileInfoLink.absoluteFilePath());
+               QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
+               qDebug() << link_status;
+               if (!check_link)
+               {
+                   QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
+                   return;
+               }
 
-               Widgettorrent *wt = new Widgettorrent(sphere_data);
-               connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
-               wt->addFile(target_link);
-               flowLayout->addWidget(wt);
+               createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
+               connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
+               //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
            }
            else
            {
-               createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
-               connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
+               // none
+               QMessageBox::information(this, tr("Dropped, but unknown in %1 sphere").arg(sphere_data.title), tr("Unknown: %1").arg(fileInfo.canonicalFilePath()));
            }
-
-           //QMessageBox::information(this, tr("Dropped file in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
-       }
-       else if(fileInfo.isDir())
-       {
-           if (!localPath.endsWith("/")) localPath.append("/"); // workaround a strange behaviour between Mac and Linux ...
-           QFileInfo fileInfo(localPath);
-
-           QDir take_dir = fileInfo.dir();
-           QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
-           fsutils::forceRemove(target_link);
-           qDebug() << "TARGET LINK : " << target_link;
-           QFileInfo fileInfoLink(target_link);
-
-           bool check_link = fsutils::createLinkDir(localPath, fileInfoLink.absoluteFilePath());
-           QString link_status = check_link? "LINK IS OK" : "LINK IS KO";
-           qDebug() << link_status;
-           if (!check_link)
-           {
-               QMessageBox::information(this, tr("Create link failed in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
-               return;
-           }
-
-           createTorrentDlg = new TorrentCreatorDlg(sphere_data.directory, fileInfoLink.fileName(), fileInfoLink.absoluteFilePath(), this);
-           connect(createTorrentDlg, SIGNAL(torrent_to_seed(QString, bool)), this, SLOT(addTorrent(QString, bool)));
-           //QMessageBox::information(this, tr("Dropped directory in %1 sphere").arg(sphere_data.title), fileInfo.absoluteFilePath());
-       }
-       else
-       {
-           // none
-           QMessageBox::information(this, tr("Dropped, but unknown in %1 sphere").arg(sphere_data.title), tr("Unknown: %1").arg(fileInfo.canonicalFilePath()));
-       }
+        }
     }
 
     event->acceptProposedAction();
