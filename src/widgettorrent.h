@@ -12,6 +12,10 @@
 #include <QDesktopServices>
 #include <QMenu>
 #include <QMessageBox>
+#include <QXmppTransferManager.h>
+#include <QMutexLocker>
+#include <QRunnable>
+#include <QThreadPool>
 
 //#include "torrentpersistentdata.h"
 #include "qtorrenthandle.h"
@@ -21,6 +25,7 @@
 #include "deletionconfirmationdlg.h"
 #include "flowlayout.h"
 #include "preferences.h"
+#include "global_mutex.h"
 
 namespace Ui {
 class widgettorrent;
@@ -38,6 +43,21 @@ struct Torrent_data {
     bool is_torrent=true;
 };
 
+
+class updateThumbnail : public QObject, public QRunnable
+{
+    Q_OBJECT
+
+public:
+    updateThumbnail( Ui::widgettorrent *ui, Torrent_data *torrent_data, QTorrentHandle *torrent_handle);
+    void run();
+
+private:
+    Torrent_data *m_torrent_data;
+    QTorrentHandle *m_torrent_handle;
+    Ui::widgettorrent *m_ui;
+    QMimeDatabase m_mime_db;
+};
 
 class Widgettorrent : public QWidget
 {
@@ -65,7 +85,6 @@ signals:
 private:
     void displayListMenuTorrent();
     void displayListMenuFile();
-    void update_torrent_type_thumbnail();
     QTorrentHandle m_torrent;
     Ui::widgettorrent *ui;
     QPixmap *myPix;
@@ -77,21 +96,27 @@ private:
 
     QProcess *videoPlayer;
     QTimer *timer_get_torrent_progress;
-    QMimeDatabase m_mime_db;
 
 private slots:
     void on_media_doubleClicked();
     void update_timer_torrent_progress();
+    void update_torrent_type_thumbnail();
 
     void startSelectedTorrents();
     void pauseSelectedTorrents();
     void deleteSelectedTorrents();
     void openSelectedTorrentsFolder() const;
     void recheckSelectedTorrents();
+    void job_progress(qint64 done, qint64 total);
 
 public slots:
     void addTorrent(const QTorrentHandle &h);
-    void addFile(const QFileInfo &file);
+    void addFile(const QFileInfo &file, QXmppTransferJob *job=NULL);
 };
+
+
+
+
+
 
 #endif // WIDGETTORRENT_H

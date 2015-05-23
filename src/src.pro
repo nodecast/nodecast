@@ -120,7 +120,8 @@ SOURCES +=  main.cpp\
             newsphere.cpp \
             sphere.cpp \
     room.cpp \
-    roominvit.cpp
+    roominvit.cpp \
+    global_mutex.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -151,7 +152,8 @@ HEADERS  += mainwindow.h \
     global.h \
     room.h \
     roominvit.h \
-    deletionconfirmationdlg.h
+    deletionconfirmationdlg.h \
+    global_mutex.h
 
 
 win32|macx {

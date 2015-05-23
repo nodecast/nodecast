@@ -281,10 +281,29 @@ void Widgettorrent::on_media_doubleClicked()
 //}
 
 
-void Widgettorrent::addFile(const QFileInfo &file)
+void Widgettorrent::job_progress(qint64 done, qint64 total)
+{
+    qDebug() << "Widgettorrent::job_progress Transmission progress:" << done << "/" << total;
+
+    //float tmp = done * 100;
+    //qDebug() << "PROGRESS float * 100 : " << m_torrent.name() << " : " << tmp;
+
+    //int progress = int(tmp + 0.5);
+    int progress = done * 100 / total;
+    ui->progressBar_torrent->setValue(progress);
+}
+
+void Widgettorrent::addFile(const QFileInfo &file, QXmppTransferJob *job)
 {
     qDebug() << "Widgettorrent::addFile";
     connect(this, SIGNAL(emit_title()), this, SLOT(on_media_doubleClicked()));
+    if (job)
+    {
+        bool check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
+        Q_ASSERT(check);
+        check = connect(job, SIGNAL(finished()), this, SLOT(update_torrent_type_thumbnail()));
+        Q_ASSERT(check);
+    }
 
     m_title.setText(file.fileName());
     ui->label_title->setText(file.fileName());
@@ -407,11 +426,21 @@ void Widgettorrent::update_timer_torrent_progress()
 // when torrent is completly download, I can check his mime type. do not use extension file
 void Widgettorrent::update_torrent_type_thumbnail()
 {
-
     qDebug() << "Widgettorrent::update_torrent_type_thumbnail";
 
     if (torrent_data.type != "directory")
     {
+
+
+        updateThumbnail *thumbnailtask = new updateThumbnail(ui, &torrent_data, &m_torrent);
+        thumbnailtask->setAutoDelete(true);
+        QThreadPool::globalInstance()->start(thumbnailtask);
+
+
+        /*
+        QMutexLocker locker(&global_mutex::thumbnail_mutex);
+        qDebug() << "Widgettorrent::update_torrent_type_thumbnail UNLOCKED MUTEX";
+
 
         QString save_path;
         if (torrent_data.is_torrent)
@@ -489,12 +518,109 @@ void Widgettorrent::update_torrent_type_thumbnail()
                 torrent_data.type = "directory";
             }
         }
+
+        */
     }
 
-    qDebug() << "Widgettorrent::update_torrent_type_thumbnail DATA TYPE : " << torrent_data.type;
+    //qDebug() << "Widgettorrent::update_torrent_type_thumbnail DATA TYPE : " << torrent_data.type;
 }
 
 
+
+
+updateThumbnail::updateThumbnail(Ui::widgettorrent *ui, Torrent_data *torrent_data, QTorrentHandle *torrent_handle) : m_ui(ui), m_torrent_data(torrent_data), m_torrent_handle(torrent_handle)
+{
+    qDebug() << "updateThumbnail::updateThumbnail CONSTRUCT";
+}
+
+
+void updateThumbnail::run()
+{
+    qDebug() << "updateThumbnail::run";
+
+        QMutexLocker locker(&global_mutex::thumbnail_mutex);
+        qDebug() << "updateThumbnail::update_torrent_type_thumbnail UNLOCKED MUTEX";
+
+
+        QString save_path;
+        if (m_torrent_data->is_torrent)
+            save_path = m_torrent_handle->save_path_parsed();
+        else
+            save_path = m_torrent_data->filepath;
+
+        qDebug() << "Widgettorrent::update_torrent_type_thumbnail : " << save_path;
+
+        QMimeType mime = m_mime_db.mimeTypeForFile(save_path);
+
+        if (mime.inherits("image/gif") ||
+                 mime.inherits("image/jpeg") ||
+                 mime.inherits("image/png") ||
+                 mime.inherits("image/tiff"))
+        {
+            QByteArray imageFormat = QImageReader::imageFormat(save_path); //Where fileName - path to your file
+            qDebug() << "imageFormat : " << imageFormat;
+
+            QPixmap img;
+
+            if (imageFormat.size() != 0 && img.load(save_path))
+            {
+                QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+                m_ui->label_thumbnail->setPixmap(thumbnail);
+            }
+            m_torrent_data->type = "image";
+        }
+        else if (mime.inherits("text/css") ||
+                 mime.inherits("text/csv") ||
+                 mime.inherits("text/html") ||
+                 mime.inherits("text/plain") ||
+                 mime.inherits("text/xml"))
+        {
+            m_torrent_data->type = "text";
+        }
+        else if (mime.inherits("video/mpeg") ||
+                 mime.inherits("video/mp4") ||
+                 mime.inherits("video/quicktime") ||
+                 mime.inherits("video/x-ms-wmv") ||
+                 mime.inherits("video/x-msvideo") ||
+                 mime.inherits("video/x-flv") ||
+                 mime.inherits("video/webm") ||
+                 mime.inherits("video/x-matroska")
+                 )
+        {
+            m_torrent_data->type = "video";
+        }
+        else if (mime.inherits("audio/mpeg") ||
+                 mime.inherits("audio/mp3") ||
+                 mime.inherits("audio/x-ms-wma") ||
+                 mime.inherits("audio/vnd.rn-realaudio") ||
+                 mime.inherits("audio/x-wav") ||
+                 mime.inherits("audio/wav") ||
+                 mime.inherits("audio/x-matroska")
+                 )
+        {
+            m_torrent_data->type = "audio";
+        }
+        else if (mime.inherits("application/pdf"))
+        {
+            m_torrent_data->type = "pdf";
+        }
+        else
+        {
+            QFileInfo fileInfo(save_path);
+            if(fileInfo.isFile())
+            {
+                // torrent is a file but unknown type, maybe a binary file
+                m_torrent_data->type = "binary";
+            }
+            else if(fileInfo.isDir())
+            {
+                // torrent is a directory
+                m_torrent_data->type = "directory";
+            }
+        }
+
+    qDebug() << "updateThumbnail::run DATA TYPE : " << m_torrent_data->type;
+}
 
 
 void Widgettorrent::displayListMenuTorrent() {

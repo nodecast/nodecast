@@ -566,7 +566,7 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
 
 
-void Sphere::addFile(const QString &file_path)
+void Sphere::addFile(const QString &file_path, QXmppTransferJob *job)
 {
     qDebug() << "Sphere::addFile : " << file_path;
 
@@ -577,7 +577,7 @@ void Sphere::addFile(const QString &file_path)
 
     Widgettorrent *wt = new Widgettorrent(sphere_data);
     connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
-    wt->addFile(fileInfo);
+    wt->addFile(fileInfo, job);
     flowLayout->addWidget(wt);
 }
 

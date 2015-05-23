@@ -181,7 +181,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     connect(Xmpp_client::instance(), SIGNAL(emit_room(QString, QXmppMucRoom*)), this, SLOT(mapRoom(QString, QXmppMucRoom*)));
 
-    connect(Xmpp_client::instance(), SIGNAL(emit_receive_rawfile(QString,QString)), this, SLOT(receiveRawFile(QString, QString)));
+    connect(Xmpp_client::instance(), SIGNAL(emit_receive_rawfile(QString,QString, QXmppTransferJob*)), this, SLOT(receiveRawFile(QString, QString, QXmppTransferJob*)));
 
 
 
@@ -274,12 +274,12 @@ void MainWindow::receiveInvitation(QString invitation, QString from, QString rea
 
 
 
-void MainWindow::receiveRawFile(QString sphere_dest, QString file_path)
+void MainWindow::receiveRawFile(QString sphere_dest, QString file_path, QXmppTransferJob *job)
 {
     qDebug() << "MainWindow::ReceiveRawFile : " << file_path;
 
     if (m_spheres_private.contains(sphere_dest))
-        m_spheres_private.value(sphere_dest)->addFile(file_path);
+        m_spheres_private.value(sphere_dest)->addFile(file_path, job);
 
 }
 

@@ -23,6 +23,7 @@
 #include <QGroupBox>
 #include <QStackedWidget>
 #include <QItemSelection>
+#include <QMutex>
 
 #include "preferences.h"
 #include "xmlConsoleDialog.h"
@@ -35,6 +36,7 @@
 #include "rosterItemSortFilterProxyModel.h"
 #include "qbtsession.h"
 #include "profileDialog.h"
+#include "global_mutex.h"
 
 class Xmpp_client : public QXmppClient
 {
@@ -134,8 +136,8 @@ signals:
     void emit_chat(QString, QString);
     void emit_invitation(QString, QString, QString);
     void emit_room(QString room_name, QXmppMucRoom* room);
-    void emit_receive_file(QString file_path);
-    void emit_receive_rawfile(QString sphere_dest, QString file_path);
+    void emit_progress_rawfile(qint64 done, qint64 total);
+    void emit_receive_rawfile(QString sphere_dest, QString file_path, QXmppTransferJob *job);
 };
 
 

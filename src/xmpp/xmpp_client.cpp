@@ -320,6 +320,8 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
+    sphere_dest = from_jid.split("@").at(0);
+    QString from = from_jid.split("/").at(1);
 
     QXmppTransferFileInfo fileInfo = job->fileInfo();
 
@@ -349,24 +351,33 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
-
-    if (file_extension != "torrent" && file_size > 1000000)
+    else if (file_extension != "torrent" && file_size > 1000000)
     {
         qDebug() << "file size > 1Mo and not torrent";
         job->abort();
         return;
     }
+    else if (file_extension != "torrent" && file_size < 1000000)
+    {
+
+        file_dir = new QDir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
+        if (!file_dir->exists()) file_dir->mkpath(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
+
+         global_mutex::thumbnail_mutex.lock();
+
+        emit emit_receive_rawfile(sphere_dest, file_dir->absoluteFilePath(file_name), job);
+    }
+    else
+    {
+        // mkdir from user directory to torrents directory to not resend file (bypass filesystemwatcher)
+        file_dir = new QDir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
+        if (!file_dir->exists()) file_dir->mkpath(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
+    }
 
 
-    sphere_dest = from_jid.split("@").at(0);
-    QString from = from_jid.split("/").at(1);
 
     qDebug() << "RECEIVE from : " << from << " TO : " << sphere_dest;
 
-
-    // mkdir from user directory to torrents directory to not resend file (bypass filesystemwatcher)
-    file_dir = new QDir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
-    if (!file_dir->exists()) file_dir->mkpath(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
 
 
 
@@ -376,8 +387,8 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     check = connect(job, SIGNAL(finished()), this, SLOT(job_finished()));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
-    Q_ASSERT(check);
+//    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
+//    Q_ASSERT(check);
 
     // allocate a buffer to receive the file
     m_buffer = new QBuffer(this);
@@ -394,7 +405,8 @@ void Xmpp_client::job_error(QXmppTransferJob::Error error)
 
 void Xmpp_client::job_progress(qint64 done, qint64 total)
 {
-    qDebug() << "Transmission progress:" << done << "/" << total;
+    qDebug() << "Xmpp_client::job_progress Transmission progress:" << done << "/" << total;
+    emit emit_progress_rawfile(done, total);
 }
 
 
@@ -402,59 +414,65 @@ void Xmpp_client::job_finished ()
 {
     qDebug() << "Xmpp_client::job_finished";
 
-/*
-    QDir sphere_dir;
-    sphere_dir = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/";
-    if (!sphere_dir.exists())
+
+    if (file_extension == "torrent")
     {
-        qDebug() << "SPHERE DEST NOT EXIST : " << QDir::toNativeSeparators(sphere_dir.absolutePath());
+        qDebug() << "Xmpp_client::job_finished WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
+
+        QFile file_torrent(file_dir->absolutePath() + QDir::separator() + file_name);
+        if (!file_torrent.open(QIODevice::WriteOnly))
+        {
+            m_buffer->close ();
+            delete m_buffer;
+            delete file_dir;
+            return;
+        }
+
+        file_torrent.write(m_buffer->data());
+        file_torrent.close();
         m_buffer->close ();
+
+        QFileInfo file_info(file_torrent.fileName());
+        QString file_path = file_info.canonicalFilePath();
+        qDebug() << "FILE PATH : " << file_path;
         delete m_buffer;
-        delete file;
-        return;
-    }
-*/
-    qDebug() << "WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
+        delete file_dir;
 
-    QFile file_torrent(QDir::toNativeSeparators(file_dir->absolutePath() + QDir::separator()) + file_name);
-    if (!file_torrent.open(QIODevice::WriteOnly))
-        return;
+        // archive file to torrents directory
+        //QDir nodecast_datas;
+        //nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
+        //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
 
-    file_torrent.write(m_buffer->data());
-    file_torrent.close();
-    m_buffer->close ();
 
-    QFileInfo file_info(file_torrent.fileName());
-    QString file_path = file_info.canonicalFilePath();
-    qDebug() << "FILE PATH : " << file_path;
-    delete m_buffer;
-    delete file_dir;
-
-    // archive file to torrents directory
-    //QDir nodecast_datas;
-    //nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
-    //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
-
-    if (file_extension == "torrent" && fsutils::isValidTorrentFile(file_path))
-    {
-        QBtSession::instance()->addTorrent(file_path);
+        if (fsutils::isValidTorrentFile(file_path))
+            QBtSession::instance()->addTorrent(file_path);
     }
     else if (file_extension != "torrent")
     {
-        qDebug() << "RECEIVE A RAW FILE < 1Mo : " << file_path;
+        qDebug() << "Xmpp_client::job_finished WRITE RAW : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
+        QString file_path = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + QDir::separator() + file_name;
+        QFile file_raw(file_path);
 
-        qDebug() << "FILE NAME : " << file_torrent.fileName();
-
-        // move file to sphere directory
-        QString new_file_path = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + QDir::separator() + file_info.fileName();
-        file_torrent.rename(new_file_path);
-        qDebug() << "MOVE FILE TO : " << new_file_path;
-        emit emit_receive_rawfile(sphere_dest, new_file_path);        
-    }     
+        if (!file_raw.open(QIODevice::WriteOnly))
+        {
+            m_buffer->close ();
+            delete m_buffer;
+            delete file_dir;
+            return;
+        }
+        file_raw.write(m_buffer->data());
+        file_raw.close();
+        m_buffer->close ();
+        delete m_buffer;
+        delete file_dir;
+        global_mutex::thumbnail_mutex.unlock();
+    }
     else
     {
-        qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_path;
-        fsutils::forceRemove(file_path);
+        qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_name;
+        m_buffer->close ();
+        delete m_buffer;
+        delete file_dir;
     }
 }
 

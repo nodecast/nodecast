@@ -56,7 +56,7 @@ public:
     ~Sphere();
     static QString gen_directory(QString sphere_name);
     void addTorrent(const QTorrentHandle &h);
-    void addFile(const QString &file_path);
+    void addFile(const QString &file_path, QXmppTransferJob *job);
     void populate();
     virtual QSize sizeHint() const;
     int index_tab;
