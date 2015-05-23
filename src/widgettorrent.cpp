@@ -301,8 +301,6 @@ void Widgettorrent::addFile(const QFileInfo &file, QXmppTransferJob *job)
     {
         bool check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
         Q_ASSERT(check);
-        check = connect(job, SIGNAL(finished()), this, SLOT(update_torrent_type_thumbnail()));
-        Q_ASSERT(check);
     }
 
     m_title.setText(file.fileName());
