@@ -392,6 +392,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
 
 
     File_data file_data;
+    file_data.file_extension = file_extension;
     file_data.buffer = new QBuffer(this);
     file_data.file_name = file_name;
     file_data.file_dir = file_dir;
@@ -424,7 +425,7 @@ void Xmpp_client::job_finished (QXmppTransferJob *job)
     qDebug() << "Xmpp_client::job_finished : " << file_buffer.value(job->sid()).file_name;
 
 
-    if (file_extension == "torrent")
+    if (file_buffer.value(job->sid()).file_extension == "torrent")
     {
         qDebug() << "Xmpp_client::job_finished WRITE : " << file_buffer.value(job->sid()).file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_buffer.value(job->sid()).file_name);
 
@@ -459,7 +460,7 @@ void Xmpp_client::job_finished (QXmppTransferJob *job)
         if (fsutils::isValidTorrentFile(file_path))
             QBtSession::instance()->addTorrent(file_path);
     }
-    else if (file_extension != "torrent")
+    else if (file_buffer.value(job->sid()).file_extension != "torrent")
     {
         qDebug() << "Xmpp_client::job_finished WRITE RAW : " <<  file_buffer.value(job->sid()).file_name << " TO " <<  QDir::toNativeSeparators(file_buffer.value(job->sid()).file_dir->absolutePath()+ QDir::separator() + file_buffer.value(job->sid()).file_name);
         QString file_path = file_buffer.value(job->sid()).file_dir->absolutePath() + QDir::separator() + file_buffer.value(job->sid()).file_name;

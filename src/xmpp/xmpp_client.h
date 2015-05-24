@@ -41,6 +41,7 @@
 
 
 struct File_data {
+    QString file_extension="";
     QDir *file_dir=NULL;
     QString file_name="";
     QBuffer *buffer=NULL;
