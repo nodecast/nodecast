@@ -412,7 +412,16 @@ void Xmpp_client::job_error(QXmppTransferJob::Error error)
 
 void Xmpp_client::job_finished (QXmppTransferJob *job)
 {
-    qDebug() << "Xmpp_client::job_finished : " << file_name;
+
+    if (!file_buffer.contains(job->sid()))
+    {
+        qDebug() << "Xmpp_client::job_finished NOT FOUND : " << job->sid();
+        job->deleteLater();
+        return;
+    }
+
+
+    qDebug() << "Xmpp_client::job_finished : " << file_buffer.value(job->sid()).file_name;
 
 
     if (file_extension == "torrent")
