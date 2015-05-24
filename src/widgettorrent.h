@@ -41,6 +41,7 @@ struct Torrent_data {
     QString hash="";
     QString extension="";
     bool is_torrent=true;
+    QString transfer_sid="";
 };
 
 

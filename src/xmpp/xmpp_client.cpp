@@ -109,21 +109,28 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
 
     check = connect(this, SIGNAL(connected()),
                     SLOT(connectedToServer()));
+    Q_ASSERT(check);
 
 
     check = connect(this, SIGNAL(disconnected()),
                     SLOT(disconnectedToServer()));
-
+    Q_ASSERT(check);
 
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
                     SLOT(connectedError()));
+    Q_ASSERT(check);
 
 
 
     check = connect(transfer_manager, SIGNAL(fileReceived(QXmppTransferJob*)),
                              SLOT(file_received(QXmppTransferJob*)));
+    Q_ASSERT(check);
 
+
+    check = connect(transfer_manager, SIGNAL(jobFinished(QXmppTransferJob*)),
+                             SLOT(job_finished(QXmppTransferJob*)));
+    Q_ASSERT(check);
 
 
     check = connect(&this->vCardManager(),
@@ -146,9 +153,7 @@ Xmpp_client::Xmpp_client(QString a_login, QString a_password, int a_xmpp_client_
     Q_ASSERT(check);
 
 
-    /*check = connect(manager, SIGNAL(jobFinished(QXmppTransferJob*)),
-                             SLOT(job_finished(QXmppTransferJob*)));
-*/
+
 
     //this->logger()->setLoggingType(QXmppLogger::StdoutLogging);
 
@@ -384,59 +389,57 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(job_error(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()), this, SLOT(job_finished()));
-    Q_ASSERT(check);
 
-//    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
-//    Q_ASSERT(check);
+
+    File_data file_data;
+    file_data.buffer = new QBuffer(this);
+    file_data.file_name = file_name;
+    file_data.file_dir = file_dir;
+    file_buffer.insert(job->sid(), file_data);
 
     // allocate a buffer to receive the file
-    m_buffer = new QBuffer(this);
-    m_buffer->open(QIODevice::WriteOnly);
-    job->accept(m_buffer);
+    file_data.buffer->open(QIODevice::WriteOnly);
+    job->accept(file_data.buffer);
 }
 
 void Xmpp_client::job_error(QXmppTransferJob::Error error)
 {
     qDebug() << "Transmission failed : " << error;
-}
-
-/// A file transfer has made progress.
-
-void Xmpp_client::job_progress(qint64 done, qint64 total)
-{
-    qDebug() << "Xmpp_client::job_progress Transmission progress:" << done << "/" << total;
-    emit emit_progress_rawfile(done, total);
+    global_mutex::thumbnail_mutex.unlock();
 }
 
 
-void Xmpp_client::job_finished ()
+
+void Xmpp_client::job_finished (QXmppTransferJob *job)
 {
-    qDebug() << "Xmpp_client::job_finished";
+    qDebug() << "Xmpp_client::job_finished : " << file_name;
 
 
     if (file_extension == "torrent")
     {
-        qDebug() << "Xmpp_client::job_finished WRITE : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
+        qDebug() << "Xmpp_client::job_finished WRITE : " << file_buffer.value(job->sid()).file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_buffer.value(job->sid()).file_name);
 
-        QFile file_torrent(file_dir->absolutePath() + QDir::separator() + file_name);
+        QFile file_torrent(file_buffer.value(job->sid()).file_dir->absolutePath() + QDir::separator() + file_buffer.value(job->sid()).file_name);
         if (!file_torrent.open(QIODevice::WriteOnly))
         {
-            m_buffer->close ();
-            delete m_buffer;
-            delete file_dir;
+            file_buffer.value(job->sid()).buffer->close();
+            delete file_buffer.value(job->sid()).buffer;
+            delete file_buffer.value(job->sid()).file_dir;
+            file_buffer.remove(job->sid());
+
             return;
         }
 
-        file_torrent.write(m_buffer->data());
+        file_torrent.write(file_buffer.value(job->sid()).buffer->data());
         file_torrent.close();
-        m_buffer->close ();
+        file_buffer.value(job->sid()).buffer->close();
 
         QFileInfo file_info(file_torrent.fileName());
         QString file_path = file_info.canonicalFilePath();
         qDebug() << "FILE PATH : " << file_path;
-        delete m_buffer;
-        delete file_dir;
+        delete file_buffer.value(job->sid()).buffer;
+        delete file_buffer.value(job->sid()).file_dir;
+        file_buffer.remove(job->sid());
 
         // archive file to torrents directory
         //QDir nodecast_datas;
@@ -449,30 +452,35 @@ void Xmpp_client::job_finished ()
     }
     else if (file_extension != "torrent")
     {
-        qDebug() << "Xmpp_client::job_finished WRITE RAW : " << file_name << " TO " <<  QDir::toNativeSeparators(file_dir->absolutePath()+ QDir::separator() + file_name);
-        QString file_path = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + QDir::separator() + file_name;
+        qDebug() << "Xmpp_client::job_finished WRITE RAW : " <<  file_buffer.value(job->sid()).file_name << " TO " <<  QDir::toNativeSeparators(file_buffer.value(job->sid()).file_dir->absolutePath()+ QDir::separator() + file_buffer.value(job->sid()).file_name);
+        QString file_path = file_buffer.value(job->sid()).file_dir->absolutePath() + QDir::separator() + file_buffer.value(job->sid()).file_name;
         QFile file_raw(file_path);
 
         if (!file_raw.open(QIODevice::WriteOnly))
         {
-            m_buffer->close ();
-            delete m_buffer;
-            delete file_dir;
+            file_buffer.value(job->sid()).buffer->close();
+            delete file_buffer.value(job->sid()).buffer;
+            delete file_buffer.value(job->sid()).file_dir;
+            file_buffer.remove(job->sid());
+
             return;
         }
-        file_raw.write(m_buffer->data());
+        file_raw.write(file_buffer.value(job->sid()).buffer->data());
         file_raw.close();
-        m_buffer->close ();
-        delete m_buffer;
-        delete file_dir;
+        file_buffer.value(job->sid()).buffer->close();
+        delete file_buffer.value(job->sid()).buffer;
+        delete file_buffer.value(job->sid()).file_dir;
+        file_buffer.remove(job->sid());
+
         global_mutex::thumbnail_mutex.unlock();
     }
     else
     {
         qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_name;
-        m_buffer->close ();
-        delete m_buffer;
-        delete file_dir;
+        file_buffer.value(job->sid()).buffer->close();
+        delete file_buffer.value(job->sid()).buffer;
+        delete file_buffer.value(job->sid()).file_dir;
+        file_buffer.remove(job->sid());
     }
 }
 

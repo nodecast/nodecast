@@ -283,7 +283,7 @@ void Widgettorrent::on_media_doubleClicked()
 
 void Widgettorrent::job_progress(qint64 done, qint64 total)
 {
-    qDebug() << "Widgettorrent::job_progress Transmission progress:" << done << "/" << total;
+    qDebug() << "Widgettorrent::job_progress Transmission progress : " << torrent_data.transfer_sid << " " << done << "/" << total;
 
     //float tmp = done * 100;
     //qDebug() << "PROGRESS float * 100 : " << m_torrent.name() << " : " << tmp;
@@ -297,11 +297,6 @@ void Widgettorrent::addFile(const QFileInfo &file, QXmppTransferJob *job)
 {
     qDebug() << "Widgettorrent::addFile";
     connect(this, SIGNAL(emit_title()), this, SLOT(on_media_doubleClicked()));
-    if (job)
-    {
-        bool check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
-        Q_ASSERT(check);
-    }
 
     m_title.setText(file.fileName());
     ui->label_title->setText(file.fileName());
@@ -310,6 +305,13 @@ void Widgettorrent::addFile(const QFileInfo &file, QXmppTransferJob *job)
     torrent_data.dirpath = file.absolutePath();
     torrent_data.is_torrent = false;
 
+    if (job)
+    {
+        torrent_data.transfer_sid = job->sid();
+
+        bool check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(job_progress(qint64,qint64)));
+        Q_ASSERT(check);
+    }
 
 
     qDebug() << "Widgettorrent::addFile save_path_parsed : " << file.absoluteFilePath();

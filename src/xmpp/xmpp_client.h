@@ -38,6 +38,17 @@
 #include "profileDialog.h"
 #include "global_mutex.h"
 
+
+
+struct File_data {
+    QDir *file_dir=NULL;
+    QString file_name="";
+    QBuffer *buffer=NULL;
+};
+
+
+
+
 class Xmpp_client : public QXmppClient
 {
     Q_OBJECT
@@ -82,7 +93,7 @@ private:
     int m_xmpp_client_port;
     QXmppLogger m_logger;
     QXmppPresence subscribe;
-    QBuffer *m_buffer;
+    QHash <QString, File_data> file_buffer;
     QString file_name;
     QXmppMucManager *muc_manager;
     QHash <QString, QXmppMucRoom*> rooms;
@@ -110,10 +121,9 @@ public slots:
 
 private slots:
     void disconnectedToServer();
-    void job_finished();
+    void job_finished(QXmppTransferJob *job);
     void file_received(QXmppTransferJob *job);
     void job_error(QXmppTransferJob::Error error);
-    void job_progress(qint64 done, qint64 total);
     void presenceChanged(const QString&, const QString&);
     void action_removeContact(const QString& bareJid);
     void statusTextChanged(const QString&);
