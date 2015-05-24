@@ -198,10 +198,9 @@ void Widgettorrent::on_media_doubleClicked()
 {
 
     // open with VLC if media type is a video or a directory
-    if (torrent_data.type == "video")
-    {
-
-        qDebug() << "LAUNCH PLAYER : ";
+//    if (torrent_data.type == "video")
+//    {
+//        qDebug() << "LAUNCH PLAYER : ";
 /*
         QString program;
         QStringList arguments;
@@ -220,6 +219,7 @@ void Widgettorrent::on_media_doubleClicked()
         videoPlayer->startDetached(program, arguments);
   */
 
+    /*
         QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
         QString path = QDir::toNativeSeparators(dir);
         qDebug() << "OPEN VIDEO TO : " << path;
@@ -248,6 +248,12 @@ void Widgettorrent::on_media_doubleClicked()
         qDebug() << "OPEN DIRECTORY : " << path;
         QDesktopServices::openUrl(QUrl("file:///" + path));
     }
+    */
+
+    QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
+    QString path = QDir::toNativeSeparators(dir);
+    qDebug() << "OPEN FILE/DIRECTORY : " << path;
+    QDesktopServices::openUrl(QUrl("file:///" + path));
 }
 
 
@@ -564,7 +570,7 @@ void updateThumbnail::run()
 
             if (imageFormat.size() != 0 && img.load(save_path))
             {
-                QPixmap thumbnail = img.scaled(100, 50, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+                QPixmap thumbnail = img.scaled(100, 50, Qt::KeepAspectRatio, Qt::FastTransformation);
                 m_ui->label_thumbnail->setPixmap(thumbnail);
             }
             m_torrent_data->type = "image";
