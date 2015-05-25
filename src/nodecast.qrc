@@ -125,5 +125,6 @@
         <file>img/32x32/file_extension/file_extension_xpi.png</file>
         <file>img/32x32/file_extension/file_extension_zip.png</file>
         <file>img/32x32/file_extension/file_extension_avi.png</file>
+        <file>img/16x16/add.png</file>
     </qresource>
 </RCC>
