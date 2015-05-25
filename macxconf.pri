@@ -38,8 +38,8 @@ QT_LANG_PATH = ../dist/qt-translations
 DIST_PATH = ../dist/mac
 
 document_icon.path = Contents/Resources
-document_icon.files = $$DIST_PATH/qBitTorrentDocument.icns
-QMAKE_BUNDLE_DATA += document_icon
+#document_icon.files = $$DIST_PATH/qBitTorrentDocument.icns
+#QMAKE_BUNDLE_DATA += document_icon
 
 qt_conf.path = Contents/Resources
 qt_conf.files = $$DIST_PATH/qt.conf
@@ -78,7 +78,7 @@ qt_translations.files = \
     $$QT_LANG_PATH/qt_zh_TW.qm
 QMAKE_BUNDLE_DATA += qt_translations
 
-ICON = $$DIST_PATH/qbittorrent_mac.icns
+ICON = $$DIST_PATH/nodecast.icns
 QMAKE_INFO_PLIST = $$DIST_PATH/Info.plist
 
 DEFINES += WITH_GEOIP_EMBEDDED

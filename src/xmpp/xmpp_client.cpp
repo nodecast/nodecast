@@ -310,7 +310,7 @@ void Xmpp_client::sendFile(const QString jid, const QString path)
 
 void Xmpp_client::file_received (QXmppTransferJob *job)
 {
-    file_name = job->fileName();
+    QString file_name = job->fileName();
     QString from_jid = job->jid();
     qint64 file_size = job->fileSize();
 
@@ -325,7 +325,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         job->abort();
         return;
     }
-    sphere_dest = from_jid.split("@").at(0);
+    QString sphere_dest = from_jid.split("@").at(0);
     QString from = from_jid.split("/").at(1);
 
     QXmppTransferFileInfo fileInfo = job->fileInfo();
@@ -346,7 +346,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
         return;
     }
     //QString extension = file_name.split(".").takeLast();
-    file_extension = fsutils::fileExtension(file_name);
+    QString file_extension = fsutils::fileExtension(file_name);
     qDebug() << "RECEIVE FILE WITH EXTENSION : " << file_extension;
 
 
@@ -486,7 +486,7 @@ void Xmpp_client::job_finished (QXmppTransferJob *job)
     }
     else
     {
-        qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_name;
+        qDebug() << "RECEIVE A NOT VALID TORRENT : " << file_buffer.value(job->sid()).file_name;
         file_buffer.value(job->sid()).buffer->close();
         delete file_buffer.value(job->sid()).buffer;
         delete file_buffer.value(job->sid()).file_dir;

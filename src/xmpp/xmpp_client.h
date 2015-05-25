@@ -95,7 +95,6 @@ private:
     QXmppLogger m_logger;
     QXmppPresence subscribe;
     QHash <QString, File_data> file_buffer;
-    QString file_name;
     QXmppMucManager *muc_manager;
     QHash <QString, QXmppMucRoom*> rooms;
     xmlConsoleDialog m_consoleDlg;
@@ -106,8 +105,6 @@ private:
     rosterItemModel *m_rosterItemModel;
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
     QDir *file_dir;
-    QString sphere_dest;
-    QString file_extension;
     QHash <QString, int> itemMapChat;
     QHash <int, QTextEdit*> chatroomMap;
     QHash <int, QLineEdit*> linechatMap;
