@@ -73,7 +73,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
     chat_room->setAcceptRichText(true);
 
     line_chat = new QLineEdit;
-
+    line_chat->setFocus();
     connect(line_chat, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
     scrollArea_users->setWidget(w_users_list);

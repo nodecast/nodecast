@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2015 Frederic Logier <fred@pcode.io> -->
+<component type="desktop">
+ <id>nodecast.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-3.0 and OpenSSL</project_license>
+ <name>nodecast</name>
+ <summary>Nodecast is a file sharing software using bittorrent protocol and based on qBitorrent code</summary>
+ <description>
+  <p>
+  Nodecast is a file sharing software using bittorrent protocol and based on
+  qBitorrent code. It aims to be really simple by using spheres and respectful
+  of private life.
+  </p>
+  <p>
+   It is programmed in C++ / Qt and uses libtorrent (sometimes called
+   libtorrent-rasterbar) by Arvid Norberg. GeoLite data, created by MaxMind,
+   are included in qBittorrent. Its features include:
+  </p>
+  <ul>
+   <li>All Bittorrent extensions (DHT, Peer Exchange, Full encryption, Magnet/BitComet URIs, ...)</li>
+   <li>UPnP / NAT-PMP port forwarding support</li>
+   <li>Sequential downloading (aka "Download in order")</li>
+  </ul>
+ </description>
+ <screenshots>
+  <screenshot type="default">
+   <image width="1518" height="942">
+    https://nodecast.files.wordpress.com/2015/05/nodecast2.png
+   </image>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">http://blog.nodecast.net/</url>
+ <updatecontact>fred@pcode.io</updatecontact>
+</component>

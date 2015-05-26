@@ -511,10 +511,10 @@ void Xmpp_client::connectedToServer()
     qDebug() << "Xmpp_client::connectedToServer";
     qDebug() << "Connection successfull !";
 
-    rooms.insert("nodecast", muc_manager->addRoom("nodecast@conference.nodecast.net"));
+/*    rooms.insert("nodecast", muc_manager->addRoom("nodecast@conference.nodecast.net"));
     rooms["nodecast"]->setNickName(Preferences().getNodecastNickname());
     rooms["nodecast"]->join();
-
+*/
     emit emit_connected(true);
 }
 

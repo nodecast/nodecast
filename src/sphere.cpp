@@ -130,7 +130,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
         }
 
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
-        check_dir = nodecast_datas.absolutePath() + "/" + sphere_data.directory;
+        check_dir = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory;
         if (!check_dir.exists())
         {
             nodecast_datas.mkdir(sphere_data.directory);
@@ -157,12 +157,24 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
         m_room = new Room(sphere_data, m_stacked_room);
 
-        ScanFoldersModel::instance()->addPath(nodecast_datas.absolutePath() + "/" + sphere_data.directory, true);
+        ScanFoldersModel::instance()->addPath(nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory, true);
         connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), this, SLOT(torrentsAdded(QStringList&)));
 
         break;
 
     case Sphere_scope::PUBLIC :
+        // check directory exist
+        if (sphere_data.directory.isEmpty())
+            sphere_data.directory = sphere_data.title;
+
+        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/public/";
+        check_dir = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory;
+        if (!check_dir.exists())
+        {
+            nodecast_datas.mkdir(sphere_data.directory);
+            nodecast_datas.mkdir(sphere_data.directory + "/torrents");
+        }
+
         m_color = new QColor(119,136,153);
 
         media_scroll = new QScrollArea();
@@ -174,8 +186,8 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
         media_scroll->setWidget(media_container);
 
         view = new QWebView();
-        view->settings()->setAttribute(QWebSettings::JavascriptEnabled, false);
-        view->settings()->setAttribute(QWebSettings::PluginsEnabled, false);
+        view->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+        view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
         view->settings()->setAttribute(QWebSettings::ZoomTextOnly, true);
         view->settings()->setAttribute(QWebSettings::AutoLoadImages, true);
         view->settings()->setAttribute(QWebSettings::NotificationsEnabled, false);
@@ -188,6 +200,10 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
         index_tab = parent->addWidget(hSplitter);
         qDebug() << "INDEX TAB : " << index_tab;
+
+        m_room = new Room(sphere_data, m_stacked_room);
+        ScanFoldersModel::instance()->addPath(nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory, true);
+        connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), this, SLOT(torrentsAdded(QStringList&)));
 
         break;
 
@@ -307,7 +323,7 @@ void Sphere::dropEvent(QDropEvent* event)
 
         m_room->send_invitation(jids);
     }
-    else if (event->mimeData()->hasUrls())
+    else if (event->mimeData()->hasUrls() && sphere_data.scope == Sphere_scope::PRIVATE)
     {
 
         QList<QUrl> droppedUrls = event->mimeData()->urls();
@@ -538,7 +554,7 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
         QDir nodecast_datas;
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
-        path_dest = nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/torrents/" + fi_torrent.fileName();
+        path_dest = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory + "/torrents/" + fi_torrent.fileName();
         QFile::copy(fi_torrent.absoluteFilePath(), path_dest);
     }
 

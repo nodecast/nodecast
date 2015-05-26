@@ -157,17 +157,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 //    sphere_tab.insert( m_spheres_public[halloffame.title]->index_tab, m_spheres_public[halloffame.title]);
 
 
-    Sphere_data debian;
-    debian.title =  "debian";
-    debian.scope = Sphere_scope::PUBLIC;
-    debian.url = "http://debian.org";
-    debian.directory = "";
-    m_spheres_public.insert(debian.title, new Sphere(debian, m_stacked_tab_room, m_stacked_tab_medias) );
-    ui->verticalLayout_spherepublic->addWidget(m_spheres_public[debian.title]);
-    connect(m_spheres_public[debian.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
-    sphere_tab.insert( m_spheres_public[debian.title]->index_tab, m_spheres_public[debian.title]);
+    Sphere_data nodecast;
+    nodecast.title =  "nodecast";
+    nodecast.scope = Sphere_scope::PUBLIC;
+    nodecast.url = "http://blog.nodecast.net";
+    m_spheres_public.insert(nodecast.title, new Sphere(nodecast, m_stacked_tab_room, m_stacked_tab_medias) );
+    ui->verticalLayout_spherepublic->addWidget(m_spheres_public[nodecast.title]);
+    connect(m_spheres_public[nodecast.title], SIGNAL(row(int)), this, SLOT(changePage(int)));
+    sphere_tab.insert( m_spheres_public[nodecast.title]->index_tab, m_spheres_public[nodecast.title]);
+    m_spheres_public[nodecast.title]->populate();
 
-    //m_spheres_public.last()->populate();
 
 
     hSplitter->insertWidget(0, m_stacked_tab_medias);
@@ -239,6 +238,8 @@ void MainWindow::mapRoom(QString room_name, QXmppMucRoom *room)
     //QString sphere_name = room_name.split("_").at(0);
     if (m_spheres_private.contains(room_name))
         m_spheres_private.value(room_name)->connectRoom(room);
+    else if (m_spheres_public.contains(room_name))
+        m_spheres_public.value(room_name)->connectRoom(room);
 }
 
 
@@ -291,7 +292,7 @@ void MainWindow::receiveMessageChat(QString from, QString message)
 
     if (!from.contains("@")) return;
     QString room_dest = from.split("@").at(0);
-    if (!room_dest.contains("_")) return;
+//    if (!room_dest.contains("_")) return;
 
     // message from a user's room
     if (from.contains("/"))
@@ -299,6 +300,8 @@ void MainWindow::receiveMessageChat(QString from, QString message)
         //QString from_login = from.split("/").at(1);
         if (m_spheres_private.contains(room_dest))
             m_spheres_private.value(room_dest)->receive_message(from, message);
+        else if (m_spheres_public.contains(room_dest))
+            m_spheres_public.value(room_dest)->receive_message(from, message);
     }
 }
 
@@ -312,27 +315,55 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
     if (status)
     {
         ui->pushButton_spherenew->setEnabled(true);
+        QList <QString> keys;
 
+        // PRIVATE SPHERES
 
-        QList <QString> keys = m_spheres_private.keys();
-        qDebug() << "KEYS : " << keys;
+        keys = m_spheres_private.keys();
+        qDebug() << "KEYS SPHERES PRIVATE : " << keys;
 
-        QHashIterator<QString, Sphere*> sphere(m_spheres_private);
-        while (sphere.hasNext()) {
-            sphere.next();
-            qDebug() << "DIR " << sphere.value()->getDirectory();
+        QHashIterator<QString, Sphere*> sphere_private(m_spheres_private);
+        while (sphere_private.hasNext()) {
+            sphere_private.next();
+            qDebug() << "DIR " << sphere_private.value()->getDirectory();
 
 
      //   foreach(QString key, keys)
      //   {
           //  qDebug() << " DIR : " << m_spheres_private[key]->get_directory();
-            if (sphere.value()->isScopePrivate())
-                Xmpp_client::instance()->connectToRoom(sphere.value()->getDirectory());
+            if (sphere_private.value()->isScopePrivate())
+                Xmpp_client::instance()->connectToRoom(sphere_private.value()->getDirectory());
         }
+
+
+
+        // PUBLIC SPHERES
+
+        keys = m_spheres_public.keys();
+        qDebug() << "KEYS SPHERES PUBLIC : " << keys;
+
+        QHashIterator<QString, Sphere*> sphere_public(m_spheres_public);
+        while (sphere_public.hasNext()) {
+            sphere_public.next();
+            qDebug() << "DIR " << sphere_public.value()->getDirectory();
+
+
+     //   foreach(QString key, keys)
+     //   {
+          //  qDebug() << " DIR : " << m_spheres_private[key]->get_directory();
+            if (sphere_public.value()->isScopePublic())
+                Xmpp_client::instance()->connectToRoom(sphere_public.value()->getDirectory());
+        }
+
+
     }
     else
     {
         foreach (Sphere *sphere , m_spheres_private)
+        {
+            sphere->flushRoom();
+        }
+        foreach (Sphere *sphere , m_spheres_public)
         {
             sphere->flushRoom();
         }
@@ -608,6 +639,11 @@ void MainWindow::shutdownCleanUp()
     //qDebug() << "godcast_api deleted";
 
     foreach (Sphere *sphere, m_spheres_private)
+    {
+        delete sphere;
+    }
+
+    foreach (Sphere *sphere, m_spheres_public)
     {
         delete sphere;
     }

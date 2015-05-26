@@ -22,7 +22,7 @@ os2: include(../os2conf.pri)
 include(libs/qxmpp/qxmpp.pri)
 
 
-QT += xml svg
+QT += xml
 CONFIG(static) {
   DEFINES += QBT_STATIC_QT
   QTPLUGIN += qico
