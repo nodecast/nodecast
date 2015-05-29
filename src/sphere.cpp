@@ -337,13 +337,13 @@ void Sphere::dropEvent(QDropEvent* event)
            if(fileInfo.isFile())
            {
                QString extension = fsutils::fileExtension(fileInfo.fileName());
-               qDebug() << "EXTENSION FILE : " << extension;
+               qDebug() << "Sphere::dragEnterEvent EXTENSION FILE : " << extension;
 
                if (extension == "torrent")
                {
                    if (!fsutils::isValidTorrentFile(localPath))
                    {
-                       qDebug() << "torrent is not valid : " << fileInfo.fileName();
+                       qDebug() << "Sphere::dropEvent torrent is not valid : " << fileInfo.fileName();
                        return;
                    }
 
@@ -555,6 +555,7 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
         QDir nodecast_datas;
         nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
         path_dest = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory + "/torrents/" + fi_torrent.fileName();
+        qDebug() << " TO : " << path_dest;
         QFile::copy(fi_torrent.absoluteFilePath(), path_dest);
     }
 
@@ -626,19 +627,24 @@ void Sphere::torrentsAdded(QStringList &torrents)
     {
         qDebug() << "torrentsAdded TORRENT : " << torrent;
 
-        if (!torrent.contains(sphere_data.directory))
+        QFileInfo torrent_info(torrent);
+        QString take_lastdir = torrent_info.dir().dirName();
+
+        qDebug() << "LAST DIR : " << take_lastdir;
+
+        if (take_lastdir != sphere_data.directory)
         {
-            qDebug() << "THIS TORRENT IS NOT FOR MINE !! : " << torrent;
+            qDebug() << "THIS TORRENT IS NOT FOR MINE !! : " << sphere_data.directory << " TORRENT:  " << torrent;
             continue;
         }
 
         if (!fsutils::isValidTorrentFile(torrent))
         {
-            qDebug() << "torrent is not valid : " << torrent;
+            qDebug() << "Sphere::torrentsAdded torrent is not valid : " << torrent;
             fsutils::forceRemove(torrent);
-            return;
         }
-        addTorrent(torrent, true);
+        else
+            addTorrent(torrent, true);
     }
 }
 
