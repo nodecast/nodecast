@@ -196,7 +196,7 @@ class QMPProcess : public QProcess
 		{
 			resetValues();
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 			m_mode = QMPwidget::EmbeddedMode;
 			m_videoOutput = "directx,directx:noaccel";
 #elif defined(Q_WS_X11)
@@ -206,7 +206,7 @@ class QMPProcess : public QProcess
  #else
 			m_videoOutput = "xv";
  #endif
-#elif defined(Q_WS_MAC)
+#elif defined(Q_OS_MAC)
 			m_mode = QMPwidget::PipeMode;
  #ifdef QT_OPENGL_LIB
 			m_videoOutput = "gl,quartz";
@@ -274,7 +274,7 @@ class QMPProcess : public QProcess
 				myargs += "-input";
 				myargs += "nodefault-bindings:conf=/dev/null";
 			} else {
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN
 				// Ugly hack for older versions of mplayer (used in kmplayer and other)
 				if (m_fakeInputconf == NULL) {
 					m_fakeInputconf = new QTemporaryFile();

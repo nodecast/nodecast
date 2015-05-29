@@ -82,7 +82,7 @@ TorrentCreatorDlg::~TorrentCreatorDlg() {
 //  QString dir = QFileDialog::getExistingDirectory(this, tr("Select a folder to add to the torrent"), last_path, QFileDialog::ShowDirsOnly);
 //  if (!dir.isEmpty()) {
 //    settings.setValue("CreateTorrent/last_add_path", dir);
-//#if defined(Q_WS_WIN) || defined(Q_OS_OS2)
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
 //    dir.replace("/", "\\");
 //#endif
 //    textInputPath->setText(dir);
@@ -98,7 +98,7 @@ TorrentCreatorDlg::~TorrentCreatorDlg() {
 //  QString file = QFileDialog::getOpenFileName(this, tr("Select a file to add to the torrent"), last_path);
 //  if (!file.isEmpty()) {
 //    settings.setValue("CreateTorrent/last_add_path", fsutils::branchPath(file));
-//#if defined(Q_WS_WIN) || defined(Q_OS_OS2)
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
 //    file.replace("/", "\\");
 //#endif
 //    textInputPath->setText(file);

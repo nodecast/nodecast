@@ -201,7 +201,7 @@ public:
     setValue("Preferences/General/PreventFromSuspend", b);
   }
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
   bool Startup() const {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     return settings.contains("nodecast");
@@ -1279,7 +1279,7 @@ public:
     setValue(QString::fromUtf8("Preferences/Advanced/DisableRecursiveDownload"), disable);
   }
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
   static QString getPythonPath() {
     QString path = pythonSearchReg(USER);
     if (path.isEmpty())
@@ -1390,7 +1390,7 @@ public:
     setValue(QString::fromUtf8("Preferences/Advanced/trackerPort"), port);
   }
 
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   bool isUpdateCheckEnabled() const {
     return value(QString::fromUtf8("Preferences/Advanced/updateCheck"), true).toBool();
   }

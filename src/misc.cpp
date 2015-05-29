@@ -49,7 +49,7 @@
 #include <QDesktopWidget>
 #endif
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #include <windows.h>
 #include <PowrProf.h>
 const int UNLEN = 256;
@@ -58,7 +58,7 @@ const int UNLEN = 256;
 #include <sys/types.h>
 #endif
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include <CoreServices/CoreServices.h>
 #include <Carbon/Carbon.h>
 #endif
@@ -171,7 +171,7 @@ void misc::shutdownComputer(shutDownAction action) {
     halIface.call("Shutdown");
   }
 #endif
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
   AEEventID EventToSend;
   if (action != SHUTDOWN_COMPUTER)
     EventToSend = kAESleep;
@@ -212,7 +212,7 @@ void misc::shutdownComputer(shutDownAction action) {
 
   AEDisposeDesc(&eventReply);
 #endif
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
   HANDLE hToken;              // handle to process token
   TOKEN_PRIVILEGES tkp;       // pointer to token structure
   if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
@@ -508,7 +508,7 @@ QString misc::userFriendlyDuration(qlonglong seconds) {
 
 QString misc::getUserIDString() {
   QString uid = "0";
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
   char buffer[UNLEN+1] = {0};
   DWORD buffer_len = UNLEN + 1;
   if (!GetUserNameA(buffer, &buffer_len))

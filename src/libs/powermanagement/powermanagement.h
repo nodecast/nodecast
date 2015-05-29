@@ -33,7 +33,7 @@
 
 #include <QObject>
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 // Require Mac OS X >= 10.5
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #endif
@@ -62,7 +62,7 @@ private:
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
   PowerManagementInhibitor *m_inhibitor;
 #endif
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
   IOPMAssertionID m_assertionID;
 #endif
 };

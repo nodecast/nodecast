@@ -404,6 +404,8 @@ void MainWindow::changePage(int index)
             m_stacked_tab_room->setCurrentIndex(room_index);
         else m_stacked_tab_room->hide();
 
+        if (sphere_tab[index]->isScopePublic())
+            sphere_tab[index]->reloadWeb();
     }
 
     qDebug() << "QStackedWidget index : " << index;
@@ -592,14 +594,14 @@ void MainWindow::loadPreferences(bool configure_session) {
 
   if (configure_session)
     QBtSession::instance()->configureSession();
-
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+/*
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   if (pref.isUpdateCheckEnabled())
     checkProgramUpdate();
   else
     programUpdateTimer.stop();
 #endif
-
+*/
   qDebug("GUI settings loaded");
 }
 

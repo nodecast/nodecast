@@ -18,7 +18,7 @@ enum AdvSettingsRows {DISK_CACHE,
                       DISK_CACHE_TTL,
                     #endif
                       OS_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, RESOLVE_HOSTS, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, NETWORK_LISTEN_IPV6, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
-                    #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+                    #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
                       UPDATE_CHECK,
                     #endif
                     #if defined(Q_WS_X11)
@@ -40,7 +40,7 @@ private:
 #if LIBTORRENT_VERSION_NUM >= 1610
   QSpinBox spin_cache_ttl;
 #endif
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   QCheckBox cb_update_check;
 #endif
 #if defined(Q_WS_X11)
@@ -119,7 +119,7 @@ public slots:
     // Tracker
     pref.setTrackerEnabled(cb_tracker_status.isChecked());
     pref.setTrackerPort(spin_tracker_port.value());
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     pref.setUpdateCheckEnabled(cb_update_check.isChecked());
 #endif
     // Icon theme
@@ -278,7 +278,7 @@ private slots:
     spin_tracker_port.setMaximum(65535);
     spin_tracker_port.setValue(pref.getTrackerPort());
     setRow(TRACKER_PORT, tr("Embedded tracker port"), &spin_tracker_port);
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     cb_update_check.setChecked(pref.isUpdateCheckEnabled());
     setRow(UPDATE_CHECK, tr("Check for software updates"), &cb_update_check);
 #endif
