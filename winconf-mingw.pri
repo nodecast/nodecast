@@ -11,7 +11,7 @@ strace_win:{
   LIBS += libdbghelp
 }
 
-RC_FILE = qbittorrent_mingw.rc
+#RC_FILE = nodecast_mingw.rc
 
 #You need to link with libtorrent > 0.15.5 (or svn) and you must
 #configure libtorrent to use iconv in the building process. This is

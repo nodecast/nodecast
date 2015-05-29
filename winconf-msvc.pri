@@ -13,7 +13,7 @@ strace_win:{
 
 QMAKE_LFLAGS += "/OPT:REF /OPT:ICF"
 
-RC_FILE = qbittorrent.rc
+RC_FILE = nodecast.rc
 
 # Enable Wide characters
 DEFINES += TORRENT_USE_WPATH
@@ -31,3 +31,4 @@ LIBS += advapi32.lib shell32.lib crypt32.lib User32.lib
 LIBS += libeay32.lib ssleay32.lib
 LIBS += PowrProf.lib
 LIBS += zlib.lib
+LIBS += qxmpp.lib

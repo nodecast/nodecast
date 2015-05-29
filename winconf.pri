@@ -1,18 +1,27 @@
 # Adapt these paths on Windows
 
 #Point this to the boost include folder
-INCLUDEPATH += $$quote(C:/qBittorrent/boost_1_51_0)
+INCLUDEPATH += $$quote(C:/nodecast/boost)
 #Point this to the libtorrent include folder
-INCLUDEPATH += $$quote(C:/qBittorrent/RC_0_16/include)
+INCLUDEPATH += $$quote(C:/nodecast/libtorrent/include)
 #Point this to the zlib include folder
-INCLUDEPATH += $$quote(C:/qBittorrent/Zlib/include)
+INCLUDEPATH += $$quote(C:/nodecast/zlib/include)
+
+
+INCLUDEPATH += $$quote(C:/nodecast/qxmpp/src/base)
+INCLUDEPATH += $$quote(C:/nodecast/qxmpp/src/client)
+
 
 #Point this to the boost lib folder
-LIBS += $$quote(-LC:/qBittorrent/boost_1_51_0/stage/lib)
+LIBS += $$quote(-LC:/nodecast/boost/stage/lib)
 #Point this to the libtorrent lib folder
-LIBS += $$quote(-LC:/qBittorrent/RC_0_16/bin/<path-according-to-the-build-options-chosen>)
+LIBS += $$quote(-LC:/nodecast/libtorrent/stage/lib)
 #Point this to the zlib lib folder
-LIBS += $$quote(-LC:/qBittorrent/Zlib/lib)
+LIBS += $$quote(-LC:/nodecast/zlib/lib)
+
+DEFINES += QXMPP_STATIC
+QXMPP_LIBRARY_TYPE = staticlib
+
 
 # LIBTORRENT DEFINES
 DEFINES += BOOST_ALL_NO_LIB
@@ -26,7 +35,7 @@ DEFINES += _UNICODE
 DEFINES += WIN32
 DEFINES += _WIN32
 DEFINES += WIN32_LEAN_AND_MEAN
-DEFINES += _WIN32_WINNT=0x0500
+DEFINES += _WIN32_WINNT=0x0501
 DEFINES += _WIN32_IE=0x0500
 DEFINES += _CRT_SECURE_NO_DEPRECATE
 DEFINES += _SCL_SECURE_NO_DEPRECATE
