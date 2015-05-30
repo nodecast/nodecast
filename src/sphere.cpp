@@ -55,7 +55,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
    // content = new QWidget(parent);
 
-    nb_torrent = 0;
+    nb_media = 0;
     m_room = NULL;
 
     qDebug() << "NEW SPHERE DIRECTORY : " << sphere_data.directory;
@@ -379,6 +379,7 @@ void Sphere::dropEvent(QDropEvent* event)
                    connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
                    wt->addFile(target_link);
                    flowLayout->addWidget(wt);
+                   nb_media++;
                }
                else
                {
@@ -492,8 +493,8 @@ void Sphere::mousePressEvent(QMouseEvent *e)
 void Sphere::populate()
 {
     qDebug() << "Sphere::polulate";   
-    nb_torrent = Widgettorrent::populate(sphere_data, flowLayout);
-    media_label_counter->setText(QString::number(nb_torrent));
+    nb_media = Widgettorrent::populate(sphere_data, flowLayout);
+    media_label_counter->setText(QString::number(nb_media));
 }
 
 
@@ -577,8 +578,8 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
     // add torrent to seed file
     QBtSession::instance()->addTorrent(path, fromScanDir);
-    nb_torrent++;
-    media_label_counter->setText(QString::number(nb_torrent));
+    nb_media++;
+    media_label_counter->setText(QString::number(nb_media));
 }
 
 
@@ -596,6 +597,7 @@ void Sphere::addFile(const QString &file_path, QXmppTransferJob *job)
     connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
     wt->addFile(fileInfo, job);
     flowLayout->addWidget(wt);
+    nb_media++;
 }
 
 
@@ -698,9 +700,9 @@ void Sphere::deleteSelectedSphere() {
         {
             qDebug() << "Sphere::deleteSelectedSphere : "  << sphere_data.title;
 
-            if (nb_torrent > 0)
+            if (nb_media > 0)
             {
-                QMessageBox::warning(this, tr("Failure"), tr("please delete %1 torrent(s) before.").arg(nb_torrent));
+                QMessageBox::warning(this, tr("Failure"), tr("please delete %1 torrent(s) before.").arg(nb_media));
                 return;
             }
             else
@@ -751,8 +753,8 @@ void Sphere::renameSelectedSphere()
 
 void Sphere::deleted_torrent()
 {
-    if (nb_torrent > 0) nb_torrent--;
-    media_label_counter->setText(QString::number(nb_torrent));
+    if (nb_media > 0) nb_media--;
+    media_label_counter->setText(QString::number(nb_media));
 }
 
 QGroupBox * Sphere::getRoomWidget()

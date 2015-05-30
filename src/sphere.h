@@ -102,7 +102,7 @@ private:
     Preferences prefs;
     Room *m_room;
     ScanFoldersModel *m_scanFolders;
-    int nb_torrent;
+    int nb_media;
 
 
     QWidget *widget_container;
