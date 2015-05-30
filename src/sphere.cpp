@@ -538,6 +538,7 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     connect(wt, SIGNAL(emit_deleted(QWidget*)), flowLayout, SLOT(delItem(QWidget*)));
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
+    nb_media++;
 }
 
 
