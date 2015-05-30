@@ -37,7 +37,8 @@
 #include "qbtsession.h"
 #include "profileDialog.h"
 #include "global_mutex.h"
-
+#include "chatGraphicsView.h"
+#include "chatGraphicsScene.h"
 
 
 struct File_data {
@@ -106,7 +107,8 @@ private:
     rosterItemSortFilterProxyModel *m_rosterItemSortFilterModel;
     QDir *file_dir;
     QHash <QString, int> itemMapChat;
-    QHash <int, QTextEdit*> chatroomMap;
+    //QHash <int, QTextEdit*> chatroomMap;
+    QHash <int, chatGraphicsView*> chatroomMap;
     QHash <int, QLineEdit*> linechatMap;
 
 

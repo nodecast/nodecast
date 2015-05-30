@@ -588,7 +588,8 @@ void Xmpp_client::messageReceived(const QXmppMessage& message)
         else if (itemMapChat.contains(jid))
         {
             int stacked_index = itemMapChat.value(jid);
-            chatroomMap.value(stacked_index)->append(QXmppUtils::jidToUser(jid) + " : " + message.body());
+            //chatroomMap.value(stacked_index)->append(QXmppUtils::jidToUser(jid) + " : " + message.body());
+            chatroomMap.value(stacked_index)->addMessage(QXmppUtils::jidToUser(jid), message.body());
         }
     }
 }
@@ -955,6 +956,21 @@ void Xmpp_client::new_chat(const QString& bareJid)
 
     QLabel *jid = new QLabel;
     jid->setText(bareJid);
+
+
+    chatGraphicsView* m_view = new chatGraphicsView;
+    chatGraphicsScene* m_scene = new chatGraphicsScene;
+    m_view->setChatGraphicsScene(m_scene);
+
+    QFont font;
+    font.setBold(true);
+    QFontMetrics fontMetrics(font);
+    QRect rect = fontMetrics.boundingRect(bareJid);
+    int width = rect.width();
+    m_scene->setBoxStartLength(width);
+
+
+
     QTextEdit *chat_room = new QTextEdit;
     chat_room->setAcceptRichText(true);
     chat_room->setReadOnly(true);
@@ -962,13 +978,16 @@ void Xmpp_client::new_chat(const QString& bareJid)
     connect(line_chat, SIGNAL(returnPressed()), this, SLOT(sendMessageToJid()));
 
     box_chat->addWidget(jid);
-    box_chat->addWidget(chat_room);
+    //box_chat->addWidget(chat_room);
+    box_chat->addWidget(m_view);
+
     box_chat->addWidget(line_chat);
     groupBox->setLayout(box_chat);
 
     int tab_index = m_stacked_tab_chat->addWidget(groupBox);
     itemMapChat.insert(bareJid, tab_index);
-    chatroomMap.insert(tab_index, chat_room);
+    //chatroomMap.insert(tab_index, chat_room);
+    chatroomMap.insert(tab_index, m_view);
     linechatMap.insert(tab_index, line_chat);
 }
 
@@ -1028,7 +1047,8 @@ void Xmpp_client::sendMessageToJid()
 
 
     this->sendMessage(jid, message);
-    chatroomMap.value(stacked_index)->append("Me : " + message);
+    //chatroomMap.value(stacked_index)->append("Me : " + message);
+    chatroomMap.value(stacked_index)->addMessage("Me", message);
     linechatMap.value(stacked_index)->clear();
 }
 

@@ -73,9 +73,8 @@ void rosterListView::mousePressed(const QModelIndex& index)
     {
         QString bareJid = index.data().toString();
         QMenu menu(this);
-        menu.addAction(&m_chat);
-        menu.setDefaultAction(&m_chat);
         menu.addAction(&m_profile);
+        menu.setDefaultAction(&m_profile);
         menu.addAction(&m_removeContact);
         menu.exec(QCursor::pos());
     }
