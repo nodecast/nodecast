@@ -581,8 +581,6 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 
     // add torrent to seed file
     QBtSession::instance()->addTorrent(path, fromScanDir);
-    nb_media++;
-    media_label_counter->setText(QString::number(nb_media));
 }
 
 
