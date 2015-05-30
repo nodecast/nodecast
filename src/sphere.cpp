@@ -380,6 +380,7 @@ void Sphere::dropEvent(QDropEvent* event)
                    wt->addFile(target_link);
                    flowLayout->addWidget(wt);
                    nb_media++;
+                   media_label_counter->setText(QString::number(nb_media));
                }
                else
                {
@@ -539,6 +540,7 @@ void Sphere::addTorrent(const QTorrentHandle &h)
     wt->addTorrent(h);
     flowLayout->addWidget(wt);
     nb_media++;
+    media_label_counter->setText(QString::number(nb_media));
 }
 
 
@@ -599,6 +601,7 @@ void Sphere::addFile(const QString &file_path, QXmppTransferJob *job)
     wt->addFile(fileInfo, job);
     flowLayout->addWidget(wt);
     nb_media++;
+    media_label_counter->setText(QString::number(nb_media));
 }
 
 
