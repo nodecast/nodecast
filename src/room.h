@@ -58,7 +58,9 @@ public:
     int index_tab;
     void setXMPPRoom(QXmppMucRoom* room);
     void joinXMPPRoom();
+    void leaveXMPPRoom();
     void flushRoom();
+    bool isJoined();
     QGroupBox* getWidget() { return groupBox;}
     QStringList get_users();
     QString get_name() { return sphere_data.title;}

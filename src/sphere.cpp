@@ -665,6 +665,15 @@ void Sphere::displayListMenu() {
     QAction actionRename(IconProvider::instance()->getIcon("edit-rename"), tr("Rename..."), 0);
     connect(&actionRename, SIGNAL(triggered()), this, SLOT(renameSelectedSphere()));
 
+
+    QAction actionLeave(IconProvider::instance()->getIcon("user-group-delete"), tr("Leave sphere"), 0);
+    connect(&actionLeave, SIGNAL(triggered()), this, SLOT(leaveSelectedSphere()));
+
+
+    QAction actionJoin(IconProvider::instance()->getIcon("user-group-new"), tr("Join sphere"), 0);
+    connect(&actionJoin, SIGNAL(triggered()), this, SLOT(joinSelectedSphere()));
+
+
     QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), 0);
     connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedSphere()));
     // End of actions
@@ -675,6 +684,15 @@ void Sphere::displayListMenu() {
     listMenu.addAction(&actionRename);
 
     listMenu.addSeparator();
+
+
+    if (m_room && m_room->isJoined())
+        listMenu.addAction(&actionLeave);
+    else if (m_room)
+        listMenu.addAction(&actionJoin);
+    listMenu.addSeparator();
+
+
     listMenu.addAction(&actionDelete);
     listMenu.addSeparator();
 
@@ -684,6 +702,41 @@ void Sphere::displayListMenu() {
 }
 
 
+
+
+void Sphere::leaveSelectedSphere() {
+    QString message = "are you sure you want to leave <B>%1</B> sphere ?";
+
+    int retButton = QMessageBox::question(
+            new QWidget, "leave sphere", message.arg(sphere_data.title),
+            QMessageBox::Yes, QMessageBox::No);
+
+    switch(retButton)
+    {
+    case QMessageBox::Yes:
+        {
+            qDebug() << "Sphere::leaveSelectedSphere : "  << sphere_data.title;
+            m_room->leaveXMPPRoom();
+            m_color = new QColor(192, 31, 20);
+        }
+        break;
+    case QMessageBox::No:
+        {
+            return;
+        }
+        break;
+    default:
+        break;
+    }
+
+}
+
+
+void Sphere::joinSelectedSphere() {
+    qDebug() << "Sphere::joinSelectedSphere : "  << sphere_data.title;
+    m_room->joinXMPPRoom();
+    m_color = new QColor(105,105,105);
+}
 
 
 void Sphere::deleteSelectedSphere() {

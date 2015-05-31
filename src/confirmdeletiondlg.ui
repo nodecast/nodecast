@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>128</height>
+    <height>139</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Deletion confirmation - qBittorrent</string>
+   <string>Deletion confirmation - nodecast</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

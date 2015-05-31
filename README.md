@@ -26,6 +26,10 @@ brew install boost openssl libtorrent-rasterbar pkg-config
 COMPILE :
 ========
 
+git clone https://github.com/nodecast/nodecast.git
+
+cd nodecast
+
 git submodule update --init
 
 cd src/libs/qxmpp/
@@ -41,16 +45,18 @@ qmake && make (make -j 4 if you have a quad core)
 Mac OSX :
 ========
 
-mkdir -p src/nodecast.app/Contents/PlugIns/platforms
+cp /usr/local/lib/libqxmpp.0.8.3.dylib nodecast.app/Contents/Frameworks/libqxmpp.0.dylib
 
-cp /Users/youraccount/Qt/5.4/clang_64/plugins/platforms/libqcocoa.dylib src/nodecast.app/Contents/PlugIns/platforms
+macdeployqt nodecast.app
+
+cp -r nodecast.app /Applications/
 
 USE
 ====
 
 Nodecast / Login to setup your xmpp account
 
-You have to use an xmpp account with file transfert capability and open to Server2Server (not gmail account). You can use your own jabber server like prosody.im.
+You have to use an xmpp account with file transfert capability and open to Server2Server (gmail account should work). You can use your own jabber server like prosody.im.
 
 Nodecast / Preferences to setup bittorrent and active the embedded tracker in the advanced setting
 

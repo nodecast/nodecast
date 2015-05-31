@@ -127,7 +127,8 @@ private slots:
     void addTorrent(QString path, bool fromScandir);
     void torrentsAdded(QStringList &torrents);
 
-
+    void leaveSelectedSphere();
+    void joinSelectedSphere();
     void deleteSelectedSphere();
     void openSelectedSphereFolder() const;
     void renameSelectedSphere();

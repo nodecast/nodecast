@@ -219,6 +219,14 @@ void Room::flushRoom()
 }
 
 
+bool Room::isJoined()
+{
+    if (m_room && m_room->isJoined())
+        return true;
+    else return false;
+}
+
+
 void Room::setXMPPRoom(QXmppMucRoom* room)
 {
     qDebug() << "Room::setXMPPRoom";
@@ -232,10 +240,28 @@ void Room::setXMPPRoom(QXmppMucRoom* room)
 
 void Room::joinXMPPRoom()
 {
-    qDebug() << "ROOM JOIN : " << m_room->name();
-    if (m_room) m_room->join();
+    if (m_room && !m_room->isJoined())
+    {
+        qDebug() << "ROOM JOIN : " << m_room->name();
+
+        m_room->join();
+        line_chat->setEnabled(true);
+    }
 }
 
+
+void Room::leaveXMPPRoom()
+{
+    if (m_room && m_room->isJoined())
+    {
+        qDebug() << "ROOM LEAVE : " << m_room->name();
+
+        m_room->leave("I'll be back");
+        w_users_list->clear();
+        chat_room->clear();
+        line_chat->setEnabled(false);
+    }
+}
 
 void Room::newUser(const QString &jid)
 {
