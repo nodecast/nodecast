@@ -41,7 +41,7 @@
            <item>
             <widget class="QTabWidget" name="tabWidget_spheres">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -139,8 +139,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>104</width>
+                    <height>421</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
