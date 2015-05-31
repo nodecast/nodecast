@@ -113,6 +113,14 @@ void Room::sendInvitation()
         //errorMessageDialog->show();
         return;
     }
+    else if (!m_room->isJoined())
+    {
+        errorMessageDialog = new QErrorMessage(this);
+        errorMessageDialog->setModal(true);
+        errorMessageDialog->showMessage("you have not joined " + m_room->name() + " sphere.");
+        //errorMessageDialog->show();
+        return;
+    }
 
 
     room_invitation = new roominvit(this);
@@ -246,6 +254,8 @@ void Room::joinXMPPRoom()
 
         m_room->join();
         line_chat->setEnabled(true);
+        invit->setText("send invitation");
+        invit->setEnabled(true);
     }
 }
 
@@ -260,6 +270,8 @@ void Room::leaveXMPPRoom()
         w_users_list->clear();
         chat_room->clear();
         line_chat->setEnabled(false);
+        invit->setText("disconnected");
+        invit->setEnabled(false);
     }
 }
 

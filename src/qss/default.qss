@@ -10,6 +10,15 @@
     color: #b7b9bb;
 }
 
+.QMessageBox {
+    background-color: #202124;
+}
+
+
+QDialog, newsphere {
+    background-color: #202124;
+}
+
 
 .Sphere {
   background-color: transparent;
@@ -127,5 +136,4 @@ QRadioButton:hover, QCheckBox:hover {
 QDialogButtonBox {
     button-layout: 0;
 }
-
 

@@ -911,7 +911,7 @@ void MainWindow::on_pushButton_spherenew_clicked()
     if (ui->tabWidget_spheres->currentIndex() == 0)
     {
 
-        qDebug() << "NEW SPEHRE";
+        qDebug() << "NEW SPHERE";
         new_sphere = new newsphere(this);
         //newsphere new_sphere;
         connect(new_sphere, SIGNAL(create_sphere(QString)), SLOT(create_sphere(QString)));
@@ -923,12 +923,15 @@ void MainWindow::on_pushButton_spherenew_clicked()
     else
     {
 
+        QMessageBox::information(this, tr("Can not create public sphere"), tr("You will be able to create public sphere later"));
+        /*
         Sphere_data spublic;
         spublic.title =  "public";
         spublic.scope = Sphere_scope::PUBLIC;
 
         Sphere *sphere = new Sphere(spublic, m_stacked_tab_medias, m_stacked_tab_medias);
         ui->verticalLayout_spherepublic->addWidget(sphere);
+        */
     }
 
 }

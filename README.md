@@ -7,7 +7,7 @@ It aims to be really simple by using spheres and respectful of private life.
 Ubuntu :
 ========
 
-apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev 
+apt-get install libqt5webkit5-dev libtorrent-rasterbar-dev libboost-all-dev libidn11-dev qt5-default qtbase5-dev
 
 
 Mac OSX :
@@ -36,7 +36,9 @@ cd src/libs/qxmpp/
 
 qmake && make (make -j 4 if you have a quad core)
 
-make install
+sudo make install
+
+sudo ldconfig
 
 cd ../../../
 
