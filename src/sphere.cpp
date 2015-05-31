@@ -482,6 +482,8 @@ void Sphere::mousePressEvent(QMouseEvent *e)
     else if(e->button() == Qt::RightButton)
     {
         qDebug() << "MOUSE RIGHT PRESSED : " << sphere_data.directory;
+        this->setChecked(true);
+        emit row(m_index);
 
         if (isScopePrivate())
             displayListMenu();
