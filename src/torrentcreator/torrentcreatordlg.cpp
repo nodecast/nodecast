@@ -54,8 +54,9 @@ TorrentCreatorDlg::TorrentCreatorDlg(QString sphere_dir, QString file, QString f
   cancelButton->setIcon(IconProvider::instance()->getIcon("dialog-cancel"));
 
   textInputPath->setText(file_path);
+  Preferences* const pref = Preferences::instance();
 
-  QString tracker = "http://" + QBtSession::instance()->external_ip + ":" + QString::number(prefs.getTrackerPort()) + "/announce";
+  QString tracker = "http://" + QBtSession::instance()->external_ip + ":" + QString::number(pref->getTrackerPort()) + "/announce";
   qDebug() << "TRACKER : " << tracker;
   trackers_list->setText(tracker);
 
@@ -132,7 +133,8 @@ void TorrentCreatorDlg::on_createButton_clicked() {
 
   //QString destination = fsutils::QDesktopServicesDownloadLocation() + "/private/" + sphere_name + "/" + file_name;
   //QString destination = fsutils::QDesktopServicesDownloadLocation() + "/../torrents/" + file_name;
-  QString destination = prefs.getSavePath() + "/nodecast/spheres/private/" + m_sphere_dir + "/torrents/" + file_name;
+  Preferences* const pref = Preferences::instance();
+  QString destination = pref->getSavePath() + "/nodecast/spheres/private/" + m_sphere_dir + "/torrents/" + file_name;
 
 
   qDebug() << "DESTINATION TORRENT : " << destination;

@@ -71,6 +71,7 @@ QTracker::QTracker(QObject *parent)
     : Http::ResponseBuilder(parent)
     , m_server(new Http::Server(this, this))
 {
+    qDebug() << "TRACKER LAUNCH";
 }
 
 QTracker::~QTracker()
@@ -82,7 +83,7 @@ QTracker::~QTracker()
 
 bool QTracker::start()
 {
-    const int listen_port = Preferences().getTrackerPort();
+    const int listen_port = Preferences::instance()->getTrackerPort();
     qDebug() << "TRACKER LISTEN PORT : " << listen_port;
 
     if (m_server->isListening()) {

@@ -28,231 +28,168 @@
  * Contact : chris@qbittorrent.org
  */
 
-#include <QMutexLocker>
 #include <QList>
-#include <QDateTime>
-#include <vector>
 
 #include "qbtsession.h"
 #include "misc.h"
 #include "torrentspeedmonitor.h"
-#include "qinisettings.h"
 
 using namespace libtorrent;
 
+namespace {
+
 template<class T> struct Sample {
-  Sample(const T down = 0, const T up = 0) : download(down), upload(up) {}
-  T download;
-  T upload;
+    Sample()
+        : download()
+        , upload()
+    {}
+
+    Sample(T download, T upload)
+        : download(download)
+        , upload(upload)
+    {}
+
+    template <typename U>
+    explicit Sample(Sample<U> other)
+        : download(static_cast<U>(other.download))
+        , upload(static_cast<U>(other.upload))
+    {}
+
+    T download;
+    T upload;
 };
+
+template <typename T>
+Sample<T>& operator+=(Sample<T>& lhs, Sample<T> const& rhs) {
+    lhs.download += rhs.download;
+    lhs.upload   += rhs.upload;
+    return lhs;
+}
+
+template <typename T>
+Sample<T>& operator-=(Sample<T>& lhs, Sample<T> const& rhs) {
+    lhs.download -= rhs.download;
+    lhs.upload   -= rhs.upload;
+    return lhs;
+}
+
+template <typename T>
+Sample<T> operator+(Sample<T> const& lhs, Sample<T> const& rhs) {
+    return Sample<T>(lhs.download + rhs.download, lhs.upload + rhs.upload);
+}
+
+template <typename T>
+Sample<T> operator-(Sample<T> const& lhs, Sample<T> const& rhs) {
+    return Sample<T>(lhs.download - rhs.download, lhs.upload - rhs.upload);
+}
+
+template <typename T>
+Sample<T> operator*(Sample<T> const& lhs, T rhs) {
+    return Sample<T>(lhs.download * rhs, lhs.upload * rhs);
+}
+
+template <typename T>
+Sample<T> operator*(T lhs,Sample<T> const& rhs) {
+    return Sample<T>(lhs * rhs.download, lhs * rhs.upload);
+}
+
+template <typename T>
+Sample<T> operator/(Sample<T> const& lhs, T rhs) {
+    return Sample<T>(lhs.download / rhs, lhs.upload / rhs);
+}
+}
 
 class SpeedSample {
 
 public:
-  SpeedSample() {}
-  void addSample(int speedDL, int speedUL);
-  Sample<qreal> average() const;
-  void clear();
+    SpeedSample() {}
+    void addSample(Sample<int> const& item);
+    Sample<qreal> average() const;
 
 private:
-  static const int max_samples = 30;
+    static const int max_samples = 30;
 
 private:
-  QList<Sample<int> > m_speedSamples;
+    QList<Sample<int> > m_speedSamples;
+    Sample<long long> m_sum;
 };
 
-TorrentSpeedMonitor::TorrentSpeedMonitor(QBtSession* session) :
-  QThread(session), m_abort(false), m_session(session),
-  sessionUL(0), sessionDL(0), lastWrite(0), dirty(false)
+TorrentSpeedMonitor::TorrentSpeedMonitor(QBtSession* session)
+    : m_session(session)
 {
-  connect(m_session, SIGNAL(deletedTorrent(QString)), SLOT(removeSamples(QString)));
-  connect(m_session, SIGNAL(pausedTorrent(QTorrentHandle)), SLOT(removeSamples(QTorrentHandle)));
-  loadStats();
+    connect(m_session, SIGNAL(torrentAboutToBeRemoved(QTorrentHandle)), SLOT(removeSamples(QTorrentHandle)));
+    connect(m_session, SIGNAL(pausedTorrent(QTorrentHandle)), SLOT(removeSamples(QTorrentHandle)));
+    connect(m_session, SIGNAL(statsReceived(libtorrent::stats_alert)), SLOT(statsReceived(libtorrent::stats_alert)));
 }
 
-TorrentSpeedMonitor::~TorrentSpeedMonitor() {
-  m_abort = true;
-  m_abortCond.wakeOne();
-  wait();
-  if (dirty)
-    lastWrite = 0;
-  saveStats();
-}
+TorrentSpeedMonitor::~TorrentSpeedMonitor()
+{}
 
-void TorrentSpeedMonitor::run()
+void SpeedSample::addSample(Sample<int> const& item)
 {
-  do {
-    m_mutex.lock();
-    getSamples();
-    saveStats();
-    m_abortCond.wait(&m_mutex, 1000);
-    m_mutex.unlock();
-  } while(!m_abort);
-}
-
-void SpeedSample::addSample(int speedDL, int speedUL)
-{
-  m_speedSamples << Sample<int>(speedDL, speedUL);
-  if (m_speedSamples.size() > max_samples)
-    m_speedSamples.removeFirst();
+    m_speedSamples.push_back(item);
+    m_sum += Sample<long long>(item);
+    if (m_speedSamples.size() > max_samples) {
+        m_sum -= Sample<long long>(m_speedSamples.front());
+        m_speedSamples.pop_front();
+    }
 }
 
 Sample<qreal> SpeedSample::average() const
 {
-  if (m_speedSamples.empty())
-    return Sample<qreal>();
+    if (m_speedSamples.empty())
+        return Sample<qreal>();
 
-  qlonglong sumDL = 0;
-  qlonglong sumUL = 0;
-
-  foreach (const Sample<int>& s, m_speedSamples) {
-    sumDL += s.download;
-    sumUL += s.upload;
-  }
-
-  const qreal numSamples = m_speedSamples.size();
-  return Sample<qreal>(sumDL/numSamples, sumUL/numSamples);
-}
-
-void SpeedSample::clear()
-{
-  m_speedSamples.clear();
-}
-
-void TorrentSpeedMonitor::removeSamples(const QString &hash)
-{
-  m_samples.remove(hash);
+    return Sample<qreal>(m_sum) * (qreal(1.) / m_speedSamples.size());
 }
 
 void TorrentSpeedMonitor::removeSamples(const QTorrentHandle& h) {
-  try {
-    m_samples.remove(h.hash());
-  } catch(invalid_handle&) {}
-}
-
-qlonglong TorrentSpeedMonitor::getETA(const QString &hash) const
-{
-  QMutexLocker locker(&m_mutex);
-  QTorrentHandle h = m_session->getTorrentHandle(hash);
-  if (h.is_paused() || !m_samples.contains(hash))
-    return MAX_ETA;
-
-  const Sample<qreal> speed_average = m_samples[hash].average();
-
-  if (h.is_seed()) {
-    if (!speed_average.upload)
-      return MAX_ETA;
-
-    bool _unused;
-    qreal max_ratio = m_session->getMaxRatioPerTorrent(hash, &_unused);
-    if (max_ratio < 0)
-      return MAX_ETA;
-
-    libtorrent::size_type realDL = h.all_time_download();
-    if (realDL <= 0)
-      realDL = h.total_wanted();
-
-    return (realDL * max_ratio - h.all_time_upload()) / speed_average.upload;
-  }
-
-  if (!speed_average.download)
-    return MAX_ETA;
-
-  return (h.total_wanted() - h.total_wanted_done()) / speed_average.download;
-}
-
-quint64 TorrentSpeedMonitor::getAlltimeDL() const {
-  QMutexLocker l(&m_mutex);
-  return alltimeDL + sessionDL;
-}
-
-quint64 TorrentSpeedMonitor::getAlltimeUL() const {
-  QMutexLocker l(&m_mutex);
-  return alltimeUL + sessionUL;
-}
-
-void TorrentSpeedMonitor::getSamples()
-{
-  const std::vector<torrent_handle> torrents = m_session->getSession()->get_torrents();
-
-  std::vector<torrent_handle>::const_iterator it = torrents.begin();
-  std::vector<torrent_handle>::const_iterator itend = torrents.end();
-  for ( ; it != itend; ++it) {
     try {
-#if LIBTORRENT_VERSION_NUM >= 1600
-      torrent_status st = it->status(0x0);
-#else
-      torrent_status st = it->status();
-#endif
-      if (!st.paused) {
-        int up = st.upload_payload_rate;
-        int down = st.download_payload_rate;
-        m_samples[misc::toQString(it->info_hash())].addSample(down, up);
-      }
+        m_samples.remove(h.hash());
     } catch(invalid_handle&) {}
-  }
-  libtorrent::session_status ss = m_session->getSessionStatus();
-  if (ss.total_download > sessionDL) {
-    sessionDL = ss.total_download;
-    dirty = true;
-  }
-  if (ss.total_upload > sessionUL) {
-    sessionUL = ss.total_upload;
-    dirty = true;
-  }
 }
 
-void TorrentSpeedMonitor::saveStats() const {
-#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-  if (!(dirty && (QDateTime().toTime_t() * 1000 - lastWrite >= 15*60*1000) ))
-#else
-  if (!(dirty && (QDateTime::currentMSecsSinceEpoch() - lastWrite >= 15*60*1000) ))
-#endif
-    return;
-  QIniSettings s("pcode", "nodecast-data");
-  QVariantHash v;
-  v.insert("AlltimeDL", alltimeDL + sessionDL);
-  v.insert("AlltimeUL", alltimeUL + sessionUL);
-  s.setValue("Stats/AllStats", v);
-  dirty = false;
-#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-  lastWrite = QDateTime().toTime_t() * 1000;
-#else
-  lastWrite = QDateTime::currentMSecsSinceEpoch();
-#endif
-}
+qlonglong TorrentSpeedMonitor::getETA(const QString &hash, const libtorrent::torrent_status &status) const
+{
+    if (QTorrentHandle::is_paused(status))
+        return MAX_ETA;
 
-void TorrentSpeedMonitor::loadStats() {
-  // Temp code. Versions v3.1.4 and v3.1.5 saved the data in the qbittorrent.ini file.
-  // This code reads the data from there, writes it to the new file, and removes the keys
-  // from the old file. This code should be removed after some time has passed.
-  // e.g. When we reach v3.3.0
-  QIniSettings s_old;
-  QIniSettings s("pcode", "nodecast-data");
-  QVariantHash v;
+    QHash<QString, SpeedSample>::const_iterator i = m_samples.find(hash);
+    if (i == m_samples.end())
+        return MAX_ETA;
 
-  // Let's test if the qbittorrent.ini holds the key
-  if (s_old.contains("Stats/AllStats")) {
-    v = s_old.value("Stats/AllStats").toHash();
-    dirty = true;
+    const Sample<qreal> speed_average = i->average();
 
-    // If the user has used qbt > 3.1.5 and then reinstalled/used
-    // qbt < 3.1.6, there will be stats in qbittorrent-data.ini too
-    // so we need to merge those 2.
-    if (s.contains("Stats/AllStats")) {
-      QVariantHash tmp = s.value("Stats/AllStats").toHash();
-      v["AlltimeDL"] = v["AlltimeDL"].toULongLong() + tmp["AlltimeDL"].toULongLong();
-      v["AlltimeUL"] = v["AlltimeUL"].toULongLong() + tmp["AlltimeUL"].toULongLong();
+    if (QTorrentHandle::is_seed(status)) {
+        if (!speed_average.upload)
+            return MAX_ETA;
+
+        bool _unused;
+        qreal max_ratio = m_session->getMaxRatioPerTorrent(hash, &_unused);
+        if (max_ratio < 0)
+            return MAX_ETA;
+
+        libtorrent::size_type realDL = status.all_time_download;
+        if (realDL <= 0)
+            realDL = status.total_wanted;
+
+        return (realDL * max_ratio - status.all_time_upload) / speed_average.upload;
     }
-  }
-  else
-    v = s.value("Stats/AllStats").toHash();
 
-  alltimeDL = v["AlltimeDL"].toULongLong();
-  alltimeUL = v["AlltimeUL"].toULongLong();
+    if (!speed_average.download)
+        return MAX_ETA;
 
-  if (dirty) {
-    saveStats();
-    s_old.remove("Stats/AllStats");
-  }
+    return (status.total_wanted - status.total_wanted_done) / speed_average.download;
+}
+
+void TorrentSpeedMonitor::statsReceived(const stats_alert &stats)
+{
+    Q_ASSERT(stats.interval >= 1000);
+
+    Sample<int> transferred(stats.transferred[stats_alert::download_payload],
+            stats.transferred[stats_alert::upload_payload]);
+
+    Sample<int> normalized = Sample<int>(Sample<long long>(transferred) * 1000LL / static_cast<long long>(stats.interval));
+
+    m_samples[misc::toQString(stats.handle.info_hash())].addSample(normalized);
 }

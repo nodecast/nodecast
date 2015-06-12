@@ -54,13 +54,12 @@ ProgramUpdater::ProgramUpdater(QObject *parent, bool invokedByUser) :
   QObject(parent), m_invokedByUser(invokedByUser)
 {
   mp_manager = new QNetworkAccessManager(this);
-//  Preferences* const pref = Preferences::instance();
-  Preferences pref;
+  Preferences* const pref = Preferences::instance();
 
   // Proxy support
-  if (pref.isProxyEnabled()) {
+  if (pref->isProxyEnabled()) {
     QNetworkProxy proxy;
-    switch(pref.getProxyType()) {
+    switch(pref->getProxyType()) {
     case Proxy::SOCKS4:
     case Proxy::SOCKS5:
     case Proxy::SOCKS5_PW:
@@ -69,12 +68,12 @@ ProgramUpdater::ProgramUpdater(QObject *parent, bool invokedByUser) :
       proxy.setType(QNetworkProxy::HttpProxy);
       break;
     }
-    proxy.setHostName(pref.getProxyIp());
-    proxy.setPort(pref.getProxyPort());
+    proxy.setHostName(pref->getProxyIp());
+    proxy.setPort(pref->getProxyPort());
     // Proxy authentication
-    if (pref.isProxyAuthEnabled()) {
-      proxy.setUser(pref.getProxyUsername());
-      proxy.setPassword(pref.getProxyPassword());
+    if (pref->isProxyAuthEnabled()) {
+      proxy.setUser(pref->getProxyUsername());
+      proxy.setPassword(pref->getProxyPassword());
     }
     mp_manager->setProxy(proxy);
   }

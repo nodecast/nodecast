@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt4 and libtorrent.
- * Copyright (C) 2010  Christophe Dumez
+ * Copyright (C) 2011  Christophe Dumez
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,54 +28,42 @@
  * Contact : chris@qbittorrent.org
  */
 
-#ifndef CREATE_TORRENT_IMP_H
-#define CREATE_TORRENT_IMP_H
+#ifndef EXECUTIONLOG_H
+#define EXECUTIONLOG_H
 
-#include "preferences.h"
-#include "ui_createtorrent.h"
+#include <QWidget>
 
-class TorrentCreatorThread;
+QT_BEGIN_NAMESPACE
+namespace Ui {
+    class ExecutionLog;
+}
+QT_END_NAMESPACE
+class Logger;
+class LogListWidget;
 
-class TorrentCreatorDlg : public QDialog, private Ui::createTorrentDialog{
-  Q_OBJECT
+namespace Log
+{
+    struct Msg;
+    struct Peer;
+}
+
+class ExecutionLog: public QWidget
+{
+    Q_OBJECT
 
 public:
-  TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent = 0);
-  ~TorrentCreatorDlg();
-  int getPieceSize() const;
+    explicit ExecutionLog(QWidget *parent = 0);
+    ~ExecutionLog();
 
-signals:
-  void torrent_to_seed(QString path, bool fromScandir);
-
-public slots:
-  void updateProgressBar(int progress);
-  void on_cancelButton_clicked();
-
-protected slots:
-  void on_createButton_clicked();
-  //void on_addFile_button_clicked();
-  //void on_addFolder_button_clicked();
-  void handleCreationFailure(QString msg);
-  void handleCreationSuccess(QString path, QString branch_path);
-  void setInteractionEnabled(bool enabled);
-  void showProgressBar(bool show);
-  void on_checkAutoPieceSize_clicked(bool checked);
-  void updateOptimalPieceSize();
-  void saveTrackerList();
-  void loadTrackerList();
-
-protected:
-  void closeEvent(QCloseEvent *event);
+private slots:
+    void addLogMessage(const Log::Msg &msg);
+    void addPeerMessage(const Log::Peer &peer);
 
 private:
-  void saveSettings();
-  void loadSettings();
-  QString m_sphere_dir;
-  QString file_name;
+    Ui::ExecutionLog *ui;
 
-private:
-  TorrentCreatorThread *creatorThread;
-  QList<int> m_piece_sizes;
+    LogListWidget *m_msgList;
+    LogListWidget *m_peerList;
 };
 
-#endif
+#endif // EXECUTIONLOG_H

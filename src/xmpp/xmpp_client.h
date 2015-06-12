@@ -88,7 +88,6 @@ private:
     QXmppTransferManager *transfer_manager;
     //QXmppMessageReceiptManager *receipt_manager;
     //QXmppRosterManager *roster_manager;
-    Preferences prefs;
     QFile *log;
     QString m_login;
     QString m_password;

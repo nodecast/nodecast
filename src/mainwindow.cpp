@@ -31,6 +31,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "logger.h"
+#include "torrentmodel.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     #ifndef QT_NO_SYSTEMTRAYICON
@@ -128,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     connect(QBtSession::instance(), SIGNAL(addedTorrent(QTorrentHandle)), this, SLOT(addTorrent(QTorrentHandle)));
     //connect(QBtSession::instance(), SIGNAL(newDownloadedTorrent(QString, QString)), this, SLOT(processDownloadedFiles(QString, QString)));
 
+    connect(QBtSession::instance(), SIGNAL(fullDiskError(QTorrentHandle, QString)), this, SLOT(fullDiskError(QTorrentHandle, QString)));
     connect(QBtSession::instance(), SIGNAL(UPnPSuccess(bool)), this, SLOT(NatChangeConnectionStatus(bool)));
 
 
@@ -375,11 +378,18 @@ void MainWindow::XmppChangeConnectionStatus(bool status)
 
 void MainWindow::NatChangeConnectionStatus(bool status)
 {
-    if (!prefs.isTrackerEnabled()) status = false;
+    if (!Preferences::instance()->isTrackerEnabled()) status = false;
     QPixmap pix = status? QPixmap(":/Icons/skin/connected.png") : QPixmap(":/Icons/skin/disconnected.png");
     ui->label_tracker->setPixmap(pix);
 }
 
+// Notification when disk is full
+void MainWindow::fullDiskError(const QTorrentHandle& h, QString msg) const
+{
+    if (!h.is_valid()) return;
+    //showNotificationBaloon(tr("I/O Error", "i.e: Input/Output Error"), tr("An I/O error occurred for torrent %1.\n Reason: %2", "e.g: An error occurred for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
+    QMessageBox::warning(new QWidget, tr("I/O Error", "i.e: Input/Output Error"), tr("An I/O error occurred for torrent %1.\n Reason: %2", "e.g: An error occurred for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
+}
 
 
 void MainWindow::changePage(int index)
@@ -443,8 +453,8 @@ void MainWindow::populate()
 
    // filters << "*.avi" << "*.mp4" << "*.mov" << "*.mkv";
    // dir.setNameFilters(filters);
-    qDebug() << "SAVE PATH : " << Preferences().getSavePath();
-    dir.setPath(Preferences().getSavePath());
+    qDebug() << "SAVE PATH : " << Preferences::instance()->getSavePath();
+    dir.setPath(Preferences::instance()->getSavePath());
     //    dir.setPath("/Volumes/data/videos/");
 
     QFileInfoList list = dir.entryInfoList();
@@ -510,9 +520,9 @@ void MainWindow::optionsSaved() {
 
 // Load program preferences
 void MainWindow::loadPreferences(bool configure_session) {
-  QBtSession::instance()->addConsoleMessage(tr("Options were saved successfully."));
-  const Preferences pref;
-  //const bool newSystrayIntegration = pref.systrayIntegration();
+  Logger::instance()->addMessage(tr("Options were saved successfully."));
+  const Preferences* const pref = Preferences::instance();
+  //const bool newSystrayIntegration = pref->systrayIntegration();
   //actionLock_qBittorrent->setVisible(newSystrayIntegration);
 //  if (newSystrayIntegration != (systrayIcon!=0)) {
 //    if (newSystrayIntegration) {
@@ -541,7 +551,7 @@ void MainWindow::loadPreferences(bool configure_session) {
 //    systrayIcon->setIcon(getSystrayIcon());
 //  }
   // General
-//  if (pref.isToolbarDisplayed()) {
+//  if (pref->isToolbarDisplayed()) {
 //    toolBar->setVisible(true);
 //  } else {
 //    // Clear search filter before hiding the top toolbar
@@ -549,7 +559,7 @@ void MainWindow::loadPreferences(bool configure_session) {
 //    toolBar->setVisible(false);
 //  }
 
-//  if (pref.preventFromSuspend())
+//  if (pref->preventFromSuspend())
 //  {
 //    preventTimer->start(PREVENT_SUSPEND_INTERVAL);
 //  }
@@ -559,14 +569,14 @@ void MainWindow::loadPreferences(bool configure_session) {
 //    m_pwr->setActivityState(false);
 //  }
 
-//  const uint new_refreshInterval = pref.getRefreshInterval();
+//  const uint new_refreshInterval = pref->getRefreshInterval();
 //  transferList->setRefreshInterval(new_refreshInterval);
-//  transferList->setAlternatingRowColors(pref.useAlternatingRowColors());
-////  properties->getFilesList()->setAlternatingRowColors(pref.useAlternatingRowColors());
-////  properties->getTrackerList()->setAlternatingRowColors(pref.useAlternatingRowColors());
-////  properties->getPeerList()->setAlternatingRowColors(pref.useAlternatingRowColors());
+//  transferList->setAlternatingRowColors(pref->useAlternatingRowColors());
+////  properties->getFilesList()->setAlternatingRowColors(pref->useAlternatingRowColors());
+////  properties->getTrackerList()->setAlternatingRowColors(pref->useAlternatingRowColors());
+////  properties->getPeerList()->setAlternatingRowColors(pref->useAlternatingRowColors());
 //  // Queueing System
-//  if (pref.isQueueingSystemEnabled()) {
+//  if (pref->isQueueingSystemEnabled()) {
 //    if (!actionDecreasePriority->isVisible()) {
 //      transferList->hidePriorityColumn(false);
 //      actionDecreasePriority->setVisible(true);
@@ -588,15 +598,13 @@ void MainWindow::loadPreferences(bool configure_session) {
 //  properties->reloadPreferences();
 
   // Icon provider
-#if defined(Q_WS_X11)
-  IconProvider::instance()->useSystemIconTheme(pref.useSystemIconTheme());
+#if (defined(Q_OS_UNIX) && !defined(Q_OS_MAC))
+  IconProvider::instance()->useSystemIconTheme(pref->useSystemIconTheme());
 #endif
 
-  if (configure_session)
-    QBtSession::instance()->configureSession();
 /*
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-  if (pref.isUpdateCheckEnabled())
+  if (pref->isUpdateCheckEnabled())
     checkProgramUpdate();
   else
     programUpdateTimer.stop();
@@ -606,14 +614,6 @@ void MainWindow::loadPreferences(bool configure_session) {
 }
 
 
-void MainWindow::launch_timer_handle(QTorrentHandle h)
-{
-    qDebug() << "RECEIVE HANDLER";
-    m_torrent = h;
-    timer_get_torrent_progress = new QTimer(this);
-    connect(timer_get_torrent_progress, SIGNAL(timeout()), this, SLOT(update_timer_torrent_progress()));
-    timer_get_torrent_progress->start(1000);
-}
 
 void MainWindow::shutdownCleanUp()
 {
@@ -630,7 +630,7 @@ void MainWindow::shutdownCleanUp()
     //delete ui;
     qDebug() << "stop torrent";
     QBtSession::drop();
-    Preferences().sync();
+    Preferences::instance()->save();
 
     delete transferList;
     //delete transferListFilters;
@@ -694,8 +694,8 @@ void MainWindow::on_actionQuit_triggered()
 
 
 void MainWindow::processDownloadedFiles(QString path, QString url) {
-  Preferences pref;
- // if (pref.useAdditionDialog())
+//    Preferences* const pref = Preferences::instance();
+ // if (pref->useAdditionDialog())
     //AddNewTorrentDialog::showTorrent(path, url, this);
 //  else
     QBtSession::instance()->addTorrent(path, false, url);
@@ -703,8 +703,8 @@ void MainWindow::processDownloadedFiles(QString path, QString url) {
 
 
 void MainWindow::downloadFromURLList(const QStringList& url_list) {
-  Preferences pref;
-  const bool useTorrentAdditionDialog = pref.useAdditionDialog();
+  Preferences* const pref = Preferences::instance();
+  const bool useTorrentAdditionDialog = pref->useAdditionDialog();
   foreach (QString url, url_list) {
     if (url.startsWith("bc://bt/", Qt::CaseInsensitive)) {
       qDebug("Converting bc link to magnet link");
@@ -729,68 +729,6 @@ void MainWindow::downloadFromURLList(const QStringList& url_list) {
 
 
 
-
-void MainWindow::update_timer_torrent_progress()
-{
-//    if (torrent_index == 0) return;
-
-//    int progress = 0;
-//    int havePieces = 0;
-//    int pieceBytes = 0;
-//    QByteArray url;
-//    url.resize( 1000 );
-//    bool haveUrl = false;
-
-//    dlInfo stats = torrent->getTorrentInfo(torrent_index);
-
-
-/*    if (stats.downloaded == stats.total)
-    {
-        timer_get_torrent_progress->stop();
-        return;
-    }
-*/
-
-//    pieceBytes += stats.downloadRateBs / TORRENT_INFO_UPDATES_PER_SECOND;
-
-
-//    const int currentProgress = ( pieceBytes + stats.piecesDone * stats.pieceSize ) * 100 / ( stats.pieceSize * TORRENT_PIECES_TO_PLAY );
-//    if ( currentProgress > progress ) progress = currentProgress;
-//    if ( progress > 100 ) progress = 100;
-//    else if ( progress == 0 && (stats.seeders || stats.peers ) ) progress = 3;
-
-
-
-    qDebug() << "PROGRESS : " << m_torrent.progress();;
-    float toto = m_torrent.progress();
-    qDebug() << "PROGRESS INT : " << toto;
-    float tmp = m_torrent.progress() * 100;
-    qDebug() << "PROGRESS float * 100 : " << tmp;
-
-    int progress = int(tmp + 0.5);
-    qDebug() << "PROGRESS int * 100 : " << progress;
-
-
-//    int pourcentage = (int) (stats.downloaded*100) / stats.total;
-
-//    qDebug() << "torrent_index : " << torrent_index;
-//    qDebug() << "TIMER STATS SEEDERS : " << stats.seeders;
-//    qDebug() << "TIMER STATS PEERS : " << stats.peers;
-//    qDebug() << "TIMER STATS DOWNLOADED : " << stats.downloaded;
-//    qDebug() << "TIMER STATS DOWNLOADED pourcentage : " << pourcentage;
-//    qDebug() << "TIMER STATS DOWNLOADED RATE Bs : " << stats.downloadRateBs;
-//    qDebug() << "TIMER STATS TOTAL : " << stats.total;
-
-
-    ui->progressBar_torrent->setValue(progress);
-
-    if (progress == 100)
-    {
-        timer_get_torrent_progress->stop();
-        return;
-    }
-
-}
 
 
 void MainWindow::on_actionPreferences_triggered()
@@ -840,7 +778,7 @@ void MainWindow::on_media_doubleClicked(QString video)
 
 #if defined (Q_OS_MAC)
     program = "open";
-    arguments << "-a" << Preferences().getVideoPlayer() << Preferences().getSavePath() + "/" + video;
+    arguments << "-a" << Preferences::instance()->getVideoPlayer() << Preferences::instance()->getSavePath() + "/" + video;
 #else
     program = settings.value("player").toString();
     arguments << settings.value("data").toString() + video;
@@ -942,7 +880,7 @@ void MainWindow::load_spheres()
     qDebug() << "LOAD SHERES";
     QStringList spheres;
 
-    QDir path(prefs.getSavePath() + "/nodecast/spheres/private");
+    QDir path(Preferences::instance()->getSavePath() + "/nodecast/spheres/private");
     if (path.exists())
     {
         spheres = path.entryList(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -1131,3 +1069,17 @@ void MainWindow::on_actionXml_console_triggered()
     Xmpp_client::instance()->show_xml_console();
 }
 
+
+void MainWindow::on_actionNodecast_logs_triggered()
+{
+    if (m_executionLog)
+        delete m_executionLog;
+
+    QWidget *log = new QWidget;
+    QHBoxLayout *layout = new QHBoxLayout(log);
+    m_executionLog = new ExecutionLog;
+    layout->addWidget(m_executionLog);
+
+    log->show();
+    //Preferences::instance()->setExecutionLogEnabled(checked);
+}

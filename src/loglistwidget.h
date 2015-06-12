@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt4 and libtorrent.
- * Copyright (C) 2010  Christophe Dumez
+ * Copyright (C) 2011  Christophe Dumez
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,55 +27,35 @@
  *
  * Contact : chris@qbittorrent.org
  */
+#ifndef LOGLISTWIDGET_H
+#define LOGLISTWIDGET_H
 
-#ifndef CREATE_TORRENT_IMP_H
-#define CREATE_TORRENT_IMP_H
+#include <QListWidget>
 
-#include "preferences.h"
-#include "ui_createtorrent.h"
+QT_BEGIN_NAMESPACE
+class QKeyEvent;
+QT_END_NAMESPACE
 
-class TorrentCreatorThread;
-
-class TorrentCreatorDlg : public QDialog, private Ui::createTorrentDialog{
-  Q_OBJECT
+class LogListWidget : public QListWidget
+{
+    Q_OBJECT
 
 public:
-  TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent = 0);
-  ~TorrentCreatorDlg();
-  int getPieceSize() const;
-
-signals:
-  void torrent_to_seed(QString path, bool fromScandir);
+  explicit LogListWidget(int max_lines = 100, QWidget *parent = 0);
 
 public slots:
-  void updateProgressBar(int progress);
-  void on_cancelButton_clicked();
+  void appendLine(const QString &line);
 
 protected slots:
-  void on_createButton_clicked();
-  //void on_addFile_button_clicked();
-  //void on_addFolder_button_clicked();
-  void handleCreationFailure(QString msg);
-  void handleCreationSuccess(QString path, QString branch_path);
-  void setInteractionEnabled(bool enabled);
-  void showProgressBar(bool show);
-  void on_checkAutoPieceSize_clicked(bool checked);
-  void updateOptimalPieceSize();
-  void saveTrackerList();
-  void loadTrackerList();
+  void copySelection();
+  void clearLog();
 
 protected:
-  void closeEvent(QCloseEvent *event);
+  void keyPressEvent(QKeyEvent *event);
 
 private:
-  void saveSettings();
-  void loadSettings();
-  QString m_sphere_dir;
-  QString file_name;
+  int m_maxLines;
 
-private:
-  TorrentCreatorThread *creatorThread;
-  QList<int> m_piece_sizes;
 };
 
-#endif
+#endif // LOGLISTWIDGET_H

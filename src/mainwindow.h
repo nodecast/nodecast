@@ -61,6 +61,7 @@
 #include "downloadfromurldlg.h"
 #include "widgettorrent.h"
 #include "options_imp.h"
+#include "transferlistwidget.h"
 #include "transferlistfilterswidget.h"
 #include "torrentpersistentdata.h"
 #include "flowlayout.h"
@@ -71,6 +72,7 @@
 #include "sphere.h"
 #include "room.h"
 #include "scannedfoldersmodel.h"
+#include "executionlog.h"
 
 #ifdef Q_OS_MAC
 void fixNativeWindow( QMainWindow *window );
@@ -119,10 +121,6 @@ private slots:
 
     void on_pushButton_play_clicked();
 
-    void launch_timer_handle(QTorrentHandle h);
-    void update_timer_torrent_progress();
-
-
     void on_pushButton_spherenew_clicked();
 
 
@@ -137,6 +135,7 @@ private slots:
     void changePage(int current);
     void XmppChangeConnectionStatus(bool status);
     void NatChangeConnectionStatus(bool status);
+    void fullDiskError(const QTorrentHandle& h, QString msg) const;
 
     void receiveMessageChat(QString from, QString message);
     void receiveInvitation(QString invitation, QString from, QString reason);
@@ -147,6 +146,8 @@ private slots:
     void on_actionXml_console_triggered();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void delete_sphere(Sphere *sphere);
+
+    void on_actionNodecast_logs_triggered();
 
 private:
     void createTrayIconAndMenu();
@@ -187,7 +188,6 @@ private:
     QSettings settings;
     Ui::MainWindow *ui;
     Video video;
-    Preferences prefs;
     QProcess *videoPlayer;
     Openuritorrent openuritorrent;
     int torrent_index;
@@ -202,6 +202,8 @@ private:
     QSystemTrayIcon m_trayIcon;
     QMenu m_trayIconMenu;
 #endif
+
+    QPointer<ExecutionLog> m_executionLog;
 };
 
 #endif // MAINWINDOW_H

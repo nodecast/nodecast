@@ -57,6 +57,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
 
     nb_media = 0;
     m_room = NULL;
+    const Preferences* const pref = Preferences::instance();
 
     qDebug() << "NEW SPHERE DIRECTORY : " << sphere_data.directory;
 
@@ -129,7 +130,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
             sphere_data.directory = gen_directory(sphere_data.title);
         }
 
-        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+        nodecast_datas = pref->getSavePath() + "/nodecast/spheres/private/";
         check_dir = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory;
         if (!check_dir.exists())
         {
@@ -167,7 +168,7 @@ Sphere::Sphere(Sphere_data data, QStackedWidget *stacked_room, QStackedWidget *p
         if (sphere_data.directory.isEmpty())
             sphere_data.directory = sphere_data.title;
 
-        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/public/";
+        nodecast_datas = pref->getSavePath() + "/nodecast/spheres/public/";
         check_dir = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory;
         if (!check_dir.exists())
         {
@@ -328,6 +329,7 @@ void Sphere::dropEvent(QDropEvent* event)
 
         QList<QUrl> droppedUrls = event->mimeData()->urls();
         int droppedUrlCnt = droppedUrls.size();
+        const Preferences* const pref = Preferences::instance();
 
         for(int i = 0; i < droppedUrlCnt; i++)
         {
@@ -349,12 +351,12 @@ void Sphere::dropEvent(QDropEvent* event)
 
                    qDebug() << "copy torrent to the sphere directory : " << fileInfo.fileName();
                    QDir nodecast_datas;
-                   nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+                   nodecast_datas = pref->getSavePath() + "/nodecast/spheres/private/";
                    QFile::copy(fileInfo.absoluteFilePath(), nodecast_datas.absolutePath() + "/" + sphere_data.directory + "/" + fileInfo.fileName() );
                    return;
                }
 
-               QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
+               QString target_link = pref->getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + fileInfo.fileName();
                fsutils::forceRemove(target_link);
                QFileInfo fileInfoLink(target_link);
 
@@ -396,7 +398,7 @@ void Sphere::dropEvent(QDropEvent* event)
                QFileInfo fileInfo(localPath);
 
                QDir take_dir = fileInfo.dir();
-               QString target_link = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
+               QString target_link = pref->getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + take_dir.dirName();
                fsutils::forceRemove(target_link);
                qDebug() << "TARGET LINK : " << target_link;
                QFileInfo fileInfoLink(target_link);
@@ -551,6 +553,7 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
 {
     qDebug() << "SEND TORRENT : " << path;     
     QString path_dest = path;
+    const Preferences* const pref = Preferences::instance();
 
     if (fromScanDir)
     {
@@ -559,7 +562,7 @@ void Sphere::addTorrent(QString path, bool fromScanDir)
         qDebug() << "COPY FILENAME : " << fi_torrent.fileName();
 
         QDir nodecast_datas;
-        nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/";
+        nodecast_datas = pref->getSavePath() + "/nodecast/spheres/private/";
         path_dest = nodecast_datas.absolutePath() + QDir::separator() + sphere_data.directory + "/torrents/" + fi_torrent.fileName();
         qDebug() << " TO : " << path_dest;
         QFile::copy(fi_torrent.absoluteFilePath(), path_dest);
@@ -741,9 +744,9 @@ void Sphere::joinSelectedSphere() {
 }
 
 
-void Sphere::deleteSelectedSphere() {
-
-
+void Sphere::deleteSelectedSphere()
+{
+    const Preferences* const pref = Preferences::instance();
     QString message = "are you sure you want delete <B>%1</B> sphere ?";
 
     int retButton = QMessageBox::question(
@@ -770,7 +773,7 @@ void Sphere::deleteSelectedSphere() {
                     qDebug() << "SPHERE DELETED ROOM : " << m_room->get_name();
                     m_room->flushRoom();
 
-                    QDir sphere_directory(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory);
+                    QDir sphere_directory(pref->getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory);
                     if (sphere_directory.exists())
                     {
                         bool bool_delete = sphere_directory.removeRecursively();
@@ -796,7 +799,9 @@ void Sphere::deleteSelectedSphere() {
 
 void Sphere::openSelectedSphereFolder() const
 {
-      QString sphereFolder =  prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory;
+    const Preferences* const pref = Preferences::instance();
+
+      QString sphereFolder =  pref->getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory;
       qDebug("Opening path at %s", qPrintable(sphereFolder));
       QDesktopServices::openUrl(QUrl::fromLocalFile(sphereFolder));
 }

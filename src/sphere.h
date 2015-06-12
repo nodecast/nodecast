@@ -99,7 +99,6 @@ private:
     QWidget *media_container;
     Sphere_data sphere_data;
     QPointer<TorrentCreatorDlg> createTorrentDlg;
-    Preferences prefs;
     Room *m_room;
     ScanFoldersModel *m_scanFolders;
     int nb_media;

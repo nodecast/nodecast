@@ -79,6 +79,14 @@ using namespace libtorrent;
  * This function makes sure the directory separator used is consistent
  * with the OS being run.
  */
+QString fsutils::toNativePath(const QString& path) {
+  return QDir::toNativeSeparators(path);
+}
+
+QString fsutils::fromNativePath(const QString &path) {
+  return QDir::fromNativeSeparators(path);
+}
+
 QString fsutils::toDisplayPath(const QString& path)
 {
   return QDir::toNativeSeparators(path);
@@ -350,20 +358,23 @@ bool fsutils::sameFileNames(const QString &first, const QString &second)
 #endif
 }
 
-// Replace ~ in path
-QString fsutils::expandPath(const QString& path) {
-  QString ret = path.trimmed();
-  if (ret.isEmpty()) return ret;
-  if (ret == "~")
-    return QDir::homePath();
-  if (ret[0] == '~' && (ret[1] == '/' || ret[1] == '\\')) {
-    ret.replace(0, 1, QDir::homePath());
-  } else {
-    if (!QDir::isAbsolutePath(ret))
-      ret = QDir(ret).absolutePath();
-  }
-  return QDir::cleanPath(path);
+QString fsutils::expandPath(const QString &path) {
+  QString ret = fsutils::fromNativePath(path.trimmed());
+  if (ret.isEmpty())
+    return ret;
+
+  return QDir::cleanPath(ret);
 }
+
+QString fsutils::expandPathAbs(const QString& path) {
+  QString ret = fsutils::expandPath(path);
+
+  if (!QDir::isAbsolutePath(ret))
+    ret = QDir(ret).absolutePath();
+
+  return ret;
+}
+
 
 bool fsutils::createLink(const QString& filename_source, const QString& filename_target) {
   qDebug() << "CREATE LINK source : " << filename_source << " TARGET : " << filename_target;

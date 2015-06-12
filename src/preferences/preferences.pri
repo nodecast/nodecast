@@ -11,6 +11,8 @@ INCLUDEPATH += $$PWD
 }
 
 HEADERS += \
-    $$PWD/preferences.h
+    $$PWD/preferences.h \
+    $$PWD/qinisettings.h
 
-SOURCES +=
+SOURCES += \
+    $$PWD/preferences.cpp

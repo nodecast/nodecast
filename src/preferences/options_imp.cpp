@@ -350,10 +350,10 @@ QSize options_imp::sizeFittingScreen() const {
 
 void options_imp::saveOptions() {
   applyButton->setEnabled(false);
-  Preferences pref;
+  Preferences* const pref = Preferences::instance();
   // Load the translation
   QString locale = getLocale();
-  if (pref.getLocale() != locale) {
+  if (pref->getLocale() != locale) {
     QTranslator *translator = new QTranslator;
     if (translator->load(QString::fromUtf8(":/lang/qbittorrent_") + locale)) {
       qDebug("%s locale recognized, using translation.", qPrintable(locale));
@@ -364,18 +364,18 @@ void options_imp::saveOptions() {
   }
 
   // General preferences
-  pref.setLocale(locale);
-  pref.setAlternatingRowColors(checkAltRowColors->isChecked());
-  pref.setSystrayIntegration(systrayIntegration());
-  pref.setTrayIconStyle(TrayIcon::Style(comboTrayIcon->currentIndex()));
-  pref.setCloseToTray(closeToTray());
-  pref.setMinimizeToTray(minimizeToTray());
-  pref.setStartMinimized(startMinimized());
-  pref.setSplashScreenDisabled(isSlashScreenDisabled());
-  pref.setConfirmOnExit(checkProgramExitConfirm->isChecked());
-  pref.setPreventFromSuspend(preventFromSuspend());
+  pref->setLocale(locale);
+  pref->setAlternatingRowColors(checkAltRowColors->isChecked());
+  pref->setSystrayIntegration(systrayIntegration());
+  pref->setTrayIconStyle(TrayIcon::Style(comboTrayIcon->currentIndex()));
+  pref->setCloseToTray(closeToTray());
+  pref->setMinimizeToTray(minimizeToTray());
+  pref->setStartMinimized(startMinimized());
+  pref->setSplashScreenDisabled(isSlashScreenDisabled());
+  pref->setConfirmOnExit(checkProgramExitConfirm->isChecked());
+  pref->setPreventFromSuspend(preventFromSuspend());
 #ifdef Q_OS_WIN
-  pref.setStartup(Startup());
+  pref->setStartup(Startup());
   // Windows: file association settings
   Preferences::setTorrentFileAssoc(checkAssociateTorrents->isChecked());
   Preferences::setMagnetLinkAssoc(checkAssociateMagnetLinks->isChecked());
@@ -384,7 +384,7 @@ void options_imp::saveOptions() {
 
   // Video player
   QString player = getVideoPlayer();
-  pref.setVideoPlayer(player);
+  pref->setVideoPlayer(player);
 
 
   // Downloads preferences
@@ -392,19 +392,19 @@ void options_imp::saveOptions() {
 #if defined(Q_OS_WIN) || defined(Q_OS_OS2)
   save_path.replace("\\", "/");
 #endif
-  pref.setSavePath(save_path);
-  pref.setTempPathEnabled(isTempPathEnabled());
+  pref->setSavePath(save_path);
+  pref->setTempPathEnabled(isTempPathEnabled());
   QString temp_path = getTempPath();
 #if defined(Q_OS_WIN) || defined(Q_OS_OS2)
   temp_path.replace("\\", "/");
 #endif
-  pref.setTempPath(temp_path);
-  pref.setAppendTorrentLabel(checkAppendLabel->isChecked());
-  pref.useIncompleteFilesExtension(checkAppendqB->isChecked());
-  pref.preAllocateAllFiles(preAllocateAllFiles());
-  pref.useAdditionDialog(useAdditionDialog());
-  pref.AdditionDialogFront(checkAdditionDialogFront->isChecked());
-  pref.addTorrentsInPause(addTorrentsInPause());
+  pref->setTempPath(temp_path);
+  pref->setAppendTorrentLabel(checkAppendLabel->isChecked());
+  pref->useIncompleteFilesExtension(checkAppendqB->isChecked());
+  pref->preAllocateAllFiles(preAllocateAllFiles());
+  pref->useAdditionDialog(useAdditionDialog());
+  pref->additionDialogFront(checkAdditionDialogFront->isChecked());
+  pref->addTorrentsInPause(addTorrentsInPause());
   ScanFoldersModel::instance()->makePersistent();
   addedScanDirs.clear();
   QString export_dir = getTorrentExportDir();
@@ -413,101 +413,92 @@ void options_imp::saveOptions() {
   export_dir_fin.replace("\\", "/");
   export_dir.replace("\\", "/");
 #endif
-  pref.setTorrentExportDir(export_dir);
-  pref.setFinishedTorrentExportDir(export_dir_fin);
-  pref.setMailNotificationEnabled(groupMailNotification->isChecked());
-  pref.setMailNotificationEmail(dest_email_txt->text());
-  pref.setMailNotificationSMTP(smtp_server_txt->text());
-  pref.setMailNotificationSMTPSSL(checkSmtpSSL->isChecked());
-  pref.setMailNotificationSMTPAuth(groupMailNotifAuth->isChecked());
-  pref.setMailNotificationSMTPUsername(mailNotifUsername->text());
-  pref.setMailNotificationSMTPPassword(mailNotifPassword->text());
-  pref.setAutoRunEnabled(autoRunBox->isChecked());
-  pref.setAutoRunProgram(autoRun_txt->text());
-  pref.setActionOnDblClOnTorrentDl(getActionOnDblClOnTorrentDl());
-  pref.setActionOnDblClOnTorrentFn(getActionOnDblClOnTorrentFn());
+  pref->setTorrentExportDir(export_dir);
+  pref->setFinishedTorrentExportDir(export_dir_fin);
+  pref->setMailNotificationEnabled(groupMailNotification->isChecked());
+  pref->setMailNotificationEmail(dest_email_txt->text());
+  pref->setMailNotificationSMTP(smtp_server_txt->text());
+  pref->setMailNotificationSMTPSSL(checkSmtpSSL->isChecked());
+  pref->setMailNotificationSMTPAuth(groupMailNotifAuth->isChecked());
+  pref->setMailNotificationSMTPUsername(mailNotifUsername->text());
+  pref->setMailNotificationSMTPPassword(mailNotifPassword->text());
+  pref->setAutoRunEnabled(autoRunBox->isChecked());
+  pref->setAutoRunProgram(autoRun_txt->text());
+  pref->setActionOnDblClOnTorrentDl(getActionOnDblClOnTorrentDl());
+  pref->setActionOnDblClOnTorrentFn(getActionOnDblClOnTorrentFn());
   // End Downloads preferences
   // Connection preferences
-  pref.setSessionPort(getPort());
-  pref.setRandomPort(checkRandomPort->isChecked());
-  pref.setUPnPEnabled(isUPnPEnabled());
+  pref->setSessionPort(getPort());
+  pref->setRandomPort(checkRandomPort->isChecked());
+  pref->setUPnPEnabled(isUPnPEnabled());
   const QPair<int, int> down_up_limit = getGlobalBandwidthLimits();
-  pref.setGlobalDownloadLimit(down_up_limit.first);
-  pref.setGlobalUploadLimit(down_up_limit.second);
-  pref.setuTPEnabled(checkuTP->isChecked());
-  pref.setuTPRateLimited(checkLimituTPConnections->isChecked());
-  pref.includeOverheadInLimits(checkLimitTransportOverhead->isChecked());
-  pref.setAltGlobalDownloadLimit(spinDownloadLimitAlt->value());
-  pref.setAltGlobalUploadLimit(spinUploadLimitAlt->value());
-  pref.setSchedulerEnabled(check_schedule->isChecked());
-  pref.setSchedulerStartTime(schedule_from->time());
-  pref.setSchedulerEndTime(schedule_to->time());
-  pref.setSchedulerDays((scheduler_days)schedule_days->currentIndex());
-  pref.setProxyType(getProxyType());
-  pref.setProxyIp(getProxyIp());
-  pref.setProxyPort(getProxyPort());
-  pref.setProxyPeerConnections(checkProxyPeerConnecs->isChecked());
-  pref.setProxyAuthEnabled(isProxyAuthEnabled());
-  pref.setProxyUsername(getProxyUsername());
-  pref.setProxyPassword(getProxyPassword());
+  pref->setGlobalDownloadLimit(down_up_limit.first);
+  pref->setGlobalUploadLimit(down_up_limit.second);
+  pref->setuTPEnabled(checkuTP->isChecked());
+  pref->setuTPRateLimited(checkLimituTPConnections->isChecked());
+  pref->includeOverheadInLimits(checkLimitTransportOverhead->isChecked());
+  pref->setAltGlobalDownloadLimit(spinDownloadLimitAlt->value());
+  pref->setAltGlobalUploadLimit(spinUploadLimitAlt->value());
+  pref->setSchedulerEnabled(check_schedule->isChecked());
+  pref->setSchedulerStartTime(schedule_from->time());
+  pref->setSchedulerEndTime(schedule_to->time());
+  pref->setSchedulerDays((scheduler_days)schedule_days->currentIndex());
+  pref->setProxyType(getProxyType());
+  pref->setProxyIp(getProxyIp());
+  pref->setProxyPort(getProxyPort());
+  pref->setProxyPeerConnections(checkProxyPeerConnecs->isChecked());
+  pref->setProxyAuthEnabled(isProxyAuthEnabled());
+  pref->setProxyUsername(getProxyUsername());
+  pref->setProxyPassword(getProxyPassword());
   // End Connection preferences
   // Bittorrent preferences
-  pref.setMaxConnecs(getMaxConnecs());
-  pref.setMaxConnecsPerTorrent(getMaxConnecsPerTorrent());
-  pref.setMaxUploads(getMaxUploads());
-  pref.setMaxUploadsPerTorrent(getMaxUploadsPerTorrent());
-  pref.setDHTEnabled(isDHTEnabled());
-  pref.setPeXEnabled(checkPeX->isChecked());
-  pref.setDHTPortSameAsBT(isDHTPortSameAsBT());
-  pref.setDHTPort(getDHTPort());
-  pref.setLSDEnabled(isLSDEnabled());
-  pref.setEncryptionSetting(getEncryptionSetting());
-#if LIBTORRENT_VERSION_NUM >= 1600
-  pref.enableAnonymousMode(checkAnonymousMode->isChecked());
-#endif
-  pref.setGlobalMaxRatio(getMaxRatio());
-  pref.setMaxRatioAction(comboRatioLimitAct->currentIndex());
+  pref->setMaxConnecs(getMaxConnecs());
+  pref->setMaxConnecsPerTorrent(getMaxConnecsPerTorrent());
+  pref->setMaxUploads(getMaxUploads());
+  pref->setMaxUploadsPerTorrent(getMaxUploadsPerTorrent());
+  pref->setDHTEnabled(isDHTEnabled());
+  pref->setPeXEnabled(checkPeX->isChecked());
+  pref->setLSDEnabled(isLSDEnabled());
+  pref->setEncryptionSetting(getEncryptionSetting());
+  pref->enableAnonymousMode(checkAnonymousMode->isChecked());
+  pref->setGlobalMaxRatio(getMaxRatio());
+  pref->setMaxRatioAction(comboRatioLimitAct->currentIndex());
   // End Bittorrent preferences
   // Misc preferences
   // * IPFilter
-  pref.setFilteringEnabled(isFilteringEnabled());
-  if (isFilteringEnabled()) {
-    QString filter_path = textFilterPath->text();
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-    filter_path.replace("\\", "/");
-#endif
-    pref.setFilter(filter_path);
-  }
+  pref->setFilteringEnabled(isFilteringEnabled());
+  if (isFilteringEnabled())
+      pref->setFilter(textFilterPath->text());
   // End IPFilter preferences
   // Queueing system
-  pref.setQueueingSystemEnabled(isQueueingSystemEnabled());
-  pref.setMaxActiveDownloads(spinMaxActiveDownloads->value());
-  pref.setMaxActiveUploads(spinMaxActiveUploads->value());
-  pref.setMaxActiveTorrents(spinMaxActiveTorrents->value());
-  pref.setIgnoreSlowTorrentsForQueueing(checkIgnoreSlowTorrentsForQueueing->isChecked());
+  pref->setQueueingSystemEnabled(isQueueingSystemEnabled());
+  pref->setMaxActiveDownloads(spinMaxActiveDownloads->value());
+  pref->setMaxActiveUploads(spinMaxActiveUploads->value());
+  pref->setMaxActiveTorrents(spinMaxActiveTorrents->value());
+  pref->setIgnoreSlowTorrentsForQueueing(checkIgnoreSlowTorrentsForQueueing->isChecked());
   // End Queueing system preferences
   // Web UI
-//  pref.setWebUiEnabled(isWebUiEnabled());
+//  pref->setWebUiEnabled(isWebUiEnabled());
 //  if (isWebUiEnabled())
 //  {
-//    pref.setWebUiPort(webUiPort());
-//    pref.setUPnPForWebUIPort(checkWebUIUPnP->isChecked());
-//    pref.setWebUiHttpsEnabled(checkWebUiHttps->isChecked());
+//    pref->setWebUiPort(webUiPort());
+//    pref->setUPnPForWebUIPort(checkWebUIUPnP->isChecked());
+//    pref->setWebUiHttpsEnabled(checkWebUiHttps->isChecked());
 //    if (checkWebUiHttps->isChecked())
 //    {
-//      pref.setWebUiHttpsCertificate(m_sslCert);
-//      pref.setWebUiHttpsKey(m_sslKey);
+//      pref->setWebUiHttpsCertificate(m_sslCert);
+//      pref->setWebUiHttpsKey(m_sslKey);
 //    }
-//    pref.setWebUiUsername(webUiUsername());
+//    pref->setWebUiUsername(webUiUsername());
 //    // FIXME: Check that the password is valid (not empty at least)
-//    pref.setWebUiPassword(webUiPassword());
-//    pref.setWebUiLocalAuthEnabled(!checkBypassLocalAuth->isChecked());
+//    pref->setWebUiPassword(webUiPassword());
+//    pref->setWebUiLocalAuthEnabled(!checkBypassLocalAuth->isChecked());
 //    // DynDNS
-//    pref.setDynDNSEnabled(checkDynDNS->isChecked());
-//    pref.setDynDNSService(comboDNSService->currentIndex());
-//    pref.setDynDomainName(domainNameTxt->text());
-//    pref.setDynDNSUsername(DNSUsernameTxt->text());
-//    pref.setDynDNSPassword(DNSPasswordTxt->text());
+//    pref->setDynDNSEnabled(checkDynDNS->isChecked());
+//    pref->setDynDNSService(comboDNSService->currentIndex());
+//    pref->setDynDomainName(domainNameTxt->text());
+//    pref->setDynDNSUsername(DNSUsernameTxt->text());
+//    pref->setDynDNSPassword(DNSPasswordTxt->text());
 //  }
 //  // End Web UI
   // End preferences
@@ -544,21 +535,21 @@ void options_imp::loadOptions() {
   qreal floatValue;
   QString strValue;
   // General preferences
-  const Preferences pref;
-  setLocale(pref.getLocale());
-  checkAltRowColors->setChecked(pref.useAlternatingRowColors());
-  checkShowSystray->setChecked(pref.systrayIntegration());
-  checkShowSplash->setChecked(!pref.isSlashScreenDisabled());
+  const Preferences* const pref = Preferences::instance();
+  setLocale(pref->getLocale());
+  checkAltRowColors->setChecked(pref->useAlternatingRowColors());
+  checkShowSystray->setChecked(pref->systrayIntegration());
+  checkShowSplash->setChecked(!pref->isSplashScreenDisabled());
   if (checkShowSystray->isChecked()) {
-    checkCloseToSystray->setChecked(pref.closeToTray());
-    checkMinimizeToSysTray->setChecked(pref.minimizeToTray());
-    checkStartMinimized->setChecked(pref.startMinimized());
+    checkCloseToSystray->setChecked(pref->closeToTray());
+    checkMinimizeToSysTray->setChecked(pref->minimizeToTray());
+    checkStartMinimized->setChecked(pref->startMinimized());
   }
-  comboTrayIcon->setCurrentIndex(pref.trayIconStyle());
-  checkProgramExitConfirm->setChecked(pref.confirmOnExit());
-  checkPreventFromSuspend->setChecked(pref.preventFromSuspend());
+  comboTrayIcon->setCurrentIndex(pref->trayIconStyle());
+  checkProgramExitConfirm->setChecked(pref->confirmOnExit());
+  checkPreventFromSuspend->setChecked(pref->preventFromSuspend());
 #ifdef Q_OS_WIN
-  checkStartup->setChecked(pref.Startup());
+  checkStartup->setChecked(pref->Startup());
   // Windows: file association settings
   checkAssociateTorrents->setChecked(Preferences::isTorrentFileAssocSet());
   checkAssociateMagnetLinks->setChecked(Preferences::isMagnetLinkAssocSet());
@@ -566,82 +557,68 @@ void options_imp::loadOptions() {
   // End General preferences
 
   // Video player
-  QString player = pref.getVideoPlayer();
+  QString player = pref->getVideoPlayer();
   lineEdit_videoplayer->setText(player);
 
   // Downloads preferences
-  QString save_path = pref.getSavePath();
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-  save_path.replace("/", "\\");
-#endif
-  textSavePath->setText(save_path);
-  if (pref.isTempPathEnabled()) {
+  textSavePath->setText(fsutils::toNativePath(pref->getSavePath()));
+  if (pref->isTempPathEnabled()) {
     // enable
     checkTempFolder->setChecked(true);
   } else {
     checkTempFolder->setChecked(false);
   }
-  QString temp_path = pref.getTempPath();
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-  temp_path.replace("/", "\\");
-#endif
-  textTempPath->setText(temp_path);
-  checkAppendLabel->setChecked(pref.appendTorrentLabel());
-  checkAppendqB->setChecked(pref.useIncompleteFilesExtension());
-  checkPreallocateAll->setChecked(pref.preAllocateAllFiles());
-  checkAdditionDialog->setChecked(pref.useAdditionDialog());
-  checkAdditionDialogFront->setChecked(pref.AdditionDialogFront());
-  checkStartPaused->setChecked(pref.addTorrentsInPause());
+  textTempPath->setText(fsutils::toNativePath(pref->getTempPath()));
+  checkAppendLabel->setChecked(pref->appendTorrentLabel());
+  checkAppendqB->setChecked(pref->useIncompleteFilesExtension());
+  checkPreallocateAll->setChecked(pref->preAllocateAllFiles());
+  checkAdditionDialog->setChecked(pref->useAdditionDialog());
+  checkAdditionDialogFront->setChecked(pref->additionDialogFront());
+  checkStartPaused->setChecked(pref->addTorrentsInPause());
 
-  strValue = pref.getTorrentExportDir();
+  strValue = fsutils::toNativePath(pref->getTorrentExportDir());
   if (strValue.isEmpty()) {
     // Disable
     checkExportDir->setChecked(false);
   } else {
     // enable
     checkExportDir->setChecked(true);
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-    strValue.replace("/", "\\");
-#endif
     textExportDir->setText(strValue);
   }
 
-  strValue = pref.getFinishedTorrentExportDir();
+  strValue = fsutils::toNativePath(pref->getFinishedTorrentExportDir());
   if (strValue.isEmpty()) {
     // Disable
     checkExportDirFin->setChecked(false);
   } else {
     // enable
     checkExportDirFin->setChecked(true);
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-    strValue.replace("/", "\\");
-#endif
     textExportDirFin->setText(strValue);
   }
-  groupMailNotification->setChecked(pref.isMailNotificationEnabled());
-  dest_email_txt->setText(pref.getMailNotificationEmail());
-  smtp_server_txt->setText(pref.getMailNotificationSMTP());
-  checkSmtpSSL->setChecked(pref.getMailNotificationSMTPSSL());
-  groupMailNotifAuth->setChecked(pref.getMailNotificationSMTPAuth());
-  mailNotifUsername->setText(pref.getMailNotificationSMTPUsername());
-  mailNotifPassword->setText(pref.getMailNotificationSMTPPassword());
-  autoRunBox->setChecked(pref.isAutoRunEnabled());
-  autoRun_txt->setText(pref.getAutoRunProgram());
-  intValue = pref.getActionOnDblClOnTorrentDl();
+  groupMailNotification->setChecked(pref->isMailNotificationEnabled());
+  dest_email_txt->setText(pref->getMailNotificationEmail());
+  smtp_server_txt->setText(pref->getMailNotificationSMTP());
+  checkSmtpSSL->setChecked(pref->getMailNotificationSMTPSSL());
+  groupMailNotifAuth->setChecked(pref->getMailNotificationSMTPAuth());
+  mailNotifUsername->setText(pref->getMailNotificationSMTPUsername());
+  mailNotifPassword->setText(pref->getMailNotificationSMTPPassword());
+  autoRunBox->setChecked(pref->isAutoRunEnabled());
+  autoRun_txt->setText(pref->getAutoRunProgram());
+  intValue = pref->getActionOnDblClOnTorrentDl();
   if (intValue >= actionTorrentDlOnDblClBox->count())
     intValue = 0;
   actionTorrentDlOnDblClBox->setCurrentIndex(intValue);
-  intValue = pref.getActionOnDblClOnTorrentFn();
+  intValue = pref->getActionOnDblClOnTorrentFn();
   if (intValue >= actionTorrentFnOnDblClBox->count())
     intValue = 1;
   actionTorrentFnOnDblClBox->setCurrentIndex(intValue);
   // End Downloads preferences
   // Connection preferences
-  spinPort->setValue(pref.getSessionPort());
-  checkUPnP->setChecked(pref.isUPnPEnabled());
-  checkRandomPort->setChecked(pref.useRandomPort());
+  spinPort->setValue(pref->getSessionPort());
+  checkUPnP->setChecked(pref->isUPnPEnabled());
+  checkRandomPort->setChecked(pref->useRandomPort());
   spinPort->setDisabled(checkRandomPort->isChecked());
-  intValue = pref.getGlobalDownloadLimit();
+  intValue = pref->getGlobalDownloadLimit();
   if (intValue > 0) {
     // Enabled
     checkDownloadLimit->setChecked(true);
@@ -652,7 +629,7 @@ void options_imp::loadOptions() {
     checkDownloadLimit->setChecked(false);
     spinDownloadLimit->setEnabled(false);
   }
-  intValue = pref.getGlobalUploadLimit();
+  intValue = pref->getGlobalUploadLimit();
   if (intValue != -1) {
     // Enabled
     checkUploadLimit->setChecked(true);
@@ -663,19 +640,19 @@ void options_imp::loadOptions() {
     checkUploadLimit->setChecked(false);
     spinUploadLimit->setEnabled(false);
   }
-  spinUploadLimitAlt->setValue(pref.getAltGlobalUploadLimit());
-  spinDownloadLimitAlt->setValue(pref.getAltGlobalDownloadLimit());
+  spinUploadLimitAlt->setValue(pref->getAltGlobalUploadLimit());
+  spinDownloadLimitAlt->setValue(pref->getAltGlobalDownloadLimit());
   // Options
-  checkuTP->setChecked(pref.isuTPEnabled());
-  checkLimituTPConnections->setChecked(pref.isuTPRateLimited());
-  checkLimitTransportOverhead->setChecked(pref.includeOverheadInLimits());
+  checkuTP->setChecked(pref->isuTPEnabled());
+  checkLimituTPConnections->setChecked(pref->isuTPRateLimited());
+  checkLimitTransportOverhead->setChecked(pref->includeOverheadInLimits());
   // Scheduler
-  check_schedule->setChecked(pref.isSchedulerEnabled());
-  schedule_from->setTime(pref.getSchedulerStartTime());
-  schedule_to->setTime(pref.getSchedulerEndTime());
-  schedule_days->setCurrentIndex((int)pref.getSchedulerDays());
+  check_schedule->setChecked(pref->isSchedulerEnabled());
+  schedule_from->setTime(pref->getSchedulerStartTime());
+  schedule_to->setTime(pref->getSchedulerEndTime());
+  schedule_days->setCurrentIndex((int)pref->getSchedulerDays());
 
-  intValue = pref.getProxyType();
+  intValue = pref->getProxyType();
   switch(intValue) {
   case Proxy::SOCKS4:
     comboProxyType->setCurrentIndex(1);
@@ -694,16 +671,16 @@ void options_imp::loadOptions() {
   enableProxy(comboProxyType->currentIndex());
   //if (isProxyEnabled()) {
   // Proxy is enabled, save settings
-  textProxyIP->setText(pref.getProxyIp());
-  spinProxyPort->setValue(pref.getProxyPort());
-  checkProxyPeerConnecs->setChecked(pref.proxyPeerConnections());
-  checkProxyAuth->setChecked(pref.isProxyAuthEnabled());
-  textProxyUsername->setText(pref.getProxyUsername());
-  textProxyPassword->setText(pref.getProxyPassword());
+  textProxyIP->setText(pref->getProxyIp());
+  spinProxyPort->setValue(pref->getProxyPort());
+  checkProxyPeerConnecs->setChecked(pref->proxyPeerConnections());
+  checkProxyAuth->setChecked(pref->isProxyAuthEnabled());
+  textProxyUsername->setText(pref->getProxyUsername());
+  textProxyPassword->setText(pref->getProxyPassword());
   //}
   // End Connection preferences
   // Bittorrent preferences
-  intValue = pref.getMaxConnecs();
+  intValue = pref->getMaxConnecs();
   if (intValue > 0) {
     // enable
     checkMaxConnecs->setChecked(true);
@@ -714,7 +691,7 @@ void options_imp::loadOptions() {
     checkMaxConnecs->setChecked(false);
     spinMaxConnec->setEnabled(false);
   }
-  intValue = pref.getMaxConnecsPerTorrent();
+  intValue = pref->getMaxConnecsPerTorrent();
   if (intValue > 0) {
     // enable
     checkMaxConnecsPerTorrent->setChecked(true);
@@ -725,7 +702,7 @@ void options_imp::loadOptions() {
     checkMaxConnecsPerTorrent->setChecked(false);
     spinMaxConnecPerTorrent->setEnabled(false);
   }
-  intValue = pref.getMaxUploads();
+  intValue = pref->getMaxUploads();
   if (intValue > 0) {
     // enable
     checkMaxUploads->setChecked(true);
@@ -736,7 +713,7 @@ void options_imp::loadOptions() {
     checkMaxUploads->setChecked(false);
     spinMaxUploads->setEnabled(false);
   }
-  intValue = pref.getMaxUploadsPerTorrent();
+  intValue = pref->getMaxUploadsPerTorrent();
   if (intValue > 0) {
     // enable
     checkMaxUploadsPerTorrent->setChecked(true);
@@ -747,17 +724,13 @@ void options_imp::loadOptions() {
     checkMaxUploadsPerTorrent->setChecked(false);
     spinMaxUploadsPerTorrent->setEnabled(false);
   }
-  checkDHT->setChecked(pref.isDHTEnabled());
-  checkDifferentDHTPort->setChecked(!pref.isDHTPortSameAsBT());
-  spinDHTPort->setValue(pref.getDHTPort());
-  checkPeX->setChecked(pref.isPeXEnabled());
-  checkLSD->setChecked(pref.isLSDEnabled());
-  comboEncryption->setCurrentIndex(pref.getEncryptionSetting());
-#if LIBTORRENT_VERSION_NUM >= 1600
-  checkAnonymousMode->setChecked(pref.isAnonymousModeEnabled());
-#endif
+  checkDHT->setChecked(pref->isDHTEnabled());
+  checkPeX->setChecked(pref->isPeXEnabled());
+  checkLSD->setChecked(pref->isLSDEnabled());
+  comboEncryption->setCurrentIndex(pref->getEncryptionSetting());
+  checkAnonymousMode->setChecked(pref->isAnonymousModeEnabled());
   // Ratio limit
-  floatValue = pref.getGlobalMaxRatio();
+  floatValue = pref->getGlobalMaxRatio();
   if (floatValue >= 0.) {
     // Enable
     checkMaxRatio->setChecked(true);
@@ -770,36 +743,36 @@ void options_imp::loadOptions() {
     spinMaxRatio->setEnabled(false);
     comboRatioLimitAct->setEnabled(false);
   }
-  comboRatioLimitAct->setCurrentIndex(pref.getMaxRatioAction());
+  comboRatioLimitAct->setCurrentIndex(pref->getMaxRatioAction());
   // End Bittorrent preferences
   // Misc preferences
   // * IP Filter
-  checkIPFilter->setChecked(pref.isFilteringEnabled());
-  textFilterPath->setText(pref.getFilter());
+  checkIPFilter->setChecked(pref->isFilteringEnabled());
+  textFilterPath->setText(pref->getFilter());
   // End IP Filter
   // Queueing system preferences
-  checkEnableQueueing->setChecked(pref.isQueueingSystemEnabled());
-  spinMaxActiveDownloads->setValue(pref.getMaxActiveDownloads());
-  spinMaxActiveUploads->setValue(pref.getMaxActiveUploads());
-  spinMaxActiveTorrents->setValue(pref.getMaxActiveTorrents());
-  checkIgnoreSlowTorrentsForQueueing->setChecked(pref.ignoreSlowTorrentsForQueueing());
+  checkEnableQueueing->setChecked(pref->isQueueingSystemEnabled());
+  spinMaxActiveDownloads->setValue(pref->getMaxActiveDownloads());
+  spinMaxActiveUploads->setValue(pref->getMaxActiveUploads());
+  spinMaxActiveTorrents->setValue(pref->getMaxActiveTorrents());
+  checkIgnoreSlowTorrentsForQueueing->setChecked(pref->ignoreSlowTorrentsForQueueing());
   // End Queueing system preferences
   // Web UI
-//  checkWebUi->setChecked(pref.isWebUiEnabled());
-//  spinWebUiPort->setValue(pref.getWebUiPort());
-//  checkWebUIUPnP->setChecked(pref.useUPnPForWebUIPort());
-//  checkWebUiHttps->setChecked(pref.isWebUiHttpsEnabled());
-//  setSslCertificate(pref.getWebUiHttpsCertificate(), false);
-//  setSslKey(pref.getWebUiHttpsKey(), false);
-//  textWebUiUsername->setText(pref.getWebUiUsername());
-//  textWebUiPassword->setText(pref.getWebUiPassword());
-//  checkBypassLocalAuth->setChecked(!pref.isWebUiLocalAuthEnabled());
+//  checkWebUi->setChecked(pref->isWebUiEnabled());
+//  spinWebUiPort->setValue(pref->getWebUiPort());
+//  checkWebUIUPnP->setChecked(pref->useUPnPForWebUIPort());
+//  checkWebUiHttps->setChecked(pref->isWebUiHttpsEnabled());
+//  setSslCertificate(pref->getWebUiHttpsCertificate(), false);
+//  setSslKey(pref->getWebUiHttpsKey(), false);
+//  textWebUiUsername->setText(pref->getWebUiUsername());
+//  textWebUiPassword->setText(pref->getWebUiPassword());
+//  checkBypassLocalAuth->setChecked(!pref->isWebUiLocalAuthEnabled());
 //  // Dynamic DNS
-//  checkDynDNS->setChecked(pref.isDynDNSEnabled());
-//  comboDNSService->setCurrentIndex((int)pref.getDynDNSService());
-//  domainNameTxt->setText(pref.getDynDomainName());
-//  DNSUsernameTxt->setText(pref.getDynDNSUsername());
-//  DNSPasswordTxt->setText(pref.getDynDNSPassword());
+//  checkDynDNS->setChecked(pref->isDynDNSEnabled());
+//  comboDNSService->setCurrentIndex((int)pref->getDynDNSService());
+//  domainNameTxt->setText(pref->getDynDomainName());
+//  DNSUsernameTxt->setText(pref->getDynDNSUsername());
+//  DNSPasswordTxt->setText(pref->getDynDNSPassword());
 //  // End Web UI
 }
 
@@ -893,7 +866,7 @@ qreal options_imp::getMaxRatio() const {
 // Return Video player
 QString options_imp::getVideoPlayer() const {
   if (lineEdit_videoplayer->text().trimmed().isEmpty()) {
-    QString player = Preferences().getVideoPlayer();
+    QString player = Preferences::instance()->getVideoPlayer();
     lineEdit_videoplayer->setText(player);
   }
   return lineEdit_videoplayer->text();
@@ -905,11 +878,8 @@ QString options_imp::getVideoPlayer() const {
 // Return Save Path
 QString options_imp::getSavePath() const {
   if (textSavePath->text().trimmed().isEmpty()) {
-    QString save_path = Preferences().getSavePath();
-#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
-    save_path.replace("/", "\\");
-#endif
-    textSavePath->setText(save_path);
+    QString save_path = Preferences::instance()->getSavePath();
+    textSavePath->setText(fsutils::toNativePath(save_path));
   }
   return fsutils::expandPath(textSavePath->text());
 }
@@ -1301,9 +1271,9 @@ void options_imp::on_IpFilterRefreshBtn_clicked() {
   if (m_refreshingIpFilter) return;
   m_refreshingIpFilter = true;
   // Updating program preferences
-  Preferences pref;
-  pref.setFilteringEnabled(true);
-  pref.setFilter(getFilter());
+  Preferences* const pref = Preferences::instance();
+  pref->setFilteringEnabled(true);
+  pref->setFilter(getFilter());
   // Force refresh
   connect(QBtSession::instance(), SIGNAL(ipFilterParsed(bool, int)), SLOT(handleIPFilterParsed(bool, int)));
   setCursor(QCursor(Qt::WaitCursor));

@@ -15,8 +15,8 @@ Xmpp_client * Xmpp_client::instance()
 void Xmpp_client::connectXMPP()
 {
     QHash<QString, QString> account;
-    Preferences prefs;
-    account = prefs.getNodecastAccount();
+    Preferences* const pref = Preferences::instance();
+    account = pref->getNodecastAccount();
 
     if (Xmpp_client::m_instance)
     {
@@ -313,6 +313,7 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     QString file_name = job->fileName();
     QString from_jid = job->jid();
     qint64 file_size = job->fileSize();
+    Preferences* const pref = Preferences::instance();
 
     qDebug() << "Xmpp_client::file_received : " << file_name << " file size : " << file_size;
     qDebug() << "Got transfer request from:" << job->jid();
@@ -365,8 +366,8 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     else if (file_extension != "torrent" && file_size < 1000000)
     {
 
-        file_dir = new QDir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
-        if (!file_dir->exists()) file_dir->mkpath(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
+        file_dir = new QDir(pref->getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
+        if (!file_dir->exists()) file_dir->mkpath(pref->getSavePath() + "/nodecast/spheres/private/" + sphere_dest);
 
          global_mutex::thumbnail_mutex.lock();
 
@@ -375,8 +376,8 @@ void Xmpp_client::file_received (QXmppTransferJob *job)
     else
     {
         // mkdir from user directory to torrents directory to not resend file (bypass filesystemwatcher)
-        file_dir = new QDir(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
-        if (!file_dir->exists()) file_dir->mkpath(prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
+        file_dir = new QDir(pref->getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
+        if (!file_dir->exists()) file_dir->mkpath(pref->getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/" + from);
     }
 
 
@@ -453,7 +454,7 @@ void Xmpp_client::job_finished (QXmppTransferJob *job)
 
         // archive file to torrents directory
         //QDir nodecast_datas;
-        //nodecast_datas = prefs.getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
+        //nodecast_datas = pref->getSavePath() + "/nodecast/spheres/private/" + sphere_dest + "/torrents/";
         //QFile::copy(file_info.absoluteFilePath(), nodecast_datas.absolutePath() + QDir::separator() + file_info.fileName() );
 
 
@@ -542,7 +543,7 @@ void Xmpp_client::connectToRoom(QString room_name)
     if (room_name.isEmpty()) return;
 
     rooms.insert(room_name, muc_manager->addRoom(room_name + "@conference.nodecast.net"));
-    rooms[room_name]->setNickName(Preferences().getNodecastNickname());
+    rooms[room_name]->setNickName(Preferences::instance()->getNodecastNickname());
     rooms[room_name]->join();
     emit emit_room(room_name, rooms[room_name]);
 }

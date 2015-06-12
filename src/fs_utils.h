@@ -43,6 +43,8 @@ class fsutils
   Q_DECLARE_TR_FUNCTIONS(fsutils)
 
 public:
+static QString toNativePath(const QString& path);
+static QString fromNativePath(const QString& path);
 static QString toDisplayPath(const QString& path);
 static QString fileExtension(const QString& filename);
 static QString fileName(const QString& file_path);
@@ -55,6 +57,7 @@ static long long freeDiskSpaceOnPath(QString path);
 static QString branchPath(const QString& file_path, QString* removed = 0);
 static bool sameFileNames(const QString& first, const QString& second);
 static QString expandPath(const QString& path);
+static QString expandPathAbs(const QString& path);
 static bool isValidTorrentFile(const QString& path);
 static bool smartRemoveEmptyFolderTree(const QString& dir_path);
 static bool forceRemove(const QString& file_path);

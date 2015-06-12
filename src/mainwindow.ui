@@ -352,6 +352,7 @@
     </property>
     <addaction name="actionTransferts"/>
     <addaction name="actionXml_console"/>
+    <addaction name="actionNodecast_logs"/>
    </widget>
    <addaction name="menuNodecast"/>
    <addaction name="menuShow"/>
@@ -400,6 +401,11 @@
    </property>
    <property name="text">
     <string>xml console</string>
+   </property>
+  </action>
+  <action name="actionNodecast_logs">
+   <property name="text">
+    <string>nodecast logs</string>
    </property>
   </action>
  </widget>

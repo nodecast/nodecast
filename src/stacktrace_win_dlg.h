@@ -26,17 +26,17 @@ public:
         QString htmlStr;
         QTextStream outStream(&htmlStr);
         outStream << "<p align=center><b><font size=7 color=red>" <<
-            "qBittorrent has crashed" <<
+            "nodecast has crashed" <<
             "</font></b></p>" <<
             "<font size=4>" <<
             "<p>" <<
-            "Please report a bug at <a href=\"http://bugs.qbittorrent.org\">" <<
-            "http://bugs.qbittorrent.org</a>" <<
+            "Please report a bug at <a href=\"http://bugs.nodecast.org\">" <<
+            "http://bugs.nodecast.org</a>" <<
             " and provide the following backtrace." <<
             "</p>" <<
             "</font>" <<
             "<br/><hr><br/>" <<
-            "<p align=center><font size=4>qBittorrent version: " << VERSION <<
+            "<p align=center><font size=4>nodecast version: " << VERSION <<
             "<br/>Libtorrent version: " << LIBTORRENT_VERSION <<
             "<br/>Qt version: " << QT_VERSION_STR <<
             "<br/>Boost version: " << QString::number(BOOST_VERSION / 100000) << '.' <<

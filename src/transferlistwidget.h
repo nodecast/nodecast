@@ -57,6 +57,7 @@ public:
   TorrentModel* getSourceModel() const;
 
 public slots:
+  void forceStartSelectedTorrents();
   void setSelectionLabel(QString label);
   void setRefreshInterval(int t);
   //void setSelectedTorrentsLocation();
@@ -65,7 +66,7 @@ public slots:
   void pauseSelectedTorrents();
   void pauseVisibleTorrents();
   void deleteSelectedTorrents();
-  //void deleteVisibleTorrents();
+  void deleteVisibleTorrents();
   //void increasePrioSelectedTorrents();
   //void decreasePrioSelectedTorrents();
   //void topPrioSelectedTorrents();
@@ -81,10 +82,13 @@ public slots:
   void displayDLHoSMenu(const QPoint&);
   void applyNameFilter(const QString& name);
   void applyStatusFilter(int f);
+  void applyLabelFilterAll();
   void applyLabelFilter(QString label);
   void previewFile(QString filePath);
   void removeLabelFromRows(QString label);
   //void renameSelectedTorrent();
+  void applyTrackerFilterAll();
+  void applyTrackerFilter(const QStringList &hashes);
 
 protected:
   int getRowFromHash(QString hash) const;
@@ -103,7 +107,10 @@ protected slots:
   void toggleSelectedTorrentsSuperSeeding() const;
   void toggleSelectedTorrentsSequentialDownload() const;
   void toggleSelectedFirstLastPiecePrio() const;
-//  void askNewLabelForSelection();
+  //void askNewLabelForSelection();
+
+private:
+    bool openUrl(const QString& _path) const;
 
 signals:
   void currentTorrentChanged(const QTorrentHandle &h);

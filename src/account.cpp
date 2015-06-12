@@ -37,7 +37,9 @@ account::account(QWidget *parent) :
 {
     ui->setupUi(this);
     QHash<QString, QString> account;
-    account = pref.getNodecastAccount();
+    const Preferences* const pref = Preferences::instance();
+
+    account = pref->getNodecastAccount();
 
     ui->lineEdit_login->setText(account.value("login") );
     ui->lineEdit_password->setText(account.value("password"));
@@ -55,14 +57,15 @@ account::~account()
 void account::on_buttonBox_accepted()
 {
     QHash<QString, QString> hash;
+    Preferences* const pref = Preferences::instance();
 
 
     hash["login"] = ui->lineEdit_login->text();
     hash["password"]  = ui->lineEdit_password->text();
     hash["nickname"]  = ui->lineEdit_nickname->text();
 
-    pref.setNodecastAccount(hash);
-    pref.sync();
+    pref->setNodecastAccount(hash);
+    pref->save();
 
     qDebug() << "ACCOUNT : " << hash;
 

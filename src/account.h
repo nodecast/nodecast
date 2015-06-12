@@ -54,7 +54,6 @@ private slots:
     void receive_tchat(QString message);
 
 private:
-    Preferences pref;
     Ui::account *ui;
 };
 

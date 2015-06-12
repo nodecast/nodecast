@@ -30,6 +30,9 @@
 
 #include "widgettorrent.h"
 #include "ui_widgettorrent.h"
+#include "fs_utils.h"
+#include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/session.hpp>
 
 Widgettorrent *last_widget = NULL;
 
@@ -44,11 +47,11 @@ void Widgettorrent::unckeck_widget_selected(Widgettorrent *wt)
 
 int Widgettorrent::populate(Sphere_data a_sphere_data, FlowLayout *parent)
 {
-    Preferences prefs;
+    Preferences* const pref = Preferences::instance();
 
-    qDebug() << "POPULATE : " << prefs.getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory;
+    qDebug() << "POPULATE : " << pref->getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory;
 
-    QDir sphere_dir(prefs.getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory);
+    QDir sphere_dir(pref->getSavePath() + "/nodecast/spheres/private/" + a_sphere_data.directory);
     QFileInfoList file_list = sphere_dir.entryInfoList(QDir::NoDotAndDotDot |QDir::Files);
     //qDebug() << "Widgettorrent::populate FILE LIST : " << file_list.first().fileName();
 
@@ -250,7 +253,7 @@ void Widgettorrent::on_media_doubleClicked()
     }
     */
 
-    QString dir = Preferences().getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
+    QString dir = Preferences::instance()->getSavePath() + "/nodecast/spheres/private/" + sphere_data.directory + "/" + torrent_data.file;
     QString path = QDir::toNativeSeparators(dir);
     qDebug() << "OPEN FILE/DIRECTORY : " << path;
     QDesktopServices::openUrl(QUrl("file:///" + path));
@@ -415,7 +418,9 @@ void Widgettorrent::update_timer_torrent_progress()
 
  //   qDebug() << "PROGRESS : " << m_torrent.progress();;
 
-    float tmp = m_torrent.progress() * 100;
+    libtorrent::torrent_status lastStatus = m_torrent.status(libtorrent::torrent_handle::query_accurate_download_counters);
+
+    float tmp = m_torrent.progress(lastStatus) * 100;
     //qDebug() << "PROGRESS float * 100 : " << m_torrent.name() << " : " << tmp;
 
     int progress = int(tmp + 0.5);
@@ -727,9 +732,9 @@ void Widgettorrent::displayListMenuTorrent() {
         has_pause = true;
       }
     }
-    if (h.has_metadata() && QBtSession::instance()->isFilePreviewPossible(hash) && !has_preview) {
-      has_preview = true;
-    }
+//    if (h.has_metadata() && QBtSession::instance()->isFilePreviewPossible(hash) && !has_preview) {
+//      has_preview = true;
+//    }
     first = false;
   //  if (has_pause && has_start && has_preview && one_not_seed) break;
 
@@ -845,7 +850,7 @@ void Widgettorrent::deleteSelectedTorrents() {
     {
         QTorrentHandle torrent = QBtSession::instance()->getTorrentHandle(torrent_data.hash);
         bool delete_local_files = false;
-        if (Preferences().confirmTorrentDeletion() &&
+        if (Preferences::instance()->confirmTorrentDeletion() &&
                 !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
             return;
         QBtSession::instance()->deleteTorrent(torrent_data.hash, delete_local_files);
@@ -855,7 +860,7 @@ void Widgettorrent::deleteSelectedTorrents() {
     else
     {
         bool delete_local_files = true;
-        if (Preferences().confirmTorrentDeletion() &&
+        if (Preferences::instance()->confirmTorrentDeletion() &&
                 !DeletionConfirmationDlg::askForDeletionConfirmation(delete_local_files, 1, torrent_data.file))
             return;
         qDebug() << "DELETE FILE : " << torrent_data.filepath;

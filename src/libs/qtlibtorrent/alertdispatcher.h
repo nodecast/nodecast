@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt4 and libtorrent.
- * Copyright (C) 2010  Christophe Dumez
+ * Copyright (C) 2014  Ivan Sorokin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,57 +25,56 @@
  * but you are not obligated to do so. If you do not wish to do so, delete this
  * exception statement from your version.
  *
- * Contact : chris@qbittorrent.org
+ * Contact : vanyacpp@gmail.com
  */
 
-#ifndef CREATE_TORRENT_IMP_H
-#define CREATE_TORRENT_IMP_H
+#ifndef ALERTDISPATCHER_H
+#define ALERTDISPATCHER_H
 
-#include "preferences.h"
-#include "ui_createtorrent.h"
+#include <QObject>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QAtomicPointer>
+#include <QSharedPointer>
 
-class TorrentCreatorThread;
+#include <vector>
+#include <memory>
 
-class TorrentCreatorDlg : public QDialog, private Ui::createTorrentDialog{
-  Q_OBJECT
+namespace libtorrent {
+class session;
+class alert;
+}
+
+class QAlertDispatcher : public QObject {
+    Q_OBJECT
+    Q_DISABLE_COPY(QAlertDispatcher)
+
+    struct Tag;
 
 public:
-  TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent = 0);
-  ~TorrentCreatorDlg();
-  int getPieceSize() const;
+    QAlertDispatcher(libtorrent::session *session, QObject* parent);
+    ~QAlertDispatcher();
+
+    void getPendingAlertsNoWait(std::vector<libtorrent::alert*>&);
+    void getPendingAlerts(std::vector<libtorrent::alert*>&, unsigned long time = ULONG_MAX);
 
 signals:
-  void torrent_to_seed(QString path, bool fromScandir);
-
-public slots:
-  void updateProgressBar(int progress);
-  void on_cancelButton_clicked();
-
-protected slots:
-  void on_createButton_clicked();
-  //void on_addFile_button_clicked();
-  //void on_addFolder_button_clicked();
-  void handleCreationFailure(QString msg);
-  void handleCreationSuccess(QString path, QString branch_path);
-  void setInteractionEnabled(bool enabled);
-  void showProgressBar(bool show);
-  void on_checkAutoPieceSize_clicked(bool checked);
-  void updateOptimalPieceSize();
-  void saveTrackerList();
-  void loadTrackerList();
-
-protected:
-  void closeEvent(QCloseEvent *event);
+    void alertsReceived();
 
 private:
-  void saveSettings();
-  void loadSettings();
-  QString m_sphere_dir;
-  QString file_name;
+    static void dispatch(QSharedPointer<Tag>,
+                         std::auto_ptr<libtorrent::alert>);
+    void enqueueToMainThread();
+
+private slots:
+    void deliverSignal();
 
 private:
-  TorrentCreatorThread *creatorThread;
-  QList<int> m_piece_sizes;
+    libtorrent::session *m_session;
+    QWaitCondition alerts_condvar;
+    std::vector<libtorrent::alert*> alerts;
+    QSharedPointer<Tag> current_tag;
+    bool event_posted;
 };
 
-#endif
+#endif // ALERTDISPATCHER_H

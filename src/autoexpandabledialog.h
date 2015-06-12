@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt4 and libtorrent.
- * Copyright (C) 2010  Christophe Dumez
+ * Copyright (C) 2013  Nick Tiskov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,57 +25,36 @@
  * but you are not obligated to do so. If you do not wish to do so, delete this
  * exception statement from your version.
  *
- * Contact : chris@qbittorrent.org
+ * Contact : daymansmail@gmail.com
  */
 
-#ifndef CREATE_TORRENT_IMP_H
-#define CREATE_TORRENT_IMP_H
+#ifndef AUTOEXPANDABLEDIALOG_H
+#define AUTOEXPANDABLEDIALOG_H
 
-#include "preferences.h"
-#include "ui_createtorrent.h"
+#include <QDialog>
+#include <QString>
+#include <QLineEdit>
 
-class TorrentCreatorThread;
+namespace Ui {
+class AutoExpandableDialog;
+}
 
-class TorrentCreatorDlg : public QDialog, private Ui::createTorrentDialog{
+class AutoExpandableDialog : public QDialog {
   Q_OBJECT
-
+  
 public:
-  TorrentCreatorDlg(QString sphere_dir, QString file, QString file_path, QWidget *parent = 0);
-  ~TorrentCreatorDlg();
-  int getPieceSize() const;
+  explicit AutoExpandableDialog(QWidget *parent = 0);
+  ~AutoExpandableDialog();
 
-signals:
-  void torrent_to_seed(QString path, bool fromScandir);
-
-public slots:
-  void updateProgressBar(int progress);
-  void on_cancelButton_clicked();
-
-protected slots:
-  void on_createButton_clicked();
-  //void on_addFile_button_clicked();
-  //void on_addFolder_button_clicked();
-  void handleCreationFailure(QString msg);
-  void handleCreationSuccess(QString path, QString branch_path);
-  void setInteractionEnabled(bool enabled);
-  void showProgressBar(bool show);
-  void on_checkAutoPieceSize_clicked(bool checked);
-  void updateOptimalPieceSize();
-  void saveTrackerList();
-  void loadTrackerList();
+  static QString getText(QWidget *parent, const QString& title,  const QString& label,
+                         QLineEdit::EchoMode mode = QLineEdit::Normal, const QString & text = QString(),
+                         bool * ok = 0, Qt::InputMethodHints inputMethodHints = Qt::ImhNone);
 
 protected:
-  void closeEvent(QCloseEvent *event);
-
+  void showEvent(QShowEvent *e);
+  
 private:
-  void saveSettings();
-  void loadSettings();
-  QString m_sphere_dir;
-  QString file_name;
-
-private:
-  TorrentCreatorThread *creatorThread;
-  QList<int> m_piece_sizes;
+  Ui::AutoExpandableDialog *ui;
 };
 
-#endif
+#endif // AUTOEXPANDABLEDIALOG_H

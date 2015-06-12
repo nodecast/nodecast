@@ -121,7 +121,14 @@ SOURCES +=  main.cpp\
             sphere.cpp \
     room.cpp \
     roominvit.cpp \
-    global_mutex.cpp
+    global_mutex.cpp \
+    logger.cpp \
+    transferlistsortmodel.cpp \
+    torrentpersistentdata.cpp \
+    transferlistfilterswidget.cpp \
+    autoexpandabledialog.cpp \
+    executionlog.cpp \
+    loglistwidget.cpp
 
 HEADERS  += mainwindow.h \
             ico.h \
@@ -132,7 +139,6 @@ HEADERS  += mainwindow.h \
             downloadthread.h \
             scannedfoldersmodel.h \
             iconprovider.h \
-            qinisettings.h \
             openuritorrent.h \
             downloadfromurldlg.h \
             widgettorrent.h \
@@ -153,7 +159,11 @@ HEADERS  += mainwindow.h \
     room.h \
     roominvit.h \
     deletionconfirmationdlg.h \
-    global_mutex.h
+    global_mutex.h \
+    logger.h \
+    autoexpandabledialog.h \
+    executionlog.h \
+    loglistwidget.h
 
 
 win32|macx {
@@ -171,7 +181,9 @@ FORMS += mainwindow.ui \
     account.ui \
     newsphere.ui \
     roominvit.ui \
-    confirmdeletiondlg.ui
+    confirmdeletiondlg.ui \
+    autoexpandabledialog.ui \
+    executionlog.ui
 
 
 # OS specific config

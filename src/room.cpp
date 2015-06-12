@@ -46,7 +46,7 @@ Room::Room(Sphere_data a_sphere_data, QStackedWidget *parent) : sphere_data(a_sp
 
     m_room = NULL;
 
-    my_nickname = Preferences().getNodecastNickname();
+    my_nickname = Preferences::instance()->getNodecastNickname();
 
 
     refresh_users = new QTimer(this);
@@ -135,7 +135,7 @@ void Room::send_invitation(QStringList jids)
     foreach(const QString jid, jids)
     {
         qDebug() << "SEND INVITATION ROOM : " << jid;
-        m_room->sendInvitation(jid, "you have been invited to join this sphere, from " + Preferences().getNodecastLogin());
+        m_room->sendInvitation(jid, "you have been invited to join this sphere, from " + Preferences::instance()->getNodecastLogin());
     }
 }
 

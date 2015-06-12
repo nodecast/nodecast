@@ -73,63 +73,63 @@ public:
 
 public slots:
   void saveAdvancedSettings() {
-    Preferences pref;
+    Preferences* const pref = Preferences::instance();
     // Disk write cache
-    pref.setDiskCacheSize(spin_cache.value());
+    pref->setDiskCacheSize(spin_cache.value());
 #if LIBTORRENT_VERSION_NUM >= 1610
-    pref.setDiskCacheTTL(spin_cache_ttl.value());
+    pref->setDiskCacheTTL(spin_cache_ttl.value());
 #endif
     // Enable OS cache
-    pref.setOsCache(cb_os_cache.isChecked());
+    pref->setOsCache(cb_os_cache.isChecked());
     // Outgoing ports
-    pref.setOutgoingPortsMin(outgoing_ports_min.value());
-    pref.setOutgoingPortsMax(outgoing_ports_max.value());
+    pref->setOutgoingPortsMin(outgoing_ports_min.value());
+    pref->setOutgoingPortsMax(outgoing_ports_max.value());
     // Ignore limits on LAN
-    pref.ignoreLimitsOnLAN(cb_ignore_limits_lan.isChecked());
+    pref->ignoreLimitsOnLAN(cb_ignore_limits_lan.isChecked());
     // Recheck torrents on completion
-    pref.recheckTorrentsOnCompletion(cb_recheck_completed.isChecked());
+    pref->recheckTorrentsOnCompletion(cb_recheck_completed.isChecked());
     // Transfer list refresh interval
-    pref.setRefreshInterval(spin_list_refresh.value());
+    pref->setRefreshInterval(spin_list_refresh.value());
     // Peer resolution
-    pref.resolvePeerCountries(cb_resolve_countries.isChecked());
-    pref.resolvePeerHostNames(cb_resolve_hosts.isChecked());
+    pref->resolvePeerCountries(cb_resolve_countries.isChecked());
+    pref->resolvePeerHostNames(cb_resolve_hosts.isChecked());
     // Max Half-Open connections
-    pref.setMaxHalfOpenConnections(spin_maxhalfopen.value());
+    pref->setMaxHalfOpenConnections(spin_maxhalfopen.value());
     // Super seeding
-    pref.enableSuperSeeding(cb_super_seeding.isChecked());
+    pref->enableSuperSeeding(cb_super_seeding.isChecked());
     // Network interface
     if (combo_iface.currentIndex() == 0) {
       // All interfaces (default)
-      pref.setNetworkInterface(QString::null);
-      pref.setNetworkInterfaceName(QString::null);
+      pref->setNetworkInterface(QString::null);
+      pref->setNetworkInterfaceName(QString::null);
     } else {
-      pref.setNetworkInterface(combo_iface.itemData(combo_iface.currentIndex()).toString());
-      pref.setNetworkInterfaceName(combo_iface.currentText());
+      pref->setNetworkInterface(combo_iface.itemData(combo_iface.currentIndex()).toString());
+      pref->setNetworkInterfaceName(combo_iface.currentText());
     }
     // Listen on IPv6 address
-    pref.setListenIPv6(cb_listen_ipv6.isChecked());
+    pref->setListenIPv6(cb_listen_ipv6.isChecked());
     // Network address
     QHostAddress addr(txt_network_address.text().trimmed());
     if (addr.isNull())
-      pref.setNetworkAddress("");
+      pref->setNetworkAddress("");
     else
-      pref.setNetworkAddress(addr.toString());
+      pref->setNetworkAddress(addr.toString());
     // Program notification
-    pref.useProgramNotification(cb_program_notifications.isChecked());
+    pref->useProgramNotification(cb_program_notifications.isChecked());
     // Tracker
-    pref.setTrackerEnabled(cb_tracker_status.isChecked());
-    pref.setTrackerPort(spin_tracker_port.value());
+    pref->setTrackerEnabled(cb_tracker_status.isChecked());
+    pref->setTrackerPort(spin_tracker_port.value());
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    pref.setUpdateCheckEnabled(cb_update_check.isChecked());
+    pref->setUpdateCheckEnabled(cb_update_check.isChecked());
 #endif
     // Icon theme
 #if defined(Q_WS_X11)
-    pref.useSystemIconTheme(cb_use_icon_theme.isChecked());
+    pref->useSystemIconTheme(cb_use_icon_theme.isChecked());
 #endif
-    pref.setConfirmTorrentDeletion(cb_confirm_torrent_deletion.isChecked());
+    pref->setConfirmTorrentDeletion(cb_confirm_torrent_deletion.isChecked());
     // Tracker exchange
-    pref.setTrackerExchangeEnabled(cb_enable_tracker_ext.isChecked());
-    pref.setAnnounceToAllTrackers(cb_announce_all_trackers.isChecked());
+    pref->setTrackerExchangeEnabled(cb_enable_tracker_ext.isChecked());
+    pref->setAnnounceToAllTrackers(cb_announce_all_trackers.isChecked());
   }
 
 signals:
@@ -179,7 +179,7 @@ private slots:
 
   void loadAdvancedSettings()
   {
-    const Preferences pref;
+    const Preferences* const pref = Preferences::instance();
     // Disk write cache
     spin_cache.setMinimum(0);
     // When build as 32bit binary, set the maximum at less than 2GB to prevent crashes.
@@ -191,59 +191,59 @@ private slots:
     // 4GiB
     spin_cache.setMaximum(4*1024);
 #endif
-    spin_cache.setValue(pref.diskCacheSize());
+    spin_cache.setValue(pref->diskCacheSize());
     updateCacheSpinSuffix(spin_cache.value());
     setRow(DISK_CACHE, tr("Disk write cache size"), &spin_cache);
 #if LIBTORRENT_VERSION_NUM >= 1610
     // Disk cache expiry
     spin_cache_ttl.setMinimum(15);
     spin_cache_ttl.setMaximum(600);
-    spin_cache_ttl.setValue(pref.diskCacheTTL());
+    spin_cache_ttl.setValue(pref->diskCacheTTL());
     spin_cache_ttl.setSuffix(tr(" s", " seconds"));
     setRow(DISK_CACHE_TTL, tr("Disk cache expiry interval"), &spin_cache_ttl);
 #endif
     // Enable OS cache
-    cb_os_cache.setChecked(pref.osCache());
+    cb_os_cache.setChecked(pref->osCache());
     setRow(OS_CACHE, tr("Enable OS cache"), &cb_os_cache);
     // Outgoing port Min
     outgoing_ports_min.setMinimum(0);
     outgoing_ports_min.setMaximum(65535);
-    outgoing_ports_min.setValue(pref.outgoingPortsMin());
+    outgoing_ports_min.setValue(pref->outgoingPortsMin());
     setRow(OUTGOING_PORT_MIN, tr("Outgoing ports (Min) [0: Disabled]"), &outgoing_ports_min);
     // Outgoing port Min
     outgoing_ports_max.setMinimum(0);
     outgoing_ports_max.setMaximum(65535);
-    outgoing_ports_max.setValue(pref.outgoingPortsMax());
+    outgoing_ports_max.setValue(pref->outgoingPortsMax());
     setRow(OUTGOING_PORT_MAX, tr("Outgoing ports (Max) [0: Disabled]"), &outgoing_ports_max);
     // Ignore transfer limits on local network
-    cb_ignore_limits_lan.setChecked(pref.ignoreLimitsOnLAN());
+    cb_ignore_limits_lan.setChecked(pref->ignoreLimitsOnLAN());
     setRow(IGNORE_LIMIT_LAN, tr("Ignore transfer limits on local network"), &cb_ignore_limits_lan);
     // Recheck completed torrents
-    cb_recheck_completed.setChecked(pref.recheckTorrentsOnCompletion());
+    cb_recheck_completed.setChecked(pref->recheckTorrentsOnCompletion());
     setRow(RECHECK_COMPLETED, tr("Recheck torrents on completion"), &cb_recheck_completed);
     // Transfer list refresh interval
     spin_list_refresh.setMinimum(30);
     spin_list_refresh.setMaximum(99999);
-    spin_list_refresh.setValue(pref.getRefreshInterval());
+    spin_list_refresh.setValue(pref->getRefreshInterval());
     spin_list_refresh.setSuffix(tr(" ms", " milliseconds"));
     setRow(LIST_REFRESH, tr("Transfer list refresh interval"), &spin_list_refresh);
     // Resolve Peer countries
-    cb_resolve_countries.setChecked(pref.resolvePeerCountries());
+    cb_resolve_countries.setChecked(pref->resolvePeerCountries());
     setRow(RESOLVE_COUNTRIES, tr("Resolve peer countries (GeoIP)"), &cb_resolve_countries);
     // Resolve peer hosts
-    cb_resolve_hosts.setChecked(pref.resolvePeerHostNames());
+    cb_resolve_hosts.setChecked(pref->resolvePeerHostNames());
     setRow(RESOLVE_HOSTS, tr("Resolve peer host names"), &cb_resolve_hosts);
     // Max Half Open connections
     spin_maxhalfopen.setMinimum(0);
     spin_maxhalfopen.setMaximum(99999);
-    spin_maxhalfopen.setValue(pref.getMaxHalfOpenConnections());
+    spin_maxhalfopen.setValue(pref->getMaxHalfOpenConnections());
     setRow(MAX_HALF_OPEN, tr("Maximum number of half-open connections [0: Disabled]"), &spin_maxhalfopen);
     // Super seeding
-    cb_super_seeding.setChecked(pref.isSuperSeedingEnabled());
+    cb_super_seeding.setChecked(pref->isSuperSeedingEnabled());
     setRow(SUPER_SEEDING, tr("Strict super seeding"), &cb_super_seeding);
     // Network interface
     combo_iface.addItem(tr("Any interface", "i.e. Any network interface"));
-    const QString current_iface = pref.getNetworkInterface();
+    const QString current_iface = pref->getNetworkInterface();
     bool interface_exists = current_iface.isEmpty();
     int i = 1;
     foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
@@ -257,43 +257,43 @@ private slots:
     }
     // Saved interface does not exist, show it anyway
     if (!interface_exists) {
-      combo_iface.addItem(pref.getNetworkInterfaceName(),current_iface);
+      combo_iface.addItem(pref->getNetworkInterfaceName(),current_iface);
       combo_iface.setCurrentIndex(i);
     }
     setRow(NETWORK_IFACE, tr("Network Interface (requires restart)"), &combo_iface);
     // Listen on IPv6 address
-    cb_listen_ipv6.setChecked(pref.getListenIPv6());
+    cb_listen_ipv6.setChecked(pref->getListenIPv6());
     setRow(NETWORK_LISTEN_IPV6, tr("Listen on IPv6 address (requires restart)"), &cb_listen_ipv6);
     // Network address
-    txt_network_address.setText(pref.getNetworkAddress());
+    txt_network_address.setText(pref->getNetworkAddress());
     setRow(NETWORK_ADDRESS, tr("IP Address to report to trackers (requires restart)"), &txt_network_address);
     // Program notifications
-    cb_program_notifications.setChecked(pref.useProgramNotification());
+    cb_program_notifications.setChecked(pref->useProgramNotification());
     setRow(PROGRAM_NOTIFICATIONS, tr("Display program on-screen notifications"), &cb_program_notifications);
     // Tracker State
-    cb_tracker_status.setChecked(pref.isTrackerEnabled());
+    cb_tracker_status.setChecked(pref->isTrackerEnabled());
     setRow(TRACKER_STATUS, tr("Enable embedded tracker"), &cb_tracker_status);
     // Tracker port
     spin_tracker_port.setMinimum(1);
     spin_tracker_port.setMaximum(65535);
-    spin_tracker_port.setValue(pref.getTrackerPort());
+    spin_tracker_port.setValue(pref->getTrackerPort());
     setRow(TRACKER_PORT, tr("Embedded tracker port"), &spin_tracker_port);
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    cb_update_check.setChecked(pref.isUpdateCheckEnabled());
+    cb_update_check.setChecked(pref->isUpdateCheckEnabled());
     setRow(UPDATE_CHECK, tr("Check for software updates"), &cb_update_check);
 #endif
 #if defined(Q_WS_X11)
-    cb_use_icon_theme.setChecked(pref.useSystemIconTheme());
+    cb_use_icon_theme.setChecked(pref->useSystemIconTheme());
     setRow(USE_ICON_THEME, tr("Use system icon theme"), &cb_use_icon_theme);
 #endif
     // Torrent deletion confirmation
-    cb_confirm_torrent_deletion.setChecked(pref.confirmTorrentDeletion());
+    cb_confirm_torrent_deletion.setChecked(pref->confirmTorrentDeletion());
     setRow(CONFIRM_DELETE_TORRENT, tr("Confirm torrent deletion"), &cb_confirm_torrent_deletion);
     // Tracker exchange
-    cb_enable_tracker_ext.setChecked(pref.trackerExchangeEnabled());
+    cb_enable_tracker_ext.setChecked(pref->trackerExchangeEnabled());
     setRow(TRACKER_EXCHANGE, tr("Exchange trackers with other peers"), &cb_enable_tracker_ext);
     // Announce to all trackers
-    cb_announce_all_trackers.setChecked(pref.announceToAllTrackers());
+    cb_announce_all_trackers.setChecked(pref->announceToAllTrackers());
     setRow(ANNOUNCE_ALL_TRACKERS, tr("Always announce to all trackers"), &cb_announce_all_trackers);
   }
 
