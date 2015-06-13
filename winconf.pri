@@ -1,7 +1,7 @@
 # Adapt these paths on Windows
 
 #Point this to the boost include folder
-INCLUDEPATH += $$quote(C:/nodecast/install/boost)
+INCLUDEPATH += $$quote(C:/nodecast/install/boost/include)
 #Point this to the libtorrent include folder
 INCLUDEPATH += $$quote(C:/nodecast/install/libtorrent/include)
 #Point this to the zlib include folder
