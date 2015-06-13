@@ -109,6 +109,14 @@ QString fsutils::fileName(const QString& file_path)
   return file_path.mid(slash_index + 1);
 }
 
+QString fsutils::folderName(const QString& file_path) {
+  QString path = fsutils::fromNativePath(file_path);
+  const int slash_index = path.lastIndexOf("/");
+  if (slash_index == -1)
+    return path;
+  return path.left(slash_index);
+}
+
 bool fsutils::isValidTorrentFile(const QString& torrent_path) {
   try {
     boost::intrusive_ptr<libtorrent::torrent_info> t = new torrent_info(torrent_path.toUtf8().constData());

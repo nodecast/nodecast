@@ -32,7 +32,6 @@
 #define OPTIONS_IMP_H
 
 #include "ui_options.h"
-#include <libtorrent/ip_filter.hpp>
 
 // actions on double-click on torrents
 enum DoubleClickAction {TOGGLE_PAUSE, OPEN_DEST, NO_ACTION};
@@ -75,8 +74,8 @@ private slots:
   void handleScanFolderViewSelectionChanged();
   void on_IpFilterRefreshBtn_clicked();
   void handleIPFilterParsed(bool error, int ruleCount);
-  void on_browseExportDirButton_clicked();
-  void on_browseExportDirFinButton_clicked();
+//  void on_browseExportDirButton_clicked();
+//  void on_browseExportDirFinButton_clicked();
   void on_browseFilterButton_clicked();
   void on_browseSaveDirButton_clicked();
   void on_browseTempDirButton_clicked();
@@ -114,8 +113,8 @@ private:
   bool preAllocateAllFiles() const;
   bool useAdditionDialog() const;
   bool addTorrentsInPause() const;
-  QString getTorrentExportDir() const;
-  QString getFinishedTorrentExportDir() const;
+//  QString getTorrentExportDir() const;
+//  QString getFinishedTorrentExportDir() const;
   QString askForExportDir(const QString& currentExportPath);
   int getActionOnDblClOnTorrentDl() const;
   int getActionOnDblClOnTorrentFn() const;

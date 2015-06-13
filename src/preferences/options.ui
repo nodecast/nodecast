@@ -532,7 +532,7 @@
              <x>0</x>
              <y>0</y>
              <width>498</width>
-             <height>1060</height>
+             <height>528</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -726,6 +726,9 @@
                    <layout class="QHBoxLayout" name="horizontalLayout_16">
                     <item>
                      <widget class="QTableView" name="scanFoldersView">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                         <horstretch>0</horstretch>
@@ -768,6 +771,9 @@
                      <layout class="QVBoxLayout" name="verticalLayout_37">
                       <item>
                        <widget class="QPushButton" name="addScanFolderButton">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Add folder...</string>
                         </property>
@@ -803,101 +809,6 @@
                  </layout>
                 </widget>
                </item>
-               <item>
-                <widget class="QGroupBox" name="checkExportDir">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="title">
-                  <string>Copy .torrent files to:</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_4">
-                  <property name="bottomMargin">
-                   <number>9</number>
-                  </property>
-                  <item row="0" column="0">
-                   <widget class="QLineEdit" name="textExportDir"/>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QToolButton" name="browseExportDirButton">
-                    <property name="minimumSize">
-                     <size>
-                      <width>22</width>
-                      <height>22</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>25</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string notr="true">...</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QGroupBox" name="checkExportDirFin">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::StrongFocus</enum>
-                 </property>
-                 <property name="title">
-                  <string>Copy .torrent files for finished downloads to:</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_13">
-                  <property name="bottomMargin">
-                   <number>9</number>
-                  </property>
-                  <item row="0" column="0">
-                   <widget class="QLineEdit" name="textExportDirFin"/>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QToolButton" name="browseExportDirFinButton">
-                    <property name="minimumSize">
-                     <size>
-                      <width>22</width>
-                      <height>22</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>25</width>
-                      <height>27</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string notr="true">...</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
               </layout>
              </widget>
             </item>
@@ -913,123 +824,6 @@
                </size>
               </property>
              </spacer>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupMailNotification">
-              <property name="title">
-               <string>Email notification upon download completion</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_21">
-               <item>
-                <layout class="QFormLayout" name="formLayout">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_2">
-                   <property name="text">
-                    <string>Destination email:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="dest_email_txt"/>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_3">
-                   <property name="text">
-                    <string>SMTP server:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="smtp_server_txt"/>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QGroupBox" name="groupMailNotifAuth">
-                   <property name="title">
-                    <string>Authentication</string>
-                   </property>
-                   <property name="checkable">
-                    <bool>true</bool>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <layout class="QFormLayout" name="formLayout_2">
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_7">
-                      <property name="text">
-                       <string>Username:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="mailNotifUsername"/>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_8">
-                      <property name="text">
-                       <string>Password:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="mailNotifPassword">
-                      <property name="echoMode">
-                       <enum>QLineEdit::Password</enum>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QCheckBox" name="checkSmtpSSL">
-                   <property name="text">
-                    <string>This server requires a secure connection (SSL)</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="autoRunBox">
-              <property name="title">
-               <string>Run an external program on torrent completion</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_19">
-               <item>
-                <widget class="QLineEdit" name="autoRun_txt"/>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>The following parameters are supported:
-&lt;ul&gt;
-&lt;li&gt;%f: Torrent path&lt;/li&gt;
-&lt;li&gt;%n: Torrent name&lt;/li&gt;
-&lt;/ul&gt;</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::RichText</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
             </item>
            </layout>
           </widget>
@@ -1049,7 +843,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>498</width>
+             <width>470</width>
              <height>623</height>
             </rect>
            </property>
@@ -1533,7 +1327,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>498</width>
+             <width>350</width>
              <height>474</height>
             </rect>
            </property>
@@ -2362,8 +2156,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>498</width>
-             <height>394</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>
