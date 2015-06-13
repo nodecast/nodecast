@@ -145,7 +145,7 @@ void Preferences::save()
     // between deleting the file and recreating it. This is a safety measure.
     // Write everything to qBittorrent_new.ini/qBittorrent_new.conf and if it succeeds
     // replace qBittorrent_new.ini/qBittorrent.conf with it.
-    QIniSettings *settings = new QIniSettings("pcode", "nodecast");
+    QIniSettings *settings = new QIniSettings("pcode", "nodecast_new");
 #else
     QIniSettings *settings = new QIniSettings;
 #endif
