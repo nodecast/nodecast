@@ -412,7 +412,14 @@ QString Preferences::getSavePath() const
 
 void Preferences::setSavePath(const QString &save_path)
 {
-    setValue("Preferences/Downloads/SavePath", fsutils::fromNativePath(save_path));
+    QString tmp_save_path = save_path;
+    if (tmp_save_path.isEmpty())
+    {
+        QDir home = QDir::home();
+        tmp_save_path = home.absolutePath();
+    }
+    fsutils::QDesktopInitServicesDownloadLocation(tmp_save_path);
+    setValue("Preferences/Downloads/SavePath", fsutils::fromNativePath(tmp_save_path));
 }
 
 bool Preferences::isTempPathEnabled() const

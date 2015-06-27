@@ -527,6 +527,11 @@ QString fsutils::QDesktopInitServicesDownloadLocation(const QString &save_path)
 
 
 QString fsutils::QDesktopServicesDownloadLocation() {
+
+    QDir home = QDir::home();
+    return fsutils::QDesktopInitServicesDownloadLocation(home.absolutePath());
+
+
 #if defined(Q_OS_WIN) || defined(Q_OS_OS2)
   // as long as it stays WinXP like we do the same on OS/2
   // TODO: Use IKnownFolderManager to get path of FOLDERID_Downloads
@@ -584,8 +589,7 @@ QString fsutils::QDesktopServicesDownloadLocation() {
   // Fallback
   //return QDir::home().absoluteFilePath(tr("Downloads"));
 
-  QDir home = QDir::home();
-  return fsutils::QDesktopInitServicesDownloadLocation(home.absolutePath());
+
 }
 
 QString fsutils::searchEngineLocation() {

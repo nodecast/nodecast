@@ -1064,7 +1064,7 @@ void options_imp::setLocale(const QString &localeStr) {
   if (index < 0) {
     // Unrecognized, use US English
     index = comboI18n->findData(QLocale("en").name(), Qt::UserRole);
-    Q_ASSERT(index >= 0);
+    //Q_ASSERT(index >= 0);
   }
   comboI18n->setCurrentIndex(index);
 }
