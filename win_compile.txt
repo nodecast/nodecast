@@ -1,0 +1,32 @@
+
+# OPENSSL
+perl Configure VC-WIN64A threads shared zlib -IC:\nodecast\install\zlib\include -LC:\nodecast\install\zlib\lib --prefix=C:\nodecast\install\openssl
+
+
+#BOOST
+.\b2.exe --toolset=msvc architecture=x86 address-model=64 --prefix=C:\nodecast\install\bjam link=shared runtime-link=shared variant=release debug-symbols=off warnings=off warnings-as-errors=off inlining=full optimization=speed "cflags=/O2 /GL /Gy /favor:blend" "linkflags=/NOLOGO /OPT:REF /OPT:ICF=5 /LTCG" install
+
+
+SET "PATH=C:\nodecast\install\bjam\bin;%PATH%"
+
+
+bjam -j2 -q --toolset=msvc --layout=system --prefix=C:\nodecast\install\boost link=shared runtime-link=shared variant=release debug-symbols=off threading=multi address-model=64 host-os=windows target-os=windows embed-manifest=on architecture=x86 warnings=off warnings-as-errors=off inlining=full optimization=speed "cflags=/O2 /GL /favor:blend" "linkflags=/NOLOGO /OPT:REF /OPT:ICF=5 /LTCG" install
+
+XCOPY /Y /Q /I .\*.jam C:\nodecast\install\boost\
+
+COPY /Y Jamroot C:\nodecast\install\boost\
+
+#LIBTORRENT
+
+SET "PATH=C:\nodecast\install\bjam\bin;%PATH%"
+
+bjam -j2 -q --toolset=msvc --prefix=C:\nodecast\install\libtorrent boost=system boost-link=shared link=shared runtime-link=shared variant=release debug-symbols=off resolve-countries=on full-stats=on export-extra=off ipv6=on dht=on character-set=unicode geoip=static encryption=openssl windows-version=vista threading=multi address-model=64 host-os=windows target-os=windows embed-manifest=on architecture=x86 warnings=off warnings-as-errors=off inlining=full optimization=speed "cflags=/O2 /GL /favor:blend" "linkflags=/NOLOGO /OPT:REF /OPT:ICF=5 /LTCG" "include=C:\nodecast\install\openssl\include" "include=C:\nodecast\install\boost\include" "library-path=C:\nodecast\install\openssl\lib" "library-path=C:\nodecast\install\boost\lib" "define=BOOST_ALL_NO_LIB" install
+
+
+
+
+bjam -j2 -q --toolset=msvc --prefix=T:\install\libtorrent boost=system boost-link=shared link=shared runtime-link=shared variant=release debug-symbols=off resolve-countries=on full-stats=on export-extra=off ipv6=on dht-support=on character-set=unicode geoip=static encryption=openssl windows-version=vista threading=multi address-model=64 host-os=windows target-os=windows embed-manifest=on architecture=x86 warnings=off warnings-as-errors=off inlining=full optimization=speed "cflags=/O2 /GL /favor:blend" "linkflags=/NOLOGO /OPT:REF /OPT:ICF=5 /LTCG" "include=T:\install\OpenSSL\include" "include=T:\install\Boost\include" "library-path=T:\install\OpenSSL\lib" "library-path=T:\install\Boost\lib" "define=BOOST_ALL_NO_LIB" install
+
+
+bjam -j2 -q --toolset=msvc --prefix=T:\install\libtorrent boost=system boost-link=shared link=shared runtime-link=shared variant=release debug-symbols=off resolve-countries=on full-stats=on export-extra=off ipv6=on dht-support=on character-set=unicode geoip=static encryption=openssl windows-version=vista threading=multi address-model=64 host-os=windows target-os=windows embed-manifest=on architecture=x86 warnings=off warnings-as-errors=off inlining=full optimization=speed "cflags=/O2 /GL /favor:blend" "linkflags=/NOLOGO /OPT:REF /OPT:ICF=5 /LTCG" "include=T:\install\OpenSSL\include" "include=T:\install\Boost\include" "library-path=T:\install\OpenSSL\lib" "library-path=T:\install\Boost\lib" "define=BOOST_ALL_NO_LIB" install
+
